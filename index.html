@@ -190,7 +190,6 @@
 
     <div class="game-container" id="gameContainer">
         <div class="image-wrapper" id="imageWrapper">
-            <!-- Modification ici : 5.png -> 5.jpg -->
             <img id="trackerImage" src="5.jpg" alt="État actuel du Chlorévisiomètre">
             <div id="burgerLoader" class="burger-loader">🍔</div>
         </div>
@@ -261,10 +260,9 @@
         </div>
     </div>
 
-    <!-- MOTEUR DU JEU - FIREBASE (MULTIJOUEUR) -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+        import { getDatabase, ref, set, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyDaHguuxN1Jq8c4YZuk0XEzm1E-tHTBzAY",
@@ -287,7 +285,7 @@
             nbPetitesSurprises: 0,
             nbGrandesSurprises: 0,
             modeJeu: 'attente',
-            timestampMode: Date.now()
+            timestampMode: null
         };
 
         let localPieces = 0; 
@@ -302,7 +300,6 @@
         const repasDisplay = document.getElementById("repasDisplay");
         const panelPause = document.getElementById("panelPause");
         const titrePanelPause = document.getElementById("titrePanelPause");
-        
         const btnStart = document.getElementById("btnStart");
         const btnPause = document.getElementById("btnPause");
         const btnStop = document.getElementById("btnStop");
@@ -313,7 +310,7 @@
         const coeursJaunesDispos = document.getElementById("coeursJaunesDispos");
 
         window.ouvrirModal = function(id) { document.getElementById(id).style.display = "flex"; }
-        window.fermerModal = function(id) { document.getElementById(id).style.display = "none"; }
+        window.fermerModal = function(id) { document.getElementById(id).style.none = "none"; document.getElementById(id).style.display = "none";}
         window.afficherAlerte = function(titre, texte) {
             document.getElementById("titreAlerte").innerText = titre;
             document.getElementById("texteAlerte").innerText = texte;
@@ -342,13 +339,11 @@
         });
 
         function mettreAJourInterface() {
-            // Modification ici : ".png" -> ".jpg"
             imageElement.src = gameState.pvActuels + ".jpg"; 
             let basePetite = (gameState.pvActuels >= 5) ? 1 : 0;
             let baseGrande = (gameState.pvActuels >= 7) ? 1 : 0;
             document.getElementById("txtPetites").innerText = gameState.nbPetitesSurprises + basePetite;
             document.getElementById("txtGrandes").innerText = gameState.nbGrandesSurprises + baseGrande;
-            
             repasDisplay.innerText = "🍔 Repas : " + gameState.repasRestants; 
 
             if (gameState.modeJeu === 'attente') {
@@ -359,25 +354,28 @@
             } else {
                 messageFin.style.display = "none";
                 btnStart.disabled = true; btnStop.disabled = false;
-                
                 if (gameState.modeJeu === 'travail') {
                     btnPause.disabled = false; btnMinus.disabled = false; btnBoutique.disabled = false; btnPlus.disabled = false;
                     panelPause.style.display = "none"; imageElement.classList.remove("en-pause"); burgerLoader.style.display = "none";
-                } else if (gameState.modeJeu === 'pause_cafe') {
+                } else {
                     btnPause.disabled = true; btnMinus.disabled = true; btnBoutique.disabled = true; btnPlus.disabled = true;
-                    titrePanelPause.innerText = "🪙 EN PAUSE"; titrePanelPause.style.color = "#a855f7"; panelPause.style.borderColor = "#a855f7"; decomptePause.style.color = "#a855f7";
-                    panelPause.style.display = "block"; imageElement.classList.add("en-pause"); burgerLoader.style.display = "none";
-                } else if (gameState.modeJeu === 'pause_repas') {
-                    btnPause.disabled = true; btnMinus.disabled = true; btnBoutique.disabled = true; btnPlus.disabled = true;
-                    titrePanelPause.innerText = "🍔 BON APPÉTIT"; titrePanelPause.style.color = "#f97316"; panelPause.style.borderColor = "#f97316"; decomptePause.style.color = "#f97316";
-                    panelPause.style.display = "block"; imageElement.classList.add("en-pause"); burgerLoader.style.display = "block";
+                    panelPause.style.display = "block"; imageElement.classList.add("en-pause");
+                    if (gameState.modeJeu === 'pause_cafe') {
+                        titrePanelPause.innerText = "🪙 EN PAUSE"; titrePanelPause.style.color = "#a855f7"; burgerLoader.style.display = "none";
+                    } else {
+                        titrePanelPause.innerText = "🍔 BON APPÉTIT"; titrePanelPause.style.color = "#f97316"; burgerLoader.style.display = "block";
+                    }
                 }
             }
         }
 
         function tickLocal() {
-            if (gameState.modeJeu === 'attente') return;
+            if (gameState.modeJeu === 'attente' || !gameState.timestampMode) {
+                if (gameState.modeJeu !== 'attente') chronoAffichage.innerText = "...";
+                return;
+            }
 
+            // Calcul basé sur l'heure serveur
             let elapsedSeconds = Math.floor((Date.now() - gameState.timestampMode) / 1000);
 
             if (gameState.modeJeu === 'travail') {
@@ -390,116 +388,75 @@
                 let spentPieces = Math.floor(elapsedSeconds / 2); 
                 localPieces = gameState.piecesBase - spentPieces;
                 let tempsRestant = (gameState.piecesBase * 2) - elapsedSeconds;
-
                 if (tempsRestant <= 0 && !isTransitioning) {
-                    isTransitioning = true;
-                    window.afficherAlerte("⏱️ Fin de la pause", "Tu n'as plus de pièces. Au travail !");
-                    sortirDePause(0); 
+                    isTransitioning = true; sortirDePause(0);
                     setTimeout(() => isTransitioning = false, 2000);
-                } else if(tempsRestant > 0) {
+                } else {
                     decomptePause.innerText = formaterTemps(tempsRestant);
                     piecesDisplay.innerText = "🪙 Pièces : " + localPieces;
                 }
             }
             else if (gameState.modeJeu === 'pause_repas') {
-                localPieces = gameState.piecesBase;
                 let tempsRestant = 1800 - elapsedSeconds; 
-
                 if (tempsRestant <= 0 && !isTransitioning) {
-                    isTransitioning = true;
-                    window.afficherAlerte("⏱️ Fin du repas", "Tes 30 minutes sont écoulées. Au travail !");
-                    sortirDePause(localPieces);
+                    isTransitioning = true; sortirDePause(gameState.piecesBase);
                     setTimeout(() => isTransitioning = false, 2000);
-                } else if(tempsRestant > 0) {
+                } else {
                     decomptePause.innerText = formaterTemps(tempsRestant);
                 }
             }
         }
 
-        intervalGlobal = setInterval(tickLocal, 200);
+        intervalGlobal = setInterval(tickLocal, 500);
+
+        btnStart.addEventListener("click", () => {
+            sendUpdate({
+                pvActuels: 5, piecesBase: 0, repasRestants: 2, nbPetitesSurprises: 0, nbGrandesSurprises: 0, modeJeu: 'travail', timestampMode: serverTimestamp()
+            });
+        });
+
+        btnStop.addEventListener("click", () => sendUpdate({ modeJeu: 'attente', timestampMode: null }));
 
         btnMinus.addEventListener("click", () => {
             if (gameState.modeJeu !== 'travail') return;
-            if (gameState.pvActuels > 5) {
-                sendUpdate({ pvActuels: 5 });
-            } 
-            else if (gameState.pvActuels > 1) {
-                sendUpdate({ pvActuels: gameState.pvActuels - 1 });
-            }
+            if (gameState.pvActuels > 5) sendUpdate({ pvActuels: 5 });
+            else if (gameState.pvActuels > 1) sendUpdate({ pvActuels: gameState.pvActuels - 1 });
         });
 
         btnPlus.addEventListener("click", () => {
             if (gameState.modeJeu !== 'travail') return;
-            let newPv = gameState.pvActuels + 2;
-            if (newPv > 10) newPv = 10;
+            let newPv = Math.min(10, gameState.pvActuels + 2);
             sendUpdate({ pvActuels: newPv });
-        });
-
-        btnStart.addEventListener("click", () => {
-            sendUpdate({
-                pvActuels: 5, piecesBase: 0, repasRestants: 2, nbPetitesSurprises: 0, nbGrandesSurprises: 0, modeJeu: 'travail', timestampMode: Date.now()
-            });
-        });
-
-        btnStop.addEventListener("click", () => {
-            sendUpdate({ modeJeu: 'attente' });
         });
 
         btnPause.addEventListener("click", () => window.ouvrirModal("modalChoixPause"));
 
-        let reglesPauseLues = false; 
         document.getElementById("btnChoixCafe").addEventListener("click", () => {
-            if (localPieces < 1) { window.afficherAlerte("🪙 Attention", "Tu n'as pas assez de pièces pour une pause !"); return; }
+            if (localPieces < 1) return;
             window.fermerModal("modalChoixPause");
-            if (!reglesPauseLues) window.ouvrirModal("modalReglesPause"); else demarrerPauseCafe();
-        });
-
-        document.getElementById("btnAccepterPause").addEventListener("click", () => {
-            reglesPauseLues = true; window.fermerModal("modalReglesPause"); demarrerPauseCafe();
+            sendUpdate({ modeJeu: 'pause_cafe', piecesBase: localPieces, timestampMode: serverTimestamp() });
         });
 
         document.getElementById("btnChoixRepas").addEventListener("click", () => {
-            if (gameState.repasRestants <= 0) { window.afficherAlerte("🍔 Oops", "Plus de repas dispo !"); return; }
+            if (gameState.repasRestants <= 0) return;
             window.fermerModal("modalChoixPause");
-            demarrerPauseRepas();
+            sendUpdate({ modeJeu: 'pause_repas', piecesBase: localPieces, repasRestants: gameState.repasRestants - 1, timestampMode: serverTimestamp() });
         });
 
-        function demarrerPauseCafe() {
-            sendUpdate({ modeJeu: 'pause_cafe', piecesBase: localPieces, timestampMode: Date.now() });
-        }
-
-        function demarrerPauseRepas() {
-            sendUpdate({ modeJeu: 'pause_repas', piecesBase: localPieces, repasRestants: gameState.repasRestants - 1, timestampMode: Date.now() });
-        }
-
-        function sortirDePause(piecesForcees = localPieces) {
-            sendUpdate({ modeJeu: 'travail', piecesBase: piecesForcees, timestampMode: Date.now() });
-        }
-
+        function sortirDePause(p) { sendUpdate({ modeJeu: 'travail', piecesBase: p, timestampMode: serverTimestamp() }); }
         document.getElementById("btnStopperPause").addEventListener("click", () => sortirDePause(localPieces));
 
-        function calculerCoeurs() { return Math.max(0, gameState.pvActuels - 5); }
-
         btnBoutique.addEventListener("click", () => {
-            if (gameState.modeJeu !== 'travail') return;
-            coeursJaunesDispos.innerText = calculerCoeurs();
+            coeursJaunesDispos.innerText = Math.max(0, gameState.pvActuels - 5);
             window.ouvrirModal("modalBoutique");
         });
 
         document.getElementById("btnAchatPetite").addEventListener("click", () => {
-            if (calculerCoeurs() >= 2) {
-                sendUpdate({ pvActuels: gameState.pvActuels - 2, nbPetitesSurprises: gameState.nbPetitesSurprises + 1 });
-                window.afficherAlerte("🎉 Bravo", "Petite surprise achetée avec succès !");
-                coeursJaunesDispos.innerText = calculerCoeurs() - 2;
-            } else window.afficherAlerte("💛 Oops", "Pas assez de cœurs jaunes ! (Il t'en faut 2)");
+            if (gameState.pvActuels - 5 >= 2) sendUpdate({ pvActuels: gameState.pvActuels - 2, nbPetitesSurprises: gameState.nbPetitesSurprises + 1 });
         });
 
         document.getElementById("btnAchatGrande").addEventListener("click", () => {
-            if (calculerCoeurs() >= 3) {
-                sendUpdate({ pvActuels: gameState.pvActuels - 3, nbGrandesSurprises: gameState.nbGrandesSurprises + 1 });
-                window.afficherAlerte("🎊 Incroyable", "Grande surprise achetée avec succès !");
-                coeursJaunesDispos.innerText = calculerCoeurs() - 3;
-            } else window.afficherAlerte("💛 Oops", "Pas assez de cœurs jaunes ! (Il t'en faut 3)");
+            if (gameState.pvActuels - 5 >= 3) sendUpdate({ pvActuels: gameState.pvActuels - 3, nbGrandesSurprises: gameState.nbGrandesSurprises + 1 });
         });
 
     </script>
