@@ -190,7 +190,8 @@
 
     <div class="game-container" id="gameContainer">
         <div class="image-wrapper" id="imageWrapper">
-            <img id="trackerImage" src="5.png" alt="État actuel du Chlorévisiomètre">
+            <!-- Modification ici : 5.png -> 5.jpg -->
+            <img id="trackerImage" src="5.jpg" alt="État actuel du Chlorévisiomètre">
             <div id="burgerLoader" class="burger-loader">🍔</div>
         </div>
         
@@ -268,7 +269,6 @@
         const firebaseConfig = {
             apiKey: "AIzaSyDaHguuxN1Jq8c4YZuk0XEzm1E-tHTBzAY",
             authDomain: "chlorevisiometre.firebaseapp.com",
-            // Si le multijoueur ne marche toujours pas après avoir rafraîchi, vérifie cette ligne :
             databaseURL: "https://chlorevisiometre-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "chlorevisiometre",
             storageBucket: "chlorevisiometre.firebasestorage.app",
@@ -342,7 +342,8 @@
         });
 
         function mettreAJourInterface() {
-            imageElement.src = gameState.pvActuels + ".png"; 
+            // Modification ici : ".png" -> ".jpg"
+            imageElement.src = gameState.pvActuels + ".jpg"; 
             let basePetite = (gameState.pvActuels >= 5) ? 1 : 0;
             let baseGrande = (gameState.pvActuels >= 7) ? 1 : 0;
             document.getElementById("txtPetites").innerText = gameState.nbPetitesSurprises + basePetite;
@@ -417,15 +418,11 @@
 
         intervalGlobal = setInterval(tickLocal, 200);
 
-        // --- NOUVELLES RÈGLES DES PV ---
         btnMinus.addEventListener("click", () => {
             if (gameState.modeJeu !== 'travail') return;
-            
-            // Si on est dans la zone bonus (plus de 5), on retombe à 5
             if (gameState.pvActuels > 5) {
                 sendUpdate({ pvActuels: 5 });
             } 
-            // Sinon on perd juste 1 PV
             else if (gameState.pvActuels > 1) {
                 sendUpdate({ pvActuels: gameState.pvActuels - 1 });
             }
