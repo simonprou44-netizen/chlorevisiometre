@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chlorévisiomètre Pro</title>
+    <title>Chlorévisiomètre Pro + Boutique</title>
     <style>
         body {
             display: flex;
@@ -231,10 +231,16 @@
     <div id="modalBoutique" class="modal-overlay">
         <div class="modal-content boutique">
             <h3 style="color: #ec4899;">🛒 Boutique</h3>
-            <p><strong>Règles :</strong> Vos points bonus (PV de 6 à 10) sont des cœurs jaunes. Dépensez-les ici pour acheter des surprises !</p>
-            <p style="color: #fbbf24; font-weight: bold; font-size: 1.1em;">💛 Cœurs dispos : <span id="coeursJaunesDispos">0</span></p>
-            <button id="btnAchatPetite" class="menu-btn" style="background:#ec4899;">🎁 Acheter Petite Surprise<br><small style="font-weight: normal;">(Coûte 2 cœurs jaunes)</small></button>
-            <button id="btnAchatGrande" class="menu-btn" style="background:#ec4899;">🎀 Acheter Grande Surprise<br><small style="font-weight: normal;">(Coûte 3 cœurs jaunes)</small></button>
+            <p>Dépense tes cœurs bonus (PV 6-10) 💛 OU tes pièces accumulées 🪙 !</p>
+            
+            <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; margin-bottom: 15px;">
+                <span style="color: #fbbf24;">💛 Cœurs dispos : <span id="coeursJaunesDispos">0</span></span><br>
+                <span style="color: #fbbf24;">🪙 Pièces dispos : <span id="piecesBoutiqueDispos">0</span></span>
+            </div>
+
+            <button id="btnAchatPetite" class="menu-btn" style="background:#ec4899;">🎁 Petite Surprise<br><small style="font-weight: normal;">(2 cœurs 💛 OU 300 pièces 🪙)</small></button>
+            <button id="btnAchatGrande" class="menu-btn" style="background:#ec4899;">🎀 Grande Surprise<br><small style="font-weight: normal;">(3 cœurs 💛 OU 600 pièces 🪙)</small></button>
+            
             <button onclick="fermerModal('modalBoutique')" class="menu-btn" style="background:#6b7280; margin-top:20px;">Fermer</button>
         </div>
     </div>
@@ -280,10 +286,8 @@
         let localPieces = 0; 
         let isTransitioning = false; 
 
-        // --- CALCUL DU DÉCALAGE HORLOGE ---
         onValue(offsetRef, (snap) => {
             serverTimeOffset = snap.val() || 0;
-            console.log("Décalage horloge calculé :", serverTimeOffset, "ms");
         });
 
         const imageElement = document.getElementById("trackerImage");
@@ -302,6 +306,7 @@
         const btnPlus = document.getElementById("btnPlus");
         const messageFin = document.getElementById("messageFin");
         const coeursJaunesDispos = document.getElementById("coeursJaunesDispos");
+        const piecesBoutiqueDispos = document.getElementById("piecesBoutiqueDispos");
 
         window.ouvrirModal = function(id) { document.getElementById(id).style.display = "flex"; }
         window.fermerModal = function(id) { document.getElementById(id).style.display = "none"; }
@@ -369,8 +374,6 @@
                 return;
             }
 
-            // --- LA MAGIE EST ICI ---
-            // Date.now() + serverTimeOffset = L'heure exacte de Google
             let nowCorrected = Date.now() + serverTimeOffset;
             let elapsedSeconds = Math.floor((nowCorrected - gameState.timestampMode) / 1000);
 
@@ -441,17 +444,47 @@
         function sortirDePause(p) { sendUpdate({ modeJeu: 'travail', piecesBase: p, timestampMode: serverTimestamp() }); }
         document.getElementById("btnStopperPause").addEventListener("click", () => sortirDePause(localPieces));
 
+        // --- GESTION BOUTIQUE ---
         btnBoutique.addEventListener("click", () => {
             coeursJaunesDispos.innerText = Math.max(0, gameState.pvActuels - 5);
+            piecesBoutiqueDispos.innerText = localPieces;
             window.ouvrirModal("modalBoutique");
         });
 
         document.getElementById("btnAchatPetite").addEventListener("click", () => {
-            if (gameState.pvActuels - 5 >= 2) sendUpdate({ pvActuels: gameState.pvActuels - 2, nbPetitesSurprises: gameState.nbPetitesSurprises + 1 });
+            let coeurs = Math.max(0, gameState.pvActuels - 5);
+            // Paye avec des cœurs d'abord
+            if (coeurs >= 2) {
+                sendUpdate({ pvActuels: gameState.pvActuels - 2, nbPetitesSurprises: gameState.nbPetitesSurprises + 1 });
+                window.afficherAlerte("🎁 Succès", "Petite surprise achetée avec 2 cœurs !");
+            } 
+            // Sinon paye avec les pièces
+            else if (localPieces >= 300) {
+                sendUpdate({ 
+                    piecesBase: localPieces - 300, 
+                    nbPetitesSurprises: gameState.nbPetitesSurprises + 1,
+                    timestampMode: serverTimestamp() // Reset chrono pour recalculer les pièces depuis la nouvelle base
+                });
+                window.afficherAlerte("🎁 Succès", "Petite surprise achetée avec 300 pièces !");
+            } 
+            else window.afficherAlerte("❌ Erreur", "Pas assez de cœurs (2) ni de pièces (300) !");
         });
 
         document.getElementById("btnAchatGrande").addEventListener("click", () => {
-            if (gameState.pvActuels - 5 >= 3) sendUpdate({ pvActuels: gameState.pvActuels - 3, nbGrandesSurprises: gameState.nbGrandesSurprises + 1 });
+            let coeurs = Math.max(0, gameState.pvActuels - 5);
+            if (coeurs >= 3) {
+                sendUpdate({ pvActuels: gameState.pvActuels - 3, nbGrandesSurprises: gameState.nbGrandesSurprises + 1 });
+                window.afficherAlerte("🎀 Succès", "Grande surprise achetée avec 3 cœurs !");
+            } 
+            else if (localPieces >= 600) {
+                sendUpdate({ 
+                    piecesBase: localPieces - 600, 
+                    nbGrandesSurprises: gameState.nbGrandesSurprises + 1,
+                    timestampMode: serverTimestamp()
+                });
+                window.afficherAlerte("🎀 Succès", "Grande surprise achetée avec 600 pièces !");
+            } 
+            else window.afficherAlerte("❌ Erreur", "Pas assez de cœurs (3) ni de pièces (600) !");
         });
 
     </script>
