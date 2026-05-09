@@ -26,7 +26,7 @@
             flex-direction: column;
             align-items: center;
             gap: 10px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             background: rgba(255, 255, 255, 0.1);
             padding: 15px 20px;
             border-radius: 10px;
@@ -43,13 +43,13 @@
 
         .header-buttons {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             width: 100%;
         }
 
         button {
-            padding: 12px 15px;
-            font-size: 1em;
+            padding: 12px 10px;
+            font-size: 0.95em;
             font-weight: bold;
             border: none;
             border-radius: 8px;
@@ -59,65 +59,110 @@
             touch-action: manipulation; 
         }
 
-        button:active {
-            transform: scale(0.95);
-        }
+        button:active { transform: scale(0.95); }
+        button:disabled { background-color: #6b7280 !important; opacity: 0.5; cursor: not-allowed; transform: none; }
 
-        #btnStart { background-color: #3b82f6; color: white; }
+        #btnStart { background-color: #10b981; color: white; } 
+        #btnPause { background-color: #a855f7; color: white; } 
         #btnStop { background-color: #ef4444; color: white; }
-        button:disabled { background-color: #6b7280; opacity: 0.5; cursor: not-allowed; transform: none; }
 
-        .game-container {
-            text-align: center;
-            width: 100%;
+        .status-bar {
             display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        img {
-            max-height: 65vh;
-            max-width: 90%;
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+            gap: 10px;
+            margin-bottom: 15px;
+            width: 90%;
+            max-width: 400px;
+            justify-content: center;
         }
 
-        .controls {
-            margin-top: 20px;
-            background: rgba(255, 255, 255, 0.1);
+        .status-badge {
+            font-size: 1.05em;
+            font-weight: bold;
+            padding: 6px 12px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .pieces-display { color: #fbbf24; background: rgba(251, 191, 36, 0.1); border: 1px solid #fbbf24; }
+        .repas-display { color: #f97316; background: rgba(249, 115, 22, 0.1); border: 1px solid #f97316; }
+
+        #panelPause {
+            display: none;
+            background: rgba(168, 85, 247, 0.15);
+            border: 2px solid #a855f7;
             padding: 15px;
             border-radius: 10px;
             width: 90%;
             max-width: 400px;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        #titrePanelPause { margin: 0 0 10px 0; color: #a855f7; }
+        #textePanelPause { margin: 0; font-size: 0.9em; color: #cbd5e1; }
+        
+        #decomptePause { 
+            font-size: 2em; font-weight: bold; color: #a855f7; font-family: monospace; display: block; margin: 10px 0;
+        }
+        #btnStopperPause { background-color: #10b981; color: white; width: 100%; padding: 15px; font-size: 1.1em; }
+
+        .game-container {
+            text-align: center; width: 100%; display: flex; flex-direction: column; align-items: center;
         }
 
-        .action-buttons {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
+        .image-wrapper { position: relative; display: inline-block; }
+        
+        img {
+            max-height: 50vh; max-width: 90vw; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.6); transition: filter 0.3s ease; 
         }
+
+        .en-pause { filter: grayscale(100%) opacity(0.5); }
+
+        .burger-loader {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            font-size: 5em; display: none; z-index: 10; filter: drop-shadow(0px 4px 10px rgba(0,0,0,0.8));
+            animation: eatBurger 2s steps(4, end) infinite;
+        }
+
+        @keyframes eatBurger {
+            0% { clip-path: inset(0 0% 0 0); opacity: 1; }
+            90% { clip-path: inset(0 100% 0 0); opacity: 1; }
+            100% { clip-path: inset(0 100% 0 0); opacity: 0; }
+        }
+
+        .controls {
+            margin-top: 15px; background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 10px; width: 90%; max-width: 400px;
+        }
+
+        .action-buttons { display: flex; gap: 8px; margin-bottom: 10px; }
 
         .action-btn {
-            padding: 15px 10px;
-            font-size: 1.1em;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 5px;
+            padding: 10px 5px; font-size: 0.9em; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
         }
 
         #btnMinus { background-color: #f59e0b; color: white; } 
+        #btnBoutique { background-color: #ec4899; color: white; } 
         #btnPlus { background-color: #10b981; color: white; } 
 
-        #messageFin {
-            display: none;
-            margin-top: 15px;
-            color: #fcd34d;
-            font-weight: bold;
-            font-size: 1.2em;
-            text-align: center;
+        .inventaire { font-size: 0.9em; color: #cbd5e1; margin-top: 10px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; font-weight: bold; }
+
+        #messageFin { display: none; margin-top: 15px; color: #fcd34d; font-weight: bold; font-size: 1.2em; text-align: center; }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 100;
         }
+        .modal-content {
+            background: #2c2f33; padding: 20px; border-radius: 15px; width: 90%; max-width: 320px; color: white; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+        }
+        .modal-content.boutique { border: 2px solid #ec4899; }
+        .modal-content.alerte { border: 2px solid #fbbf24; }
+        .modal-content.choix-pause { border: 2px solid #a855f7; }
+
+        .modal-content h3 { margin-top: 0; }
+        .modal-content p { font-size: 0.95em; line-height: 1.5; color: #cbd5e1; white-space: pre-wrap; }
+        
+        .menu-btn { width: 100%; margin-top: 10px; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 1em; cursor: pointer; color: white; }
     </style>
 </head>
 <body>
@@ -126,12 +171,28 @@
         <div id="chrono">00:00:00</div>
         <div class="header-buttons">
             <button id="btnStart">Démarrer</button>
+            <button id="btnPause" disabled>Pause</button>
             <button id="btnStop" disabled>Stopper</button>
         </div>
     </div>
+    
+    <div class="status-bar">
+        <div id="piecesDisplay" class="status-badge pieces-display">🪙 Pièces : 0</div>
+        <div id="repasDisplay" class="status-badge repas-display">🍔 Repas : 2</div>
+    </div>
+
+    <div id="panelPause">
+        <h3 id="titrePanelPause">🪙 EN PAUSE</h3>
+        <p id="textePanelPause">Temps de pause restant :</p>
+        <span id="decomptePause">00:00:00</span>
+        <button id="btnStopperPause">▶️ Reprendre le travail</button>
+    </div>
 
     <div class="game-container" id="gameContainer">
-        <img id="trackerImage" src="5.png" alt="État actuel du Chlorévisiomètre">
+        <div class="image-wrapper" id="imageWrapper">
+            <img id="trackerImage" src="5.png" alt="État actuel du Chlorévisiomètre">
+            <div id="burgerLoader" class="burger-loader">🍔</div>
+        </div>
         
         <div class="controls">
             <div class="action-buttons">
@@ -139,110 +200,312 @@
                     <span>👎 Distraction</span>
                     <small>-1 PV</small>
                 </button>
+                <button id="btnBoutique" class="action-btn" disabled>
+                    <span>🛒 Boutique</span>
+                    <small>Dépenser</small>
+                </button>
                 <button id="btnPlus" class="action-btn" disabled>
                     <span>👍 Focus (1h)</span>
                     <small>+2 PV</small>
                 </button>
             </div>
             
+            <div id="inventaire" class="inventaire">
+                🎁 Petites surprises : <span id="txtPetites">1</span> <br>
+                🎀 Grandes surprises : <span id="txtGrandes">0</span>
+            </div>
+
             <p id="messageFin">Session terminée ! Excellent travail ! 🎉</p>
         </div>
     </div>
 
-    <script>
-        const extensionImage = ".png"; 
-        let pvMax = 10;
-        let pvActuels = 5; 
-        let jeuEnCours = false; 
-        let timerInterval;
-        let tempsSecondes = 0;
+    <!-- Modales -->
+    <div id="modalChoixPause" class="modal-overlay">
+        <div class="modal-content choix-pause">
+            <h3 style="color: #a855f7;">⏸️ Menu Pause</h3>
+            <p>Choisis le type de pause que tu souhaites prendre :</p>
+            <button id="btnChoixCafe" class="menu-btn" style="background:#a855f7;">🪙 Pause<br><small style="font-weight: normal;">(Coûte 30 pièces/minute)</small></button>
+            <button id="btnChoixRepas" class="menu-btn" style="background:#f97316;">🍔 Pause Repas<br><small style="font-weight: normal;">(Gratuit : 30 minutes garanties)</small></button>
+            <button onclick="fermerModal('modalChoixPause')" class="menu-btn" style="background:#6b7280; margin-top:20px;">Annuler</button>
+        </div>
+    </div>
 
+    <div id="modalReglesPause" class="modal-overlay">
+        <div class="modal-content regles">
+            <h3 style="color: #a855f7;">🪙 Règles de la Pause</h3>
+            <p>• Tu gagnes <strong>5 pièces</strong> par minute de travail.<br>• Prendre une pause coûte <strong>30 pièces/minute</strong>.<br>• L'image passera en Noir & Blanc.</p>
+            <div style="display: flex; gap: 10px; margin-top: 20px;">
+                <button onclick="fermerModal('modalReglesPause')" style="background:#ef4444; color:white; padding: 12px; width: 100%; border:none; border-radius:8px;">Annuler</button>
+                <button id="btnAccepterPause" style="background:#10b981; color:white; padding: 12px; width: 100%; border:none; border-radius:8px;">Accepter</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modalBoutique" class="modal-overlay">
+        <div class="modal-content boutique">
+            <h3 style="color: #ec4899;">🛒 Boutique</h3>
+            <p><strong>Règles :</strong> Vos points bonus (PV de 6 à 10) sont des cœurs jaunes. Dépensez-les ici pour acheter des surprises !</p>
+            <p style="color: #fbbf24; font-weight: bold; font-size: 1.1em;">💛 Cœurs dispos : <span id="coeursJaunesDispos">0</span></p>
+            <button id="btnAchatPetite" class="menu-btn" style="background:#ec4899;">🎁 Acheter Petite Surprise<br><small style="font-weight: normal;">(Coûte 2 cœurs jaunes)</small></button>
+            <button id="btnAchatGrande" class="menu-btn" style="background:#ec4899;">🎀 Acheter Grande Surprise<br><small style="font-weight: normal;">(Coûte 3 cœurs jaunes)</small></button>
+            <button onclick="fermerModal('modalBoutique')" class="menu-btn" style="background:#6b7280; margin-top:20px;">Fermer</button>
+        </div>
+    </div>
+
+    <div id="modalAlerte" class="modal-overlay">
+        <div class="modal-content alerte">
+            <h3 id="titreAlerte" style="color: #fbbf24;">Alerte</h3>
+            <p id="texteAlerte">Message</p>
+            <button onclick="fermerModal('modalAlerte')" class="menu-btn" style="background:#3b82f6;">OK</button>
+        </div>
+    </div>
+
+    <!-- MOTEUR DU JEU - FIREBASE (MULTIJOUEUR) -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+
+        // Ton Passeport Firebase (J'ai ajouté le lien de la base de données Europe)
+        const firebaseConfig = {
+            apiKey: "AIzaSyDaHguuxN1Jq8c4YZuk0XEzm1E-tHTBzAY",
+            authDomain: "chlorevisiometre.firebaseapp.com",
+            databaseURL: "https://chlorevisiometre-default-rtdb.europe-west1.firebasedatabase.app",
+            projectId: "chlorevisiometre",
+            storageBucket: "chlorevisiometre.firebasestorage.app",
+            messagingSenderId: "455853187691",
+            appId: "1:455853187691:web:5b224a6605e44946a9472e"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const gameRef = ref(db, 'sessionPartagee');
+
+        // Variables d'état du jeu (Synchronisées avec le monde entier)
+        let gameState = {
+            pvActuels: 5,
+            piecesBase: 0,
+            repasRestants: 2,
+            nbPetitesSurprises: 0,
+            nbGrandesSurprises: 0,
+            modeJeu: 'attente',
+            timestampMode: Date.now()
+        };
+
+        let localPieces = 0; // Calculé en direct
+        let isTransitioning = false; // Sécurité anti-spam
+        let intervalGlobal;
+
+        // --- ELEMENTS HTML ---
         const imageElement = document.getElementById("trackerImage");
+        const burgerLoader = document.getElementById("burgerLoader");
         const chronoAffichage = document.getElementById("chrono");
+        const decomptePause = document.getElementById("decomptePause");
+        const piecesDisplay = document.getElementById("piecesDisplay");
+        const repasDisplay = document.getElementById("repasDisplay");
+        const panelPause = document.getElementById("panelPause");
+        const titrePanelPause = document.getElementById("titrePanelPause");
+        
         const btnStart = document.getElementById("btnStart");
+        const btnPause = document.getElementById("btnPause");
         const btnStop = document.getElementById("btnStop");
         const btnMinus = document.getElementById("btnMinus");
+        const btnBoutique = document.getElementById("btnBoutique");
         const btnPlus = document.getElementById("btnPlus");
         const messageFin = document.getElementById("messageFin");
+        const coeursJaunesDispos = document.getElementById("coeursJaunesDispos");
 
-        // --- PRÉCHARGEMENT DES IMAGES ---
-        // Cette fonction se lance toute seule au démarrage
-        function prechargerImages() {
-            for (let i = 1; i <= pvMax; i++) {
-                let img = new Image();
-                img.src = i + extensionImage;
-            }
-        }
-        prechargerImages(); // Lancement du préchargement
-        // --------------------------------
-
-        function actualiserAffichage() {
-            imageElement.src = pvActuels + extensionImage;
+        // --- EXPORT DES FONCTIONS POUR LE HTML (ONCLICK) ---
+        window.ouvrirModal = function(id) { document.getElementById(id).style.display = "flex"; }
+        window.fermerModal = function(id) { document.getElementById(id).style.display = "none"; }
+        window.afficherAlerte = function(titre, texte) {
+            document.getElementById("titreAlerte").innerText = titre;
+            document.getElementById("texteAlerte").innerText = texte;
+            window.ouvrirModal("modalAlerte");
         }
 
         function formaterTemps(secondes) {
+            if(secondes < 0) secondes = 0;
             let h = Math.floor(secondes / 3600);
             let m = Math.floor((secondes % 3600) / 60);
             let s = secondes % 60;
             return String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
         }
 
-        // --- ACTIONS DU JEU ---
-        function declencherDistraction() {
-            if (!jeuEnCours) return;
-            if (pvActuels > 5) {
-                pvActuels = 5; 
-            } else if (pvActuels > 1) {
-                pvActuels--; 
+        // --- ENVOI DES DONNEES A FIREBASE ---
+        function sendUpdate(patch) {
+            const newState = { ...gameState, ...patch };
+            set(gameRef, newState);
+        }
+
+        // --- ECOUTE DE FIREBASE EN TEMPS REEL ---
+        onValue(gameRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                gameState = data;
+                mettreAJourInterface();
             }
-            actualiserAffichage();
-        }
-
-        function declencherFocus() {
-            if (!jeuEnCours) return;
-            pvActuels += 2; 
-            if (pvActuels > pvMax) pvActuels = pvMax;
-            actualiserAffichage();
-        }
-
-        // --- GESTION DES BOUTONS START/STOP ---
-        btnStart.addEventListener("click", function() {
-            pvActuels = 5;
-            actualiserAffichage();
-            tempsSecondes = 0;
-            chronoAffichage.innerText = "00:00:00";
-            messageFin.style.display = "none";
-            
-            jeuEnCours = true;
-            
-            btnStart.disabled = true;
-            btnStop.disabled = false;
-            btnMinus.disabled = false;
-            btnPlus.disabled = false;
-
-            timerInterval = setInterval(function() {
-                tempsSecondes++;
-                chronoAffichage.innerText = formaterTemps(tempsSecondes);
-            }, 1000);
         });
 
-        btnStop.addEventListener("click", function() {
-            jeuEnCours = false;
+        // --- METTRE A JOUR TOUS LES BOUTONS/IMAGES SELON L'ETAT ---
+        function mettreAJourInterface() {
+            // Mise à jour de l'image et inventaire
+            imageElement.src = gameState.pvActuels + ".png"; 
+            let basePetite = (gameState.pvActuels >= 5) ? 1 : 0;
+            let baseGrande = (gameState.pvActuels >= 7) ? 1 : 0;
+            document.getElementById("txtPetites").innerText = gameState.nbPetitesSurprises + basePetite;
+            document.getElementById("txtGrandes").innerText = gameState.nbGrandesSurprises + baseGrande;
             
-            btnStart.disabled = false;
-            btnStart.innerText = "Nouvelle session"; 
-            btnStop.disabled = true;
-            btnMinus.disabled = true;
-            btnPlus.disabled = true;
+            repasDisplay.innerText = "🍔 Repas : " + gameState.repasRestants; 
 
-            clearInterval(timerInterval);
-            messageFin.style.display = "block";
+            // Gestion de l'affichage selon le mode
+            if (gameState.modeJeu === 'attente') {
+                btnStart.disabled = false; btnStart.innerText = "Nouvelle session"; 
+                btnPause.disabled = true; btnStop.disabled = true; btnMinus.disabled = true; btnBoutique.disabled = true; btnPlus.disabled = true;
+                panelPause.style.display = "none"; imageElement.classList.remove("en-pause"); burgerLoader.style.display = "none";
+                piecesDisplay.innerText = "🪙 Pièces : 0"; chronoAffichage.innerText = "00:00:00"; messageFin.style.display = "block";
+            } else {
+                messageFin.style.display = "none";
+                btnStart.disabled = true; btnStop.disabled = false;
+                
+                if (gameState.modeJeu === 'travail') {
+                    btnPause.disabled = false; btnMinus.disabled = false; btnBoutique.disabled = false; btnPlus.disabled = false;
+                    panelPause.style.display = "none"; imageElement.classList.remove("en-pause"); burgerLoader.style.display = "none";
+                } else if (gameState.modeJeu === 'pause_cafe') {
+                    btnPause.disabled = true; btnMinus.disabled = true; btnBoutique.disabled = true; btnPlus.disabled = true;
+                    titrePanelPause.innerText = "🪙 EN PAUSE"; titrePanelPause.style.color = "#a855f7"; panelPause.style.borderColor = "#a855f7"; decomptePause.style.color = "#a855f7";
+                    panelPause.style.display = "block"; imageElement.classList.add("en-pause"); burgerLoader.style.display = "none";
+                } else if (gameState.modeJeu === 'pause_repas') {
+                    btnPause.disabled = true; btnMinus.disabled = true; btnBoutique.disabled = true; btnPlus.disabled = true;
+                    titrePanelPause.innerText = "🍔 BON APPÉTIT"; titrePanelPause.style.color = "#f97316"; panelPause.style.borderColor = "#f97316"; decomptePause.style.color = "#f97316";
+                    panelPause.style.display = "block"; imageElement.classList.add("en-pause"); burgerLoader.style.display = "block";
+                }
+            }
+        }
+
+        // --- LA BOUCLE TEMPORELLE (Executee localement sur chaque ordi) ---
+        function tickLocal() {
+            if (gameState.modeJeu === 'attente') return;
+
+            // Temps absolu depuis le début de la dernière action (Le fix Tab Sleeping)
+            let elapsedSeconds = Math.floor((Date.now() - gameState.timestampMode) / 1000);
+
+            if (gameState.modeJeu === 'travail') {
+                let gainedPieces = Math.floor(elapsedSeconds / 60) * 5;
+                localPieces = gameState.piecesBase + gainedPieces;
+                chronoAffichage.innerText = formaterTemps(elapsedSeconds);
+                piecesDisplay.innerText = "🪙 Pièces : " + localPieces;
+            } 
+            else if (gameState.modeJeu === 'pause_cafe') {
+                let spentPieces = Math.floor(elapsedSeconds / 2); // 1 pièce toutes les 2s
+                localPieces = gameState.piecesBase - spentPieces;
+                let tempsRestant = (gameState.piecesBase * 2) - elapsedSeconds;
+
+                if (tempsRestant <= 0 && !isTransitioning) {
+                    isTransitioning = true;
+                    window.afficherAlerte("⏱️ Fin de la pause", "Tu n'as plus de pièces. Au travail !");
+                    sortirDePause(0); // On force 0 pièces restantes
+                    setTimeout(() => isTransitioning = false, 2000);
+                } else if(tempsRestant > 0) {
+                    decomptePause.innerText = formaterTemps(tempsRestant);
+                    piecesDisplay.innerText = "🪙 Pièces : " + localPieces;
+                }
+            }
+            else if (gameState.modeJeu === 'pause_repas') {
+                localPieces = gameState.piecesBase;
+                let tempsRestant = 1800 - elapsedSeconds; // 30 minutes
+
+                if (tempsRestant <= 0 && !isTransitioning) {
+                    isTransitioning = true;
+                    window.afficherAlerte("⏱️ Fin du repas", "Tes 30 minutes sont écoulées. Au travail !");
+                    sortirDePause(localPieces);
+                    setTimeout(() => isTransitioning = false, 2000);
+                } else if(tempsRestant > 0) {
+                    decomptePause.innerText = formaterTemps(tempsRestant);
+                }
+            }
+        }
+
+        // Lancement de la boucle locale
+        intervalGlobal = setInterval(tickLocal, 200); // 5 fois par seconde pour plus de fluidité
+
+        // --- ACTIONS DES BOUTONS (Qui envoient l'ordre au monde entier) ---
+        btnStart.addEventListener("click", () => {
+            sendUpdate({
+                pvActuels: 5, piecesBase: 0, repasRestants: 2, nbPetitesSurprises: 0, nbGrandesSurprises: 0, modeJeu: 'travail', timestampMode: Date.now()
+            });
         });
 
-        // --- GESTIONs DES ÉVÉNEMENTS ---
-        btnMinus.addEventListener("click", declencherDistraction);
-        btnPlus.addEventListener("click", declencherFocus);
-        
+        btnStop.addEventListener("click", () => {
+            sendUpdate({ modeJeu: 'attente' });
+        });
+
+        // Les PV
+        btnMinus.addEventListener("click", () => {
+            if (gameState.pvActuels > 1) sendUpdate({ pvActuels: gameState.pvActuels - 1 });
+        });
+
+        btnPlus.addEventListener("click", () => {
+            if (gameState.pvActuels < 10) sendUpdate({ pvActuels: gameState.pvActuels + 2 > 10 ? 10 : gameState.pvActuels + 2 });
+        });
+
+        // Les Pauses
+        btnPause.addEventListener("click", () => window.ouvrirModal("modalChoixPause"));
+
+        let reglesPauseLues = false; 
+        document.getElementById("btnChoixCafe").addEventListener("click", () => {
+            if (localPieces < 1) { window.afficherAlerte("🪙 Attention", "Tu n'as pas assez de pièces pour une pause !"); return; }
+            window.fermerModal("modalChoixPause");
+            if (!reglesPauseLues) window.ouvrirModal("modalReglesPause"); else demarrerPauseCafe();
+        });
+
+        document.getElementById("btnAccepterPause").addEventListener("click", () => {
+            reglesPauseLues = true; window.fermerModal("modalReglesPause"); demarrerPauseCafe();
+        });
+
+        document.getElementById("btnChoixRepas").addEventListener("click", () => {
+            if (gameState.repasRestants <= 0) { window.afficherAlerte("🍔 Oops", "Plus de repas dispo !"); return; }
+            window.fermerModal("modalChoixPause");
+            demarrerPauseRepas();
+        });
+
+        function demarrerPauseCafe() {
+            sendUpdate({ modeJeu: 'pause_cafe', piecesBase: localPieces, timestampMode: Date.now() });
+        }
+
+        function demarrerPauseRepas() {
+            sendUpdate({ modeJeu: 'pause_repas', piecesBase: localPieces, repasRestants: gameState.repasRestants - 1, timestampMode: Date.now() });
+        }
+
+        function sortirDePause(piecesForcees = localPieces) {
+            sendUpdate({ modeJeu: 'travail', piecesBase: piecesForcees, timestampMode: Date.now() });
+        }
+
+        document.getElementById("btnStopperPause").addEventListener("click", () => sortirDePause(localPieces));
+
+        // Boutique
+        function calculerCoeurs() { return Math.max(0, gameState.pvActuels - 5); }
+
+        btnBoutique.addEventListener("click", () => {
+            coeursJaunesDispos.innerText = calculerCoeurs();
+            window.ouvrirModal("modalBoutique");
+        });
+
+        document.getElementById("btnAchatPetite").addEventListener("click", () => {
+            if (calculerCoeurs() >= 2) {
+                sendUpdate({ pvActuels: gameState.pvActuels - 2, nbPetitesSurprises: gameState.nbPetitesSurprises + 1 });
+                window.afficherAlerte("🎉 Bravo", "Petite surprise achetée avec succès !");
+                coeursJaunesDispos.innerText = calculerCoeurs() - 2;
+            } else window.afficherAlerte("💛 Oops", "Pas assez de cœurs jaunes ! (Il t'en faut 2)");
+        });
+
+        document.getElementById("btnAchatGrande").addEventListener("click", () => {
+            if (calculerCoeurs() >= 3) {
+                sendUpdate({ pvActuels: gameState.pvActuels - 3, nbGrandesSurprises: gameState.nbGrandesSurprises + 1 });
+                window.afficherAlerte("🎊 Incroyable", "Grande surprise achetée avec succès !");
+                coeursJaunesDispos.innerText = calculerCoeurs() - 3;
+            } else window.afficherAlerte("💛 Oops", "Pas assez de cœurs jaunes ! (Il t'en faut 3)");
+        });
+
     </script>
 </body>
 </html>
