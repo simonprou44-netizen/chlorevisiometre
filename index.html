@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chlorévisiomètre</title>
+    <title>Chlorévisiomètre Pro</title>
     <style>
         body {
             display: flex;
@@ -100,7 +100,6 @@
             text-align: center;
         }
         #titrePanelPause { margin: 0 0 10px 0; color: #a855f7; }
-        #textePanelPause { margin: 0; font-size: 0.9em; color: #cbd5e1; }
         
         #decomptePause { 
             font-size: 2em; font-weight: bold; color: #a855f7; font-family: monospace; display: block; margin: 10px 0;
@@ -168,7 +167,7 @@
 <body>
 
     <div class="header">
-        <div id="chrono">00:00:00</div>
+        <div id="chrono">Synchronisation...</div>
         <div class="header-buttons">
             <button id="btnStart">Démarrer</button>
             <button id="btnPause" disabled>Pause</button>
@@ -183,7 +182,6 @@
 
     <div id="panelPause">
         <h3 id="titrePanelPause">🪙 EN PAUSE</h3>
-        <p id="textePanelPause">Temps de pause restant :</p>
         <span id="decomptePause">00:00:00</span>
         <button id="btnStopperPause">▶️ Reprendre le travail</button>
     </div>
@@ -230,17 +228,6 @@
         </div>
     </div>
 
-    <div id="modalReglesPause" class="modal-overlay">
-        <div class="modal-content regles">
-            <h3 style="color: #a855f7;">🪙 Règles de la Pause</h3>
-            <p>• Tu gagnes <strong>5 pièces</strong> par minute de travail.<br>• Prendre une pause coûte <strong>30 pièces/minute</strong>.<br>• L'image passera en Noir & Blanc.</p>
-            <div style="display: flex; gap: 10px; margin-top: 20px;">
-                <button onclick="fermerModal('modalReglesPause')" style="background:#ef4444; color:white; padding: 12px; width: 100%; border:none; border-radius:8px;">Annuler</button>
-                <button id="btnAccepterPause" style="background:#10b981; color:white; padding: 12px; width: 100%; border:none; border-radius:8px;">Accepter</button>
-            </div>
-        </div>
-    </div>
-
     <div id="modalBoutique" class="modal-overlay">
         <div class="modal-content boutique">
             <h3 style="color: #ec4899;">🛒 Boutique</h3>
@@ -277,7 +264,9 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const gameRef = ref(db, 'sessionPartagee');
+        const offsetRef = ref(db, ".info/serverTimeOffset");
 
+        let serverTimeOffset = 0;
         let gameState = {
             pvActuels: 5,
             piecesBase: 0,
@@ -290,7 +279,12 @@
 
         let localPieces = 0; 
         let isTransitioning = false; 
-        let intervalGlobal;
+
+        // --- CALCUL DU DÉCALAGE HORLOGE ---
+        onValue(offsetRef, (snap) => {
+            serverTimeOffset = snap.val() || 0;
+            console.log("Décalage horloge calculé :", serverTimeOffset, "ms");
+        });
 
         const imageElement = document.getElementById("trackerImage");
         const burgerLoader = document.getElementById("burgerLoader");
@@ -310,7 +304,7 @@
         const coeursJaunesDispos = document.getElementById("coeursJaunesDispos");
 
         window.ouvrirModal = function(id) { document.getElementById(id).style.display = "flex"; }
-        window.fermerModal = function(id) { document.getElementById(id).style.none = "none"; document.getElementById(id).style.display = "none";}
+        window.fermerModal = function(id) { document.getElementById(id).style.display = "none"; }
         window.afficherAlerte = function(titre, texte) {
             document.getElementById("titreAlerte").innerText = titre;
             document.getElementById("texteAlerte").innerText = texte;
@@ -347,7 +341,7 @@
             repasDisplay.innerText = "🍔 Repas : " + gameState.repasRestants; 
 
             if (gameState.modeJeu === 'attente') {
-                btnStart.disabled = false; btnStart.innerText = "Nouvelle session"; 
+                btnStart.disabled = false;
                 btnPause.disabled = true; btnStop.disabled = true; btnMinus.disabled = true; btnBoutique.disabled = true; btnPlus.disabled = true;
                 panelPause.style.display = "none"; imageElement.classList.remove("en-pause"); burgerLoader.style.display = "none";
                 piecesDisplay.innerText = "🪙 Pièces : 0"; chronoAffichage.innerText = "00:00:00"; messageFin.style.display = "block";
@@ -371,12 +365,14 @@
 
         function tickLocal() {
             if (gameState.modeJeu === 'attente' || !gameState.timestampMode) {
-                if (gameState.modeJeu !== 'attente') chronoAffichage.innerText = "...";
+                if (gameState.modeJeu !== 'attente') chronoAffichage.innerText = "Synchro...";
                 return;
             }
 
-            // Calcul basé sur l'heure serveur
-            let elapsedSeconds = Math.floor((Date.now() - gameState.timestampMode) / 1000);
+            // --- LA MAGIE EST ICI ---
+            // Date.now() + serverTimeOffset = L'heure exacte de Google
+            let nowCorrected = Date.now() + serverTimeOffset;
+            let elapsedSeconds = Math.floor((nowCorrected - gameState.timestampMode) / 1000);
 
             if (gameState.modeJeu === 'travail') {
                 let gainedPieces = Math.floor(elapsedSeconds / 60) * 5;
@@ -407,7 +403,7 @@
             }
         }
 
-        intervalGlobal = setInterval(tickLocal, 500);
+        setInterval(tickLocal, 500);
 
         btnStart.addEventListener("click", () => {
             sendUpdate({
@@ -425,8 +421,7 @@
 
         btnPlus.addEventListener("click", () => {
             if (gameState.modeJeu !== 'travail') return;
-            let newPv = Math.min(10, gameState.pvActuels + 2);
-            sendUpdate({ pvActuels: newPv });
+            sendUpdate({ pvActuels: Math.min(10, gameState.pvActuels + 2) });
         });
 
         btnPause.addEventListener("click", () => window.ouvrirModal("modalChoixPause"));
