@@ -265,10 +265,10 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
-        // Ton Passeport Firebase (J'ai ajouté le lien de la base de données Europe)
         const firebaseConfig = {
             apiKey: "AIzaSyDaHguuxN1Jq8c4YZuk0XEzm1E-tHTBzAY",
             authDomain: "chlorevisiometre.firebaseapp.com",
+            // Si le multijoueur ne marche toujours pas après avoir rafraîchi, vérifie cette ligne :
             databaseURL: "https://chlorevisiometre-default-rtdb.europe-west1.firebasedatabase.app",
             projectId: "chlorevisiometre",
             storageBucket: "chlorevisiometre.firebasestorage.app",
@@ -280,7 +280,6 @@
         const db = getDatabase(app);
         const gameRef = ref(db, 'sessionPartagee');
 
-        // Variables d'état du jeu (Synchronisées avec le monde entier)
         let gameState = {
             pvActuels: 5,
             piecesBase: 0,
@@ -291,11 +290,10 @@
             timestampMode: Date.now()
         };
 
-        let localPieces = 0; // Calculé en direct
-        let isTransitioning = false; // Sécurité anti-spam
+        let localPieces = 0; 
+        let isTransitioning = false; 
         let intervalGlobal;
 
-        // --- ELEMENTS HTML ---
         const imageElement = document.getElementById("trackerImage");
         const burgerLoader = document.getElementById("burgerLoader");
         const chronoAffichage = document.getElementById("chrono");
@@ -314,7 +312,6 @@
         const messageFin = document.getElementById("messageFin");
         const coeursJaunesDispos = document.getElementById("coeursJaunesDispos");
 
-        // --- EXPORT DES FONCTIONS POUR LE HTML (ONCLICK) ---
         window.ouvrirModal = function(id) { document.getElementById(id).style.display = "flex"; }
         window.fermerModal = function(id) { document.getElementById(id).style.display = "none"; }
         window.afficherAlerte = function(titre, texte) {
@@ -331,13 +328,11 @@
             return String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
         }
 
-        // --- ENVOI DES DONNEES A FIREBASE ---
         function sendUpdate(patch) {
             const newState = { ...gameState, ...patch };
             set(gameRef, newState);
         }
 
-        // --- ECOUTE DE FIREBASE EN TEMPS REEL ---
         onValue(gameRef, (snapshot) => {
             const data = snapshot.val();
             if (data) {
@@ -346,9 +341,7 @@
             }
         });
 
-        // --- METTRE A JOUR TOUS LES BOUTONS/IMAGES SELON L'ETAT ---
         function mettreAJourInterface() {
-            // Mise à jour de l'image et inventaire
             imageElement.src = gameState.pvActuels + ".png"; 
             let basePetite = (gameState.pvActuels >= 5) ? 1 : 0;
             let baseGrande = (gameState.pvActuels >= 7) ? 1 : 0;
@@ -357,7 +350,6 @@
             
             repasDisplay.innerText = "🍔 Repas : " + gameState.repasRestants; 
 
-            // Gestion de l'affichage selon le mode
             if (gameState.modeJeu === 'attente') {
                 btnStart.disabled = false; btnStart.innerText = "Nouvelle session"; 
                 btnPause.disabled = true; btnStop.disabled = true; btnMinus.disabled = true; btnBoutique.disabled = true; btnPlus.disabled = true;
@@ -382,11 +374,9 @@
             }
         }
 
-        // --- LA BOUCLE TEMPORELLE (Executee localement sur chaque ordi) ---
         function tickLocal() {
             if (gameState.modeJeu === 'attente') return;
 
-            // Temps absolu depuis le début de la dernière action (Le fix Tab Sleeping)
             let elapsedSeconds = Math.floor((Date.now() - gameState.timestampMode) / 1000);
 
             if (gameState.modeJeu === 'travail') {
@@ -396,14 +386,14 @@
                 piecesDisplay.innerText = "🪙 Pièces : " + localPieces;
             } 
             else if (gameState.modeJeu === 'pause_cafe') {
-                let spentPieces = Math.floor(elapsedSeconds / 2); // 1 pièce toutes les 2s
+                let spentPieces = Math.floor(elapsedSeconds / 2); 
                 localPieces = gameState.piecesBase - spentPieces;
                 let tempsRestant = (gameState.piecesBase * 2) - elapsedSeconds;
 
                 if (tempsRestant <= 0 && !isTransitioning) {
                     isTransitioning = true;
                     window.afficherAlerte("⏱️ Fin de la pause", "Tu n'as plus de pièces. Au travail !");
-                    sortirDePause(0); // On force 0 pièces restantes
+                    sortirDePause(0); 
                     setTimeout(() => isTransitioning = false, 2000);
                 } else if(tempsRestant > 0) {
                     decomptePause.innerText = formaterTemps(tempsRestant);
@@ -412,7 +402,7 @@
             }
             else if (gameState.modeJeu === 'pause_repas') {
                 localPieces = gameState.piecesBase;
-                let tempsRestant = 1800 - elapsedSeconds; // 30 minutes
+                let tempsRestant = 1800 - elapsedSeconds; 
 
                 if (tempsRestant <= 0 && !isTransitioning) {
                     isTransitioning = true;
@@ -425,10 +415,29 @@
             }
         }
 
-        // Lancement de la boucle locale
-        intervalGlobal = setInterval(tickLocal, 200); // 5 fois par seconde pour plus de fluidité
+        intervalGlobal = setInterval(tickLocal, 200);
 
-        // --- ACTIONS DES BOUTONS (Qui envoient l'ordre au monde entier) ---
+        // --- NOUVELLES RÈGLES DES PV ---
+        btnMinus.addEventListener("click", () => {
+            if (gameState.modeJeu !== 'travail') return;
+            
+            // Si on est dans la zone bonus (plus de 5), on retombe à 5
+            if (gameState.pvActuels > 5) {
+                sendUpdate({ pvActuels: 5 });
+            } 
+            // Sinon on perd juste 1 PV
+            else if (gameState.pvActuels > 1) {
+                sendUpdate({ pvActuels: gameState.pvActuels - 1 });
+            }
+        });
+
+        btnPlus.addEventListener("click", () => {
+            if (gameState.modeJeu !== 'travail') return;
+            let newPv = gameState.pvActuels + 2;
+            if (newPv > 10) newPv = 10;
+            sendUpdate({ pvActuels: newPv });
+        });
+
         btnStart.addEventListener("click", () => {
             sendUpdate({
                 pvActuels: 5, piecesBase: 0, repasRestants: 2, nbPetitesSurprises: 0, nbGrandesSurprises: 0, modeJeu: 'travail', timestampMode: Date.now()
@@ -439,16 +448,6 @@
             sendUpdate({ modeJeu: 'attente' });
         });
 
-        // Les PV
-        btnMinus.addEventListener("click", () => {
-            if (gameState.pvActuels > 1) sendUpdate({ pvActuels: gameState.pvActuels - 1 });
-        });
-
-        btnPlus.addEventListener("click", () => {
-            if (gameState.pvActuels < 10) sendUpdate({ pvActuels: gameState.pvActuels + 2 > 10 ? 10 : gameState.pvActuels + 2 });
-        });
-
-        // Les Pauses
         btnPause.addEventListener("click", () => window.ouvrirModal("modalChoixPause"));
 
         let reglesPauseLues = false; 
@@ -482,10 +481,10 @@
 
         document.getElementById("btnStopperPause").addEventListener("click", () => sortirDePause(localPieces));
 
-        // Boutique
         function calculerCoeurs() { return Math.max(0, gameState.pvActuels - 5); }
 
         btnBoutique.addEventListener("click", () => {
+            if (gameState.modeJeu !== 'travail') return;
             coeursJaunesDispos.innerText = calculerCoeurs();
             window.ouvrirModal("modalBoutique");
         });
