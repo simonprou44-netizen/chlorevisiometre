@@ -37,7 +37,7 @@
         .glow-track {
             position: relative;
             isolation: isolate; /* Force le halo à rester strictement derrière */
-            --glow-color: 255, 255, 255; /* Blanc par défaut */
+            --glow-color: 255, 255, 255; /* Blanc par défaut, sera surchargé */
             background: #111114; /* Fond sombre et OPAQUE */
             border: 1px solid rgba(255, 255, 255, 0.08); /* Bordure subtile */
             border-radius: 12px;
@@ -160,7 +160,18 @@
         .choix-pause { --glow-color: 236, 72, 153; border: 1px solid rgba(236, 72, 153, 0.6); }
         .boutique { --glow-color: 236, 72, 153; border: 1px solid rgba(236, 72, 153, 0.6); }
         .alerte { --glow-color: 251, 191, 36; border: 1px solid rgba(251, 191, 36, 0.6); }
-        .inventaire { --glow-color: 255, 255, 255; } /* Blanc */
+
+        /* AJUSTEMENT : Lueur verte pour la fenêtre du bas (contrôles) */
+        .controls {
+            margin-top: 15px; padding: 15px; width: 90%; max-width: 400px;
+            --glow-color: 16, 185, 129; /* Vert au lieu de Violet */
+        }
+        
+        .inventaire { 
+            font-size: 0.9em; color: #cbd5e1; margin-top: 10px; 
+            padding: 10px; border-radius: 8px; 
+            border: 1px solid rgba(255,255,255,0.05); font-weight: bold; 
+        }
 
         /* Boutons internes Modales */
         #btnChoixCafe, #btnAchatPetiteCoeur, #btnAchatGrandeCoeur { --glow-color: 236, 72, 153; }
@@ -222,46 +233,8 @@
             transition: opacity 0.5s ease-in-out, filter 0.3s ease; 
         }
 
-        .shake { animation: shakeImage 0.8s; }
-        @keyframes shakeImage {
-            10%, 90% { transform: translate3d(-1px, 0, 0); }
-            20%, 80% { transform: translate3d(2px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-            40%, 60% { transform: translate3d(4px, 0, 0); }
-        }
-
-        .glow { animation: glowImage 0.8s; }
-        @keyframes glowImage {
-            0% { box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
-            50% { box-shadow: 0 0 50px #f472b6, 0 0 20px #d946ef; } 
-            100% { box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
-        }
-
-        .en-pause { filter: grayscale(100%) opacity(0.5); }
-
-        .burger-loader {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 5em; display: none; z-index: 10; filter: drop-shadow(0px 4px 10px rgba(0,0,0,0.8));
-            animation: eatBurger 2s steps(4, end) infinite;
-        }
-        @keyframes eatBurger {
-            0% { clip-path: inset(0 0% 0 0); opacity: 1; }
-            90% { clip-path: inset(0 100% 0 0); opacity: 1; }
-            100% { clip-path: inset(0 100% 0 0); opacity: 0; }
-        }
-
-        .controls {
-            margin-top: 15px; padding: 15px; width: 90%; max-width: 400px;
-        }
-
         .action-buttons { display: flex; gap: 8px; margin-bottom: 10px; }
         .action-btn { padding: 10px 5px; font-size: 0.9em; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
-
-        .inventaire { 
-            font-size: 0.9em; color: #cbd5e1; margin-top: 10px; 
-            padding: 10px; border-radius: 8px; 
-            border: 1px solid rgba(255,255,255,0.05); font-weight: bold; 
-        }
 
         #messageFin { display: none; margin-top: 15px; color: #fcd34d; font-weight: bold; font-size: 1.2em; text-align: center; }
 
@@ -282,7 +255,6 @@
 
         .modal-content h3 { margin-top: 0; }
         .modal-content p { font-size: 0.95em; line-height: 1.5; color: #cbd5e1; white-space: pre-wrap; }
-        
         .menu-btn { width: 100%; margin-top: 10px; padding: 12px; font-size: 1em; }
 
     </style>
@@ -313,7 +285,7 @@
 
     <div class="game-container" id="gameContainer">
         <div class="image-wrapper glow-track" id="imageWrapper">
-            <img id="trackerImage" src="5.jpg" alt="État actuel du Chlorévisiomètre">
+            <img id="trackerImage" src="5.jpg" alt="État actuel du Chlorévisiomètre Pro">
             <div id="burgerLoader" class="burger-loader">🍔</div>
         </div>
         
@@ -333,7 +305,7 @@
                 </button>
             </div>
             
-            <div id="inventaire" class="inventaire glow-track">
+            <div id="inventaire" class="inventaire">
                 🎁 Petites surprises : <span id="txtPetites">1</span> <br>
                 🎀 Grandes surprises : <span id="txtGrandes">0</span>
             </div>
@@ -419,7 +391,7 @@
             mouseY = e.clientY;
         });
 
-        // --- PARAMÈTRES (Mosaïque réduite et lueur plus resserrée) ---
+        // --- PARAMÈTRES (Mosaïque réduite) ---
         const gridSize = 45; 
         const glowIntensity = 2; 
         const glowRadius = 320; // Portée réduite
@@ -479,269 +451,6 @@
             requestAnimationFrame(drawBackground);
         }
         drawBackground();
-    </script>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyDaHguuxN1Jq8c4YZuk0XEzm1E-tHTBzAY",
-            authDomain: "chlorevisiometre.firebaseapp.com",
-            databaseURL: "https://chlorevisiometre-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "chlorevisiometre",
-            storageBucket: "chlorevisiometre.firebasestorage.app",
-            messagingSenderId: "455853187691",
-            appId: "1:455853187691:web:5b224a6605e44946a9472e"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const gameRef = ref(db, 'sessionPartagee');
-        const offsetRef = ref(db, ".info/serverTimeOffset");
-
-        let serverTimeOffset = 0;
-        let gameState = {
-            pvActuels: 5,
-            piecesBase: 0,
-            repasRestants: 2,
-            nbPetitesSurprises: 0,
-            nbGrandesSurprises: 0,
-            modeJeu: 'attente',
-            timestampMode: null,
-            tempsTravailCumule: 0 
-        };
-
-        let localPieces = 0; 
-        let isTransitioning = false; 
-
-        onValue(offsetRef, (snap) => {
-            serverTimeOffset = snap.val() || 0;
-        });
-
-        const imageElement = document.getElementById("trackerImage");
-        const burgerLoader = document.getElementById("burgerLoader");
-        const chronoAffichage = document.getElementById("chrono");
-        const decomptePause = document.getElementById("decomptePause");
-        const piecesDisplay = document.getElementById("piecesDisplay");
-        const repasDisplay = document.getElementById("repasDisplay");
-        const panelPause = document.getElementById("panelPause");
-        const titrePanelPause = document.getElementById("titrePanelPause");
-        const btnStart = document.getElementById("btnStart");
-        const btnPause = document.getElementById("btnPause");
-        const btnStop = document.getElementById("btnStop");
-        const btnMinus = document.getElementById("btnMinus");
-        const btnBoutique = document.getElementById("btnBoutique");
-        const btnPlus = document.getElementById("btnPlus");
-        const messageFin = document.getElementById("messageFin");
-        const coeursJaunesDispos = document.getElementById("coeursJaunesDispos");
-        const piecesBoutiqueDispos = document.getElementById("piecesBoutiqueDispos");
-
-        window.ouvrirModal = function(id) { document.getElementById(id).style.display = "flex"; }
-        window.fermerModal = function(id) { document.getElementById(id).style.display = "none"; }
-        window.afficherAlerte = function(titre, texte) {
-            document.getElementById("titreAlerte").innerText = titre;
-            document.getElementById("texteAlerte").innerText = texte;
-            window.ouvrirModal("modalAlerte");
-        }
-
-        function formaterTemps(secondes) {
-            if(secondes < 0) secondes = 0;
-            let h = Math.floor(secondes / 3600);
-            let m = Math.floor((secondes % 3600) / 60);
-            let s = secondes % 60;
-            return String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
-        }
-
-        function sendUpdate(patch) {
-            const newState = { ...gameState, ...patch };
-            set(gameRef, newState);
-        }
-
-        onValue(gameRef, (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                gameState = data;
-                mettreAJourInterface();
-            }
-        });
-
-        function triggerAnimation(className) {
-            imageElement.classList.add(className);
-            setTimeout(() => {
-                imageElement.classList.remove(className);
-            }, 800); 
-        }
-
-        function mettreAJourInterface() {
-            imageElement.src = gameState.pvActuels + ".jpg"; 
-            let basePetite = (gameState.pvActuels >= 5) ? 1 : 0;
-            let baseGrande = (gameState.pvActuels >= 7) ? 1 : 0;
-            
-            document.getElementById("txtPetites").innerText = gameState.nbPetitesSurprises + basePetite;
-            document.getElementById("txtGrandes").innerText = gameState.nbGrandesSurprises + baseGrande;
-            repasDisplay.innerText = "🍔 Repas : " + gameState.repasRestants; 
-            
-            coeursJaunesDispos.innerText = Math.max(0, gameState.pvActuels - 5);
-            piecesBoutiqueDispos.innerText = localPieces;
-
-            if (gameState.modeJeu === 'attente') {
-                btnStart.disabled = false;
-                btnPause.disabled = true; btnStop.disabled = true; btnMinus.disabled = true; btnBoutique.disabled = true; btnPlus.disabled = true;
-                panelPause.style.display = "none"; imageElement.classList.remove("en-pause"); burgerLoader.style.display = "none";
-                piecesDisplay.innerText = "🪙 Pièces : 0"; chronoAffichage.innerText = "00:00:00"; messageFin.style.display = "block";
-            } else {
-                messageFin.style.display = "none";
-                btnStart.disabled = true; btnStop.disabled = false;
-                if (gameState.modeJeu === 'travail') {
-                    btnPause.disabled = false; btnMinus.disabled = false; btnBoutique.disabled = false; btnPlus.disabled = false;
-                    panelPause.style.display = "none"; imageElement.classList.remove("en-pause"); burgerLoader.style.display = "none";
-                } else {
-                    btnPause.disabled = true; btnMinus.disabled = true; btnBoutique.disabled = true; btnPlus.disabled = true;
-                    panelPause.style.display = "block"; imageElement.classList.add("en-pause");
-                    if (gameState.modeJeu === 'pause_cafe') {
-                        titrePanelPause.innerText = "🪙 EN PAUSE"; titrePanelPause.style.color = "#ec4899"; burgerLoader.style.display = "none";
-                    } else {
-                        titrePanelPause.innerText = "🍔 BON APPÉTIT"; titrePanelPause.style.color = "#f97316"; burgerLoader.style.display = "block";
-                    }
-                }
-            }
-        }
-
-        function tickLocal() {
-            if (gameState.modeJeu === 'attente' || !gameState.timestampMode) {
-                if (gameState.modeJeu !== 'attente') chronoAffichage.innerText = "Synchro...";
-                return;
-            }
-
-            let nowCorrected = Date.now() + serverTimeOffset;
-            let elapsedSeconds = Math.floor((nowCorrected - gameState.timestampMode) / 1000);
-
-            if (gameState.modeJeu === 'travail') {
-                let gainedPieces = Math.floor(elapsedSeconds / 60) * 5;
-                localPieces = gameState.piecesBase + gainedPieces;
-                
-                let totalSeconds = (gameState.tempsTravailCumule || 0) + elapsedSeconds;
-                chronoAffichage.innerText = formaterTemps(totalSeconds);
-                piecesDisplay.innerText = "🪙 Pièces : " + localPieces;
-                piecesBoutiqueDispos.innerText = localPieces;
-            } 
-            else if (gameState.modeJeu === 'pause_cafe') {
-                let spentPieces = Math.floor(elapsedSeconds / 2); 
-                localPieces = gameState.piecesBase - spentPieces;
-                let tempsRestant = (gameState.piecesBase * 2) - elapsedSeconds;
-                
-                if (tempsRestant <= 0 && !isTransitioning) {
-                    isTransitioning = true; sortirDePause(0);
-                    setTimeout(() => isTransitioning = false, 2000);
-                } else {
-                    decomptePause.innerText = formaterTemps(tempsRestant);
-                    piecesDisplay.innerText = "🪙 Pièces : " + localPieces;
-                    chronoAffichage.innerText = formaterTemps(gameState.tempsTravailCumule);
-                }
-            }
-            else if (gameState.modeJeu === 'pause_repas') {
-                localPieces = gameState.piecesBase;
-                let tempsRestant = 1800 - elapsedSeconds; 
-                
-                if (tempsRestant <= 0 && !isTransitioning) {
-                    isTransitioning = true; sortirDePause(gameState.piecesBase);
-                    setTimeout(() => isTransitioning = false, 2000);
-                } else {
-                    decomptePause.innerText = formaterTemps(tempsRestant);
-                    chronoAffichage.innerText = formaterTemps(gameState.tempsTravailCumule);
-                }
-            }
-        }
-
-        setInterval(tickLocal, 500);
-
-        btnStart.addEventListener("click", () => {
-            sendUpdate({
-                pvActuels: 5, piecesBase: 0, repasRestants: 2, nbPetitesSurprises: 0, nbGrandesSurprises: 0, 
-                modeJeu: 'travail', timestampMode: serverTimestamp(), tempsTravailCumule: 0 
-            });
-        });
-
-        btnStop.addEventListener("click", () => sendUpdate({ modeJeu: 'attente', timestampMode: null }));
-
-        function commitTravail() {
-            let nowCorrected = Date.now() + serverTimeOffset;
-            let elapsedSeconds = Math.floor((nowCorrected - gameState.timestampMode) / 1000);
-            return {
-                tempsTravailCumule: (gameState.tempsTravailCumule || 0) + elapsedSeconds,
-                piecesBase: localPieces,
-                timestampMode: serverTimestamp()
-            };
-        }
-
-        document.getElementById("btnChoixCafe").addEventListener("click", () => {
-            if (localPieces < 1) return;
-            window.fermerModal("modalChoixPause");
-            let update = commitTravail();
-            update.modeJeu = 'pause_cafe';
-            sendUpdate(update);
-        });
-
-        document.getElementById("btnChoixRepas").addEventListener("click", () => {
-            if (gameState.repasRestants <= 0) return;
-            window.fermerModal("modalChoixPause");
-            let update = commitTravail();
-            update.modeJeu = 'pause_repas';
-            update.repasRestants = gameState.repasRestants - 1;
-            sendUpdate(update);
-        });
-
-        function sortirDePause(piecesRestantes) { 
-            sendUpdate({ modeJeu: 'travail', piecesBase: piecesRestantes, timestampMode: serverTimestamp() }); 
-        }
-        
-        document.getElementById("btnStopperPause").addEventListener("click", () => sortirDePause(localPieces));
-        btnPause.addEventListener("click", () => window.ouvrirModal("modalChoixPause"));
-
-        btnMinus.addEventListener("click", () => {
-            if (gameState.modeJeu !== 'travail') return;
-            triggerAnimation('shake');
-            if (gameState.pvActuels > 5) sendUpdate({ pvActuels: 5 });
-            else if (gameState.pvActuels > 1) sendUpdate({ pvActuels: gameState.pvActuels - 1 });
-        });
-
-        btnPlus.addEventListener("click", () => {
-            if (gameState.modeJeu !== 'travail') return;
-            triggerAnimation('glow');
-            sendUpdate({ pvActuels: Math.min(10, gameState.pvActuels + 2) });
-        });
-
-        btnBoutique.addEventListener("click", () => { window.ouvrirModal("modalBoutique"); });
-
-        document.getElementById("btnAchatPetiteCoeur").addEventListener("click", () => {
-            if (gameState.pvActuels - 5 >= 2) {
-                sendUpdate({ pvActuels: gameState.pvActuels - 2, nbPetitesSurprises: gameState.nbPetitesSurprises + 1 });
-                window.afficherAlerte("🎁 Succès", "Petite surprise achetée avec 2 cœurs !");
-            } else window.afficherAlerte("❌ Erreur", "Tu n'as pas assez de cœurs jaunes !");
-        });
-
-        document.getElementById("btnAchatPetitePiece").addEventListener("click", () => {
-            if (localPieces >= 300) {
-                sendUpdate({ piecesBase: gameState.piecesBase - 300, nbPetitesSurprises: gameState.nbPetitesSurprises + 1 });
-                window.afficherAlerte("🎁 Succès", "Petite surprise achetée avec 300 pièces !");
-            } else window.afficherAlerte("❌ Erreur", "Tu n'as pas assez de pièces !");
-        });
-
-        document.getElementById("btnAchatGrandeCoeur").addEventListener("click", () => {
-            if (gameState.pvActuels - 5 >= 3) {
-                sendUpdate({ pvActuels: gameState.pvActuels - 3, nbGrandesSurprises: gameState.nbGrandesSurprises + 1 });
-                window.afficherAlerte("🎀 Succès", "Grande surprise achetée avec 3 cœurs !");
-            } else window.afficherAlerte("❌ Erreur", "Tu n'as pas assez de cœurs jaunes !");
-        });
-
-        document.getElementById("btnAchatGrandePiece").addEventListener("click", () => {
-            if (localPieces >= 600) {
-                sendUpdate({ piecesBase: gameState.piecesBase - 600, nbGrandesSurprises: gameState.nbGrandesSurprises + 1 });
-                window.afficherAlerte("🎀 Succès", "Grande surprise achetée avec 600 pièces !");
-            } else window.afficherAlerte("❌ Erreur", "Tu n'as pas assez de pièces !");
-        });
-
     </script>
 </body>
 </html>
