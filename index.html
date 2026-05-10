@@ -3,33 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chlorévisiomètre Pro Animé + Ambiance Rose</title>
+    <title>Chlorévisiomètre Pro - Glassmorphism</title>
     <style>
+        /* --- ARRIÈRE-PLAN --- */
         body {
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: flex-start;
             min-height: 100vh;
-            background-color: #2c2f33;
-            color: white;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
             padding: 20px 0;
             box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
             user-select: none; 
             -webkit-user-select: none;
+            background-color: #0a0a0c; /* Fond très sombre */
+            overflow-x: hidden;
         }
-        
+
+        #bgCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none; /* Laisse passer les clics vers les boutons */
+        }
+
+        /* --- EFFET VERRE DÉPOLI (GLASSMORPHISM) --- */
+        .glass-panel {
+            background: rgba(15, 15, 20, 0.5);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+
         .header {
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 10px;
             margin-bottom: 10px;
-            background: rgba(255, 255, 255, 0.1);
             padding: 15px 20px;
-            border-radius: 10px;
             width: 90%;
             max-width: 400px;
         }
@@ -39,6 +59,7 @@
             font-weight: bold;
             font-family: monospace;
             color: #f472b6; 
+            text-shadow: 0 0 10px rgba(244, 114, 182, 0.5);
         }
 
         .header-buttons {
@@ -47,26 +68,42 @@
             width: 100%;
         }
 
+        /* --- BOUTONS TRANSPARENTS --- */
         button {
             padding: 12px 10px;
             font-size: 0.95em;
             font-weight: bold;
-            border: none;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s ease-in-out;
+            transition: all 0.3s ease;
             flex: 1;
-            touch-action: manipulation; 
+            color: white;
+            background: rgba(20, 20, 25, 0.6); /* Transparent sombre par défaut */
+            backdrop-filter: blur(4px);
+            border: 1px solid transparent;
         }
 
-        button:not(:disabled):hover { transform: scale(1.05); }
         button:active { transform: scale(0.95); }
-        button:disabled { background-color: #6b7280 !important; opacity: 0.5; cursor: not-allowed; transform: none; }
+        button:disabled { background: rgba(30, 30, 35, 0.4) !important; border-color: rgba(255,255,255,0.05) !important; color: rgba(255,255,255,0.3); cursor: not-allowed; transform: none; }
 
-        #btnStart { background-color: #d946ef; color: white; } 
-        /* --- CHANGEMENT : Violet -> Rose --- */
-        #btnPause { background-color: #ec4899; color: white; } 
-        #btnStop { background-color: #ef4444; color: white; }
+        /* Couleurs dynamiques au survol */
+        #btnStart { border-color: rgba(16, 185, 129, 0.5); }
+        #btnStart:hover:not(:disabled) { background: rgba(16, 185, 129, 0.2); border-color: #10b981; }
+
+        #btnPause { border-color: rgba(236, 72, 153, 0.5); }
+        #btnPause:hover:not(:disabled) { background: rgba(236, 72, 153, 0.2); border-color: #ec4899; }
+
+        #btnStop { border-color: rgba(239, 68, 68, 0.5); }
+        #btnStop:hover:not(:disabled) { background: rgba(239, 68, 68, 0.2); border-color: #ef4444; }
+
+        #btnMinus { border-color: rgba(245, 158, 11, 0.5); }
+        #btnMinus:hover:not(:disabled) { background: rgba(245, 158, 11, 0.2); border-color: #f59e0b; }
+
+        #btnBoutique { border-color: rgba(236, 72, 153, 0.5); }
+        #btnBoutique:hover:not(:disabled) { background: rgba(236, 72, 153, 0.2); border-color: #ec4899; }
+
+        #btnPlus { border-color: rgba(217, 70, 239, 0.5); }
+        #btnPlus:hover:not(:disabled) { background: rgba(217, 70, 239, 0.2); border-color: #d946ef; }
 
         .status-bar {
             display: flex;
@@ -85,39 +122,36 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            backdrop-filter: blur(8px);
+            transition: all 0.3s ease;
         }
 
-        .pieces-display { color: #fbbf24; background: rgba(251, 191, 36, 0.1); border: 1px solid #fbbf24; }
-        .repas-display { color: #f97316; background: rgba(249, 115, 22, 0.1); border: 1px solid #f97316; }
+        .pieces-display { color: #fbbf24; background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.5); }
+        .pieces-display:hover { background: rgba(251, 191, 36, 0.25); }
+        
+        .repas-display { color: #f97316; background: rgba(249, 115, 22, 0.1); border: 1px solid rgba(249, 115, 22, 0.5); }
+        .repas-display:hover { background: rgba(249, 115, 22, 0.25); }
 
         #panelPause {
             display: none;
-            /* --- CHANGEMENT : Fond Violet -> Fond Rose --- */
-            background: rgba(236, 72, 153, 0.15);
-            border: 2px solid #ec4899;
+            border: 1px solid rgba(236, 72, 153, 0.5);
             padding: 15px;
-            border-radius: 10px;
             width: 90%;
             max-width: 400px;
             margin-bottom: 15px;
             text-align: center;
         }
-        #titrePanelPause { margin: 0 0 10px 0; color: #ec4899; }
-        
-        #decomptePause { 
-            font-size: 2em; font-weight: bold; color: #ec4899; font-family: monospace; display: block; margin: 10px 0;
-        }
-        
-        #btnStopperPause { background-color: #d946ef; color: white; width: 100%; padding: 15px; font-size: 1.1em; }
+        #titrePanelPause { margin: 0 0 10px 0; color: #ec4899; text-shadow: 0 0 8px rgba(236, 72, 153, 0.5); }
+        #decomptePause { font-size: 2em; font-weight: bold; color: #ec4899; font-family: monospace; display: block; margin: 10px 0; }
+        #btnStopperPause { border-color: rgba(217, 70, 239, 0.5); width: 100%; padding: 15px; font-size: 1.1em; }
+        #btnStopperPause:hover { background: rgba(217, 70, 239, 0.2); border-color: #d946ef; }
 
-        .game-container {
-            text-align: center; width: 100%; display: flex; flex-direction: column; align-items: center;
-        }
-
+        .game-container { text-align: center; width: 100%; display: flex; flex-direction: column; align-items: center; }
         .image-wrapper { position: relative; display: inline-block; }
         
         img {
-            max-height: 50vh; max-width: 90vw; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.6); 
+            max-height: 50vh; max-width: 90vw; border-radius: 15px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8); 
             transition: opacity 0.5s ease-in-out, filter 0.3s ease; 
         }
 
@@ -131,9 +165,9 @@
 
         .glow { animation: glowImage 0.8s; }
         @keyframes glowImage {
-            0% { box-shadow: 0 8px 20px rgba(0,0,0,0.6); }
-            50% { box-shadow: 0 0 40px #f472b6, 0 0 10px #d946ef; } 
-            100% { box-shadow: 0 8px 20px rgba(0,0,0,0.6); }
+            0% { box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+            50% { box-shadow: 0 0 50px #f472b6, 0 0 20px #d946ef; } 
+            100% { box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
         }
 
         .en-pause { filter: grayscale(100%) opacity(0.5); }
@@ -143,7 +177,6 @@
             font-size: 5em; display: none; z-index: 10; filter: drop-shadow(0px 4px 10px rgba(0,0,0,0.8));
             animation: eatBurger 2s steps(4, end) infinite;
         }
-
         @keyframes eatBurger {
             0% { clip-path: inset(0 0% 0 0); opacity: 1; }
             90% { clip-path: inset(0 100% 0 0); opacity: 1; }
@@ -151,28 +184,31 @@
         }
 
         .controls {
-            margin-top: 15px; background: rgba(255, 255, 255, 0.1); padding: 15px; border-radius: 10px; width: 90%; max-width: 400px;
+            margin-top: 15px; padding: 15px; width: 90%; max-width: 400px;
         }
 
         .action-buttons { display: flex; gap: 8px; margin-bottom: 10px; }
+        .action-btn { padding: 10px 5px; font-size: 0.9em; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
 
-        .action-btn {
-            padding: 10px 5px; font-size: 0.9em; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px;
+        .inventaire { 
+            font-size: 0.9em; color: #cbd5e1; margin-top: 10px; 
+            background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; 
+            border: 1px solid rgba(255,255,255,0.05); font-weight: bold; 
         }
-
-        #btnMinus { background-color: #f59e0b; color: white; } 
-        #btnBoutique { background-color: #ec4899; color: white; } 
-        #btnPlus { background-color: #d946ef; color: white; } 
-
-        .inventaire { font-size: 0.9em; color: #cbd5e1; margin-top: 10px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; font-weight: bold; }
 
         #messageFin { display: none; margin-top: 15px; color: #fcd34d; font-weight: bold; font-size: 1.2em; text-align: center; }
 
         .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 100;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 100;
         }
+        
         .modal-content {
-            background: #2c2f33; padding: 20px; border-radius: 15px; width: 90%; max-width: 320px; color: white; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+            background: rgba(15, 15, 20, 0.7);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 20px; border-radius: 15px; width: 90%; max-width: 320px; color: white; text-align: center; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
             animation: fadeInModal 0.4s ease-out; 
         }
         @keyframes fadeInModal {
@@ -180,20 +216,25 @@
             to { opacity: 1; transform: scale(1); }
         }
 
-        .modal-content.boutique { border: 2px solid #ec4899; max-width: 350px; }
-        .modal-content.alerte { border: 2px solid #fbbf24; }
-        /* --- CHANGEMENT : Bordure modale pause Violet -> Rose --- */
-        .modal-content.choix-pause { border: 2px solid #ec4899; }
+        .modal-content.boutique { border: 1px solid rgba(236, 72, 153, 0.6); max-width: 350px; }
+        .modal-content.alerte { border: 1px solid rgba(251, 191, 36, 0.6); }
+        .modal-content.choix-pause { border: 1px solid rgba(236, 72, 153, 0.6); }
 
         .modal-content h3 { margin-top: 0; }
         .modal-content p { font-size: 0.95em; line-height: 1.5; color: #cbd5e1; white-space: pre-wrap; }
         
-        .menu-btn { width: 100%; margin-top: 10px; padding: 12px; border: none; border-radius: 8px; font-weight: bold; font-size: 1em; cursor: pointer; color: white; }
+        .menu-btn { width: 100%; margin-top: 10px; padding: 12px; font-size: 1em; }
+        
+        .btn-modal-annuler { border-color: rgba(107, 114, 128, 0.5); }
+        .btn-modal-annuler:hover { background: rgba(107, 114, 128, 0.2); border-color: #6b7280; }
+
     </style>
 </head>
 <body>
 
-    <div class="header">
+    <canvas id="bgCanvas"></canvas>
+
+    <div class="header glass-panel">
         <div id="chrono">00:00:00</div>
         <div class="header-buttons">
             <button id="btnStart">Démarrer</button>
@@ -201,364 +242,3 @@
             <button id="btnStop" disabled>Stopper</button>
         </div>
     </div>
-    
-    <div class="status-bar">
-        <div id="piecesDisplay" class="status-badge pieces-display">🪙 Pièces : 0</div>
-        <div id="repasDisplay" class="status-badge repas-display">🍔 Repas : 2</div>
-    </div>
-
-    <div id="panelPause">
-        <h3 id="titrePanelPause">🪙 EN PAUSE</h3>
-        <span id="decomptePause">00:00:00</span>
-        <button id="btnStopperPause">▶️ Reprendre le travail</button>
-    </div>
-
-    <div class="game-container" id="gameContainer">
-        <div class="image-wrapper" id="imageWrapper">
-            <img id="trackerImage" src="5.jpg" alt="État actuel du Chlorévisiomètre">
-            <div id="burgerLoader" class="burger-loader">🍔</div>
-        </div>
-        
-        <div class="controls">
-            <div class="action-buttons">
-                <button id="btnMinus" class="action-btn" disabled>
-                    <span>👎 Distraction</span>
-                    <small>-1 PV</small>
-                </button>
-                <button id="btnBoutique" class="action-btn" disabled>
-                    <span>🛒 Boutique</span>
-                    <small>Dépenser</small>
-                </button>
-                <button id="btnPlus" class="action-btn" disabled>
-                    <span>👍 Focus (1h)</span>
-                    <small>+2 PV</small>
-                </button>
-            </div>
-            
-            <div id="inventaire" class="inventaire">
-                🎁 Petites surprises : <span id="txtPetites">1</span> <br>
-                🎀 Grandes surprises : <span id="txtGrandes">0</span>
-            </div>
-
-            <p id="messageFin">Session terminée ! Excellent travail ! 🎉</p>
-        </div>
-    </div>
-
-    <div id="modalChoixPause" class="modal-overlay">
-        <div class="modal-content choix-pause">
-            <h3 style="color: #ec4899;">⏸️ Menu Pause</h3>
-            <p>Choisis le type de pause que tu souhaites prendre :</p>
-            <button id="btnChoixCafe" class="menu-btn" style="background:#ec4899;">🪙 Pause<br><small style="font-weight: normal;">(Coûte 30 pièces/minute)</small></button>
-            <button id="btnChoixRepas" class="menu-btn" style="background:#f97316;">🍔 Pause Repas<br><small style="font-weight: normal;">(Gratuit : 30 minutes garanties)</small></button>
-            <button onclick="fermerModal('modalChoixPause')" class="menu-btn" style="background:#6b7280; margin-top:20px;">Annuler</button>
-        </div>
-    </div>
-
-    <div id="modalBoutique" class="modal-overlay">
-        <div class="modal-content boutique">
-            <h3 style="color: #ec4899;">🛒 Boutique Pro</h3>
-            <p>Choisis ton moyen de paiement :</p>
-            
-            <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; margin-bottom: 15px;">
-                <span style="color: #fbbf24;">💛 Cœurs dispos : <span id="coeursJaunesDispos">0</span></span><br>
-                <span style="color: #fbbf24;">🪙 Pièces dispos : <span id="piecesBoutiqueDispos">0</span></span>
-            </div>
-
-            <h4 style="margin: 10px 0 5px 0; color: #cbd5e1; text-align: left;">🎁 Petite Surprise</h4>
-            <div style="display: flex; gap: 8px;">
-                <button id="btnAchatPetiteCoeur" class="menu-btn" style="background:#ec4899; margin-top:0; padding: 10px;">2 💛</button>
-                <button id="btnAchatPetitePiece" class="menu-btn" style="background:#f59e0b; margin-top:0; padding: 10px;">300 🪙</button>
-            </div>
-
-            <h4 style="margin: 15px 0 5px 0; color: #cbd5e1; text-align: left;">🎀 Grande Surprise</h4>
-            <div style="display: flex; gap: 8px;">
-                <button id="btnAchatGrandeCoeur" class="menu-btn" style="background:#ec4899; margin-top:0; padding: 10px;">3 💛</button>
-                <button id="btnAchatGrandePiece" class="menu-btn" style="background:#f59e0b; margin-top:0; padding: 10px;">600 🪙</button>
-            </div>
-            
-            <button onclick="fermerModal('modalBoutique')" class="menu-btn" style="background:#6b7280; margin-top:20px;">Fermer</button>
-        </div>
-    </div>
-
-    <div id="modalAlerte" class="modal-overlay">
-        <div class="modal-content alerte">
-            <h3 id="titreAlerte" style="color: #fbbf24;">Alerte</h3>
-            <p id="texteAlerte">Message</p>
-            <button onclick="fermerModal('modalAlerte')" class="menu-btn" style="background:#a855f7;">OK</button> 
-        </div>
-    </div>
-
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyDaHguuxN1Jq8c4YZuk0XEzm1E-tHTBzAY",
-            authDomain: "chlorevisiometre.firebaseapp.com",
-            databaseURL: "https://chlorevisiometre-default-rtdb.europe-west1.firebasedatabase.app",
-            projectId: "chlorevisiometre",
-            storageBucket: "chlorevisiometre.firebasestorage.app",
-            messagingSenderId: "455853187691",
-            appId: "1:455853187691:web:5b224a6605e44946a9472e"
-        };
-
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const gameRef = ref(db, 'sessionPartagee');
-        const offsetRef = ref(db, ".info/serverTimeOffset");
-
-        let serverTimeOffset = 0;
-        let gameState = {
-            pvActuels: 5,
-            piecesBase: 0,
-            repasRestants: 2,
-            nbPetitesSurprises: 0,
-            nbGrandesSurprises: 0,
-            modeJeu: 'attente',
-            timestampMode: null,
-            tempsTravailCumule: 0 
-        };
-
-        let localPieces = 0; 
-        let isTransitioning = false; 
-
-        onValue(offsetRef, (snap) => {
-            serverTimeOffset = snap.val() || 0;
-        });
-
-        const imageElement = document.getElementById("trackerImage");
-        const burgerLoader = document.getElementById("burgerLoader");
-        const chronoAffichage = document.getElementById("chrono");
-        const decomptePause = document.getElementById("decomptePause");
-        const piecesDisplay = document.getElementById("piecesDisplay");
-        const repasDisplay = document.getElementById("repasDisplay");
-        const panelPause = document.getElementById("panelPause");
-        const titrePanelPause = document.getElementById("titrePanelPause");
-        const btnStart = document.getElementById("btnStart");
-        const btnPause = document.getElementById("btnPause");
-        const btnStop = document.getElementById("btnStop");
-        const btnMinus = document.getElementById("btnMinus");
-        const btnBoutique = document.getElementById("btnBoutique");
-        const btnPlus = document.getElementById("btnPlus");
-        const messageFin = document.getElementById("messageFin");
-        const coeursJaunesDispos = document.getElementById("coeursJaunesDispos");
-        const piecesBoutiqueDispos = document.getElementById("piecesBoutiqueDispos");
-
-        window.ouvrirModal = function(id) { document.getElementById(id).style.display = "flex"; }
-        window.fermerModal = function(id) { document.getElementById(id).style.display = "none"; }
-        window.afficherAlerte = function(titre, texte) {
-            document.getElementById("titreAlerte").innerText = titre;
-            document.getElementById("texteAlerte").innerText = texte;
-            window.ouvrirModal("modalAlerte");
-        }
-
-        function formaterTemps(secondes) {
-            if(secondes < 0) secondes = 0;
-            let h = Math.floor(secondes / 3600);
-            let m = Math.floor((secondes % 3600) / 60);
-            let s = secondes % 60;
-            return String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
-        }
-
-        function sendUpdate(patch) {
-            const newState = { ...gameState, ...patch };
-            set(gameRef, newState);
-        }
-
-        onValue(gameRef, (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                gameState = data;
-                mettreAJourInterface();
-            }
-        });
-
-        function triggerAnimation(className) {
-            imageElement.classList.add(className);
-            setTimeout(() => {
-                imageElement.classList.remove(className);
-            }, 800); 
-        }
-
-        function mettreAJourInterface() {
-            imageElement.src = gameState.pvActuels + ".jpg"; 
-            let basePetite = (gameState.pvActuels >= 5) ? 1 : 0;
-            let baseGrande = (gameState.pvActuels >= 7) ? 1 : 0;
-            
-            document.getElementById("txtPetites").innerText = gameState.nbPetitesSurprises + basePetite;
-            document.getElementById("txtGrandes").innerText = gameState.nbGrandesSurprises + baseGrande;
-            repasDisplay.innerText = "🍔 Repas : " + gameState.repasRestants; 
-            
-            coeursJaunesDispos.innerText = Math.max(0, gameState.pvActuels - 5);
-            piecesBoutiqueDispos.innerText = localPieces;
-
-            if (gameState.modeJeu === 'attente') {
-                btnStart.disabled = false;
-                btnPause.disabled = true; btnStop.disabled = true; btnMinus.disabled = true; btnBoutique.disabled = true; btnPlus.disabled = true;
-                panelPause.style.display = "none"; imageElement.classList.remove("en-pause"); burgerLoader.style.display = "none";
-                piecesDisplay.innerText = "🪙 Pièces : 0"; chronoAffichage.innerText = "00:00:00"; messageFin.style.display = "block";
-            } else {
-                messageFin.style.display = "none";
-                btnStart.disabled = true; btnStop.disabled = false;
-                if (gameState.modeJeu === 'travail') {
-                    btnPause.disabled = false; btnMinus.disabled = false; btnBoutique.disabled = false; btnPlus.disabled = false;
-                    panelPause.style.display = "none"; imageElement.classList.remove("en-pause"); burgerLoader.style.display = "none";
-                } else {
-                    btnPause.disabled = true; btnMinus.disabled = true; btnBoutique.disabled = true; btnPlus.disabled = true;
-                    panelPause.style.display = "block"; imageElement.classList.add("en-pause");
-                    if (gameState.modeJeu === 'pause_cafe') {
-                        // --- CHANGEMENT : Texte de pause en Rose ---
-                        titrePanelPause.innerText = "🪙 EN PAUSE"; titrePanelPause.style.color = "#ec4899"; burgerLoader.style.display = "none";
-                    } else {
-                        titrePanelPause.innerText = "🍔 BON APPÉTIT"; titrePanelPause.style.color = "#f97316"; burgerLoader.style.display = "block";
-                    }
-                }
-            }
-        }
-
-        function tickLocal() {
-            if (gameState.modeJeu === 'attente' || !gameState.timestampMode) {
-                if (gameState.modeJeu !== 'attente') chronoAffichage.innerText = "Synchro...";
-                return;
-            }
-
-            let nowCorrected = Date.now() + serverTimeOffset;
-            let elapsedSeconds = Math.floor((nowCorrected - gameState.timestampMode) / 1000);
-
-            if (gameState.modeJeu === 'travail') {
-                let gainedPieces = Math.floor(elapsedSeconds / 60) * 5;
-                localPieces = gameState.piecesBase + gainedPieces;
-                
-                let totalSeconds = (gameState.tempsTravailCumule || 0) + elapsedSeconds;
-                chronoAffichage.innerText = formaterTemps(totalSeconds);
-                piecesDisplay.innerText = "🪙 Pièces : " + localPieces;
-                piecesBoutiqueDispos.innerText = localPieces;
-            } 
-            else if (gameState.modeJeu === 'pause_cafe') {
-                let spentPieces = Math.floor(elapsedSeconds / 2); 
-                localPieces = gameState.piecesBase - spentPieces;
-                let tempsRestant = (gameState.piecesBase * 2) - elapsedSeconds;
-                
-                if (tempsRestant <= 0 && !isTransitioning) {
-                    isTransitioning = true; sortirDePause(0);
-                    setTimeout(() => isTransitioning = false, 2000);
-                } else {
-                    decomptePause.innerText = formaterTemps(tempsRestant);
-                    piecesDisplay.innerText = "🪙 Pièces : " + localPieces;
-                    chronoAffichage.innerText = formaterTemps(gameState.tempsTravailCumule);
-                }
-            }
-            else if (gameState.modeJeu === 'pause_repas') {
-                localPieces = gameState.piecesBase;
-                let tempsRestant = 1800 - elapsedSeconds; 
-                
-                if (tempsRestant <= 0 && !isTransitioning) {
-                    isTransitioning = true; sortirDePause(gameState.piecesBase);
-                    setTimeout(() => isTransitioning = false, 2000);
-                } else {
-                    decomptePause.innerText = formaterTemps(tempsRestant);
-                    chronoAffichage.innerText = formaterTemps(gameState.tempsTravailCumule);
-                }
-            }
-        }
-
-        setInterval(tickLocal, 500);
-
-        btnStart.addEventListener("click", () => {
-            sendUpdate({
-                pvActuels: 5, piecesBase: 0, repasRestants: 2, nbPetitesSurprises: 0, nbGrandesSurprises: 0, 
-                modeJeu: 'travail', timestampMode: serverTimestamp(), tempsTravailCumule: 0 
-            });
-        });
-
-        btnStop.addEventListener("click", () => sendUpdate({ modeJeu: 'attente', timestampMode: null }));
-
-        function commitTravail() {
-            let nowCorrected = Date.now() + serverTimeOffset;
-            let elapsedSeconds = Math.floor((nowCorrected - gameState.timestampMode) / 1000);
-            return {
-                tempsTravailCumule: (gameState.tempsTravailCumule || 0) + elapsedSeconds,
-                piecesBase: localPieces,
-                timestampMode: serverTimestamp()
-            };
-        }
-
-        document.getElementById("btnChoixCafe").addEventListener("click", () => {
-            if (localPieces < 1) return;
-            window.fermerModal("modalChoixPause");
-            
-            let update = commitTravail();
-            update.modeJeu = 'pause_cafe';
-            sendUpdate(update);
-        });
-
-        document.getElementById("btnChoixRepas").addEventListener("click", () => {
-            if (gameState.repasRestants <= 0) return;
-            window.fermerModal("modalChoixPause");
-            
-            let update = commitTravail();
-            update.modeJeu = 'pause_repas';
-            update.repasRestants = gameState.repasRestants - 1;
-            sendUpdate(update);
-        });
-
-        function sortirDePause(piecesRestantes) { 
-            sendUpdate({ modeJeu: 'travail', piecesBase: piecesRestantes, timestampMode: serverTimestamp() }); 
-        }
-        
-        document.getElementById("btnStopperPause").addEventListener("click", () => sortirDePause(localPieces));
-        btnPause.addEventListener("click", () => window.ouvrirModal("modalChoixPause"));
-
-
-        btnMinus.addEventListener("click", () => {
-            if (gameState.modeJeu !== 'travail') return;
-            
-            triggerAnimation('shake');
-            
-            if (gameState.pvActuels > 5) sendUpdate({ pvActuels: 5 });
-            else if (gameState.pvActuels > 1) sendUpdate({ pvActuels: gameState.pvActuels - 1 });
-        });
-
-        btnPlus.addEventListener("click", () => {
-            if (gameState.modeJeu !== 'travail') return;
-            
-            triggerAnimation('glow');
-            
-            sendUpdate({ pvActuels: Math.min(10, gameState.pvActuels + 2) });
-        });
-
-        btnBoutique.addEventListener("click", () => {
-            window.ouvrirModal("modalBoutique");
-        });
-
-        document.getElementById("btnAchatPetiteCoeur").addEventListener("click", () => {
-            if (gameState.pvActuels - 5 >= 2) {
-                sendUpdate({ pvActuels: gameState.pvActuels - 2, nbPetitesSurprises: gameState.nbPetitesSurprises + 1 });
-                window.afficherAlerte("🎁 Succès", "Petite surprise achetée avec 2 cœurs !");
-            } else window.afficherAlerte("❌ Erreur", "Tu n'as pas assez de cœurs jaunes !");
-        });
-
-        document.getElementById("btnAchatPetitePiece").addEventListener("click", () => {
-            if (localPieces >= 300) {
-                sendUpdate({ piecesBase: gameState.piecesBase - 300, nbPetitesSurprises: gameState.nbPetitesSurprises + 1 });
-                window.afficherAlerte("🎁 Succès", "Petite surprise achetée avec 300 pièces !");
-            } else window.afficherAlerte("❌ Erreur", "Tu n'as pas assez de pièces !");
-        });
-
-        document.getElementById("btnAchatGrandeCoeur").addEventListener("click", () => {
-            if (gameState.pvActuels - 5 >= 3) {
-                sendUpdate({ pvActuels: gameState.pvActuels - 3, nbGrandesSurprises: gameState.nbGrandesSurprises + 1 });
-                window.afficherAlerte("🎀 Succès", "Grande surprise achetée avec 3 cœurs !");
-            } else window.afficherAlerte("❌ Erreur", "Tu n'as pas assez de cœurs jaunes !");
-        });
-
-        document.getElementById("btnAchatGrandePiece").addEventListener("click", () => {
-            if (localPieces >= 600) {
-                sendUpdate({ piecesBase: gameState.piecesBase - 600, nbGrandesSurprises: gameState.nbGrandesSurprises + 1 });
-                window.afficherAlerte("🎀 Succès", "Grande surprise achetée avec 600 pièces !");
-            } else window.afficherAlerte("❌ Erreur", "Tu n'as pas assez de pièces !");
-        });
-
-    </script>
-</body>
-</html>
