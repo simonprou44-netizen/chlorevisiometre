@@ -167,7 +167,7 @@
 <body>
 
     <div class="header">
-        <div id="chrono">Synchronisation...</div>
+        <div id="chrono">00:00:00</div>
         <div class="header-buttons">
             <button id="btnStart">Démarrer</button>
             <button id="btnPause" disabled>Pause</button>
@@ -280,7 +280,8 @@
             nbPetitesSurprises: 0,
             nbGrandesSurprises: 0,
             modeJeu: 'attente',
-            timestampMode: null
+            timestampMode: null,
+            tempsTravailCumule: 0 // Nouvelle variable pour mémoriser le temps
         };
 
         let localPieces = 0; 
@@ -380,7 +381,10 @@
             if (gameState.modeJeu === 'travail') {
                 let gainedPieces = Math.floor(elapsedSeconds / 60) * 5;
                 localPieces = gameState.piecesBase + gainedPieces;
-                chronoAffichage.innerText = formaterTemps(elapsedSeconds);
+                
+                // On affiche le cumulé + le temps de la session en cours
+                let totalSeconds = (gameState.tempsTravailCumule || 0) + elapsedSeconds;
+                chronoAffichage.innerText = formaterTemps(totalSeconds);
                 piecesDisplay.innerText = "🪙 Pièces : " + localPieces;
             } 
             else if (gameState.modeJeu === 'pause_cafe') {
@@ -393,6 +397,8 @@
                 } else {
                     decomptePause.innerText = formaterTemps(tempsRestant);
                     piecesDisplay.innerText = "🪙 Pièces : " + localPieces;
+                    // Le chrono principal reste figé sur le temps de travail total
+                    chronoAffichage.innerText = formaterTemps(gameState.tempsTravailCumule);
                 }
             }
             else if (gameState.modeJeu === 'pause_repas') {
@@ -402,6 +408,7 @@
                     setTimeout(() => isTransitioning = false, 2000);
                 } else {
                     decomptePause.innerText = formaterTemps(tempsRestant);
+                    chronoAffichage.innerText = formaterTemps(gameState.tempsTravailCumule);
                 }
             }
         }
@@ -410,7 +417,8 @@
 
         btnStart.addEventListener("click", () => {
             sendUpdate({
-                pvActuels: 5, piecesBase: 0, repasRestants: 2, nbPetitesSurprises: 0, nbGrandesSurprises: 0, modeJeu: 'travail', timestampMode: serverTimestamp()
+                pvActuels: 5, piecesBase: 0, repasRestants: 2, nbPetitesSurprises: 0, nbGrandesSurprises: 0, 
+                modeJeu: 'travail', timestampMode: serverTimestamp(), tempsTravailCumule: 0 // Reset complet
             });
         });
 
@@ -429,22 +437,41 @@
 
         btnPause.addEventListener("click", () => window.ouvrirModal("modalChoixPause"));
 
+        // Fonction pour sauvegarder le temps de travail avant de changer de mode
+        function preparerChangementMode(nouveauMode) {
+            let nowCorrected = Date.now() + serverTimeOffset;
+            let segmentTravail = Math.floor((nowCorrected - gameState.timestampMode) / 1000);
+            return {
+                tempsTravailCumule: (gameState.tempsTravailCumule || 0) + segmentTravail,
+                timestampMode: serverTimestamp()
+            };
+        }
+
         document.getElementById("btnChoixCafe").addEventListener("click", () => {
             if (localPieces < 1) return;
             window.fermerModal("modalChoixPause");
-            sendUpdate({ modeJeu: 'pause_cafe', piecesBase: localPieces, timestampMode: serverTimestamp() });
+            let update = preparerChangementMode();
+            update.modeJeu = 'pause_cafe';
+            update.piecesBase = localPieces;
+            sendUpdate(update);
         });
 
         document.getElementById("btnChoixRepas").addEventListener("click", () => {
             if (gameState.repasRestants <= 0) return;
             window.fermerModal("modalChoixPause");
-            sendUpdate({ modeJeu: 'pause_repas', piecesBase: localPieces, repasRestants: gameState.repasRestants - 1, timestampMode: serverTimestamp() });
+            let update = preparerChangementMode();
+            update.modeJeu = 'pause_repas';
+            update.piecesBase = localPieces;
+            update.repasRestants = gameState.repasRestants - 1;
+            sendUpdate(update);
         });
 
-        function sortirDePause(p) { sendUpdate({ modeJeu: 'travail', piecesBase: p, timestampMode: serverTimestamp() }); }
+        function sortirDePause(p) { 
+            sendUpdate({ modeJeu: 'travail', piecesBase: p, timestampMode: serverTimestamp() }); 
+        }
+        
         document.getElementById("btnStopperPause").addEventListener("click", () => sortirDePause(localPieces));
 
-        // --- GESTION BOUTIQUE ---
         btnBoutique.addEventListener("click", () => {
             coeursJaunesDispos.innerText = Math.max(0, gameState.pvActuels - 5);
             piecesBoutiqueDispos.innerText = localPieces;
@@ -453,17 +480,15 @@
 
         document.getElementById("btnAchatPetite").addEventListener("click", () => {
             let coeurs = Math.max(0, gameState.pvActuels - 5);
-            // Paye avec des cœurs d'abord
             if (coeurs >= 2) {
                 sendUpdate({ pvActuels: gameState.pvActuels - 2, nbPetitesSurprises: gameState.nbPetitesSurprises + 1 });
                 window.afficherAlerte("🎁 Succès", "Petite surprise achetée avec 2 cœurs !");
             } 
-            // Sinon paye avec les pièces
             else if (localPieces >= 300) {
                 sendUpdate({ 
                     piecesBase: localPieces - 300, 
                     nbPetitesSurprises: gameState.nbPetitesSurprises + 1,
-                    timestampMode: serverTimestamp() // Reset chrono pour recalculer les pièces depuis la nouvelle base
+                    timestampMode: serverTimestamp() 
                 });
                 window.afficherAlerte("🎁 Succès", "Petite surprise achetée avec 300 pièces !");
             } 
