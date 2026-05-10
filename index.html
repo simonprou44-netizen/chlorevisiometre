@@ -19,7 +19,7 @@
             color: white;
             user-select: none; 
             -webkit-user-select: none;
-            background-color: #0a0a0c; /* Fond très sombre */
+            background-color: #0a0a0c; 
             overflow-x: hidden;
         }
 
@@ -30,7 +30,7 @@
             width: 100%;
             height: 100%;
             z-index: -1;
-            pointer-events: none; /* Laisse passer les clics vers les boutons */
+            pointer-events: none; 
         }
 
         /* --- EFFET VERRE DÉPOLI (GLASSMORPHISM) --- */
@@ -78,7 +78,7 @@
             transition: all 0.3s ease;
             flex: 1;
             color: white;
-            background: rgba(20, 20, 25, 0.6); /* Transparent sombre par défaut */
+            background: rgba(20, 20, 25, 0.6); 
             backdrop-filter: blur(4px);
             border: 1px solid transparent;
         }
@@ -86,7 +86,6 @@
         button:active { transform: scale(0.95); }
         button:disabled { background: rgba(30, 30, 35, 0.4) !important; border-color: rgba(255,255,255,0.05) !important; color: rgba(255,255,255,0.3); cursor: not-allowed; transform: none; }
 
-        /* Couleurs dynamiques au survol */
         #btnStart { border-color: rgba(16, 185, 129, 0.5); }
         #btnStart:hover:not(:disabled) { background: rgba(16, 185, 129, 0.2); border-color: #10b981; }
 
@@ -289,7 +288,7 @@
         <div class="modal-content choix-pause">
             <h3 style="color: #ec4899;">⏸️ Menu Pause</h3>
             <p>Choisis le type de pause que tu souhaites prendre :</p>
-            <button id="btnChoixCafe" class="menu-btn border-pink">🪙 Pause<br><small style="font-weight: normal;">(Coûte 30 pièces/minute)</small></button>
+            <button id="btnChoixCafe" class="menu-btn border-pink" style="border-color: rgba(236, 72, 153, 0.5);" onmouseover="this.style.background='rgba(236, 72, 153, 0.2)'; this.style.borderColor='#ec4899'" onmouseout="this.style.background='rgba(20, 20, 25, 0.6)'; this.style.borderColor='rgba(236, 72, 153, 0.5)'">🪙 Pause<br><small style="font-weight: normal;">(Coûte 30 pièces/minute)</small></button>
             <button id="btnChoixRepas" class="menu-btn border-orange" style="border-color: rgba(249, 115, 22, 0.5);" onmouseover="this.style.background='rgba(249, 115, 22, 0.2)'; this.style.borderColor='#f97316'" onmouseout="this.style.background='rgba(20, 20, 25, 0.6)'; this.style.borderColor='rgba(249, 115, 22, 0.5)'">🍔 Pause Repas<br><small style="font-weight: normal;">(Gratuit : 30 min)</small></button>
             <button onclick="fermerModal('modalChoixPause')" class="menu-btn btn-modal-annuler" style="margin-top:20px;">Annuler</button>
         </div>
@@ -348,18 +347,18 @@
             mouseY = e.clientY;
         });
 
-        // Paramètres configurés sur-mesure (Taille 70, Intensité Lueur 2)
-        const gridSize = 70; 
+        // --- NOUVEAUX PARAMÈTRES (Mosaïque réduite et lueur plus resserrée) ---
+        const gridSize = 45; // Taille réduite (était 70)
         const glowIntensity = 2; 
-        const glowRadius = 400 * (glowIntensity / 1.5); // Large portée de la lueur
-        const gridRadius = 250; // Courte portée de la mosaïque (inférieure à la lueur)
+        const glowRadius = 320; // Portée réduite
+        const gridRadius = 220; // Zone où la mosaïque s'active
 
         function drawBackground() {
             ctx.clearRect(0, 0, width, height);
 
             // 1. Dessiner la lueur monochrome rose
             let gradient = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, glowRadius);
-            gradient.addColorStop(0, `rgba(236, 72, 153, ${0.15 * glowIntensity})`); 
+            gradient.addColorStop(0, `rgba(236, 72, 153, ${0.12 * glowIntensity})`); 
             gradient.addColorStop(1, 'rgba(236, 72, 153, 0)');
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, width, height);
@@ -371,8 +370,8 @@
             const startRow = Math.floor((mouseY - gridRadius) / gridSize);
             const endRow = Math.ceil((mouseY + gridRadius) / gridSize);
 
-            // Le temps sert de graine pour l'aléatoire (fait clignoter doucement)
-            const time = Date.now() / 200; 
+            // Le temps pour animer le scintillement
+            const time = Date.now() / 250; 
 
             for (let x = startCol; x <= endCol; x++) {
                 for (let y = startRow; y <= endRow; y++) {
@@ -383,19 +382,23 @@
                     const dist = Math.hypot(mouseX - centerX, mouseY - centerY);
 
                     if (dist < gridRadius) {
-                        // Randomizer doux (crée un effet de mosaïque vivante)
-                        const randomFactor = Math.sin(x * 12.9898 + y * 78.233 + time) * 43758.5453 % 1;
-                        
-                        if (randomFactor > 0.4) {
-                            // Atténuation par la distance (fondu sur les bords)
-                            let alpha = (1 - dist / gridRadius) * 0.4;
+                        // NOUVEAU RANDOMIZER : Scintillement homogène et indépendant pour chaque case
+                        // La seed (graine) est fixe pour chaque case
+                        const seed = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
+                        // On utilise la seed pour décaler la phase dans le temps
+                        const pulse = Math.sin(time + seed);
+
+                        // Seules les cases avec un pulse positif s'éclairent
+                        if (pulse > 0.2) {
+                            // On diminue l'opacité vers les bords du cercle
+                            let alpha = (1 - dist / gridRadius) * 0.5 * pulse; 
                             
                             // Contour du carré
                             ctx.strokeStyle = `rgba(236, 72, 153, ${alpha})`;
                             ctx.strokeRect(rectX, rectY, gridSize, gridSize);
                             
-                            // Léger remplissage pour accentuer la "mosaïque"
-                            if (randomFactor > 0.8) {
+                            // Remplissage léger
+                            if (pulse > 0.7) {
                                 ctx.fillStyle = `rgba(236, 72, 153, ${alpha * 0.15})`;
                                 ctx.fillRect(rectX, rectY, gridSize, gridSize);
                             }
