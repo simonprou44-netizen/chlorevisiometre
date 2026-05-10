@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chlorévisiomètre Pro Animé</title>
+    <title>Chlorévisiomètre Pro Animé + Ambiance Rose/Violette</title>
     <style>
         body {
             display: flex;
@@ -38,7 +38,8 @@
             font-size: 2.2em;
             font-weight: bold;
             font-family: monospace;
-            color: #4ade80;
+            /* --- CHANGEMENT : Vert -> Rose brillant --- */
+            color: #f472b6; 
         }
 
         .header-buttons {
@@ -54,16 +55,17 @@
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.2s ease-in-out; /* --- ANIMATION : Transition douce --- */
+            transition: all 0.2s ease-in-out;
             flex: 1;
             touch-action: manipulation; 
         }
 
-        button:not(:disabled):hover { transform: scale(1.05); /* --- ANIMATION : Pulsation souris --- */ }
+        button:not(:disabled):hover { transform: scale(1.05); }
         button:active { transform: scale(0.95); }
         button:disabled { background-color: #6b7280 !important; opacity: 0.5; cursor: not-allowed; transform: none; }
 
-        #btnStart { background-color: #10b981; color: white; } 
+        /* --- CHANGEMENT : Bouton Démarrer Vert -> Violet/Rose vif --- */
+        #btnStart { background-color: #d946ef; color: white; } 
         #btnPause { background-color: #a855f7; color: white; } 
         #btnStop { background-color: #ef4444; color: white; }
 
@@ -105,7 +107,9 @@
         #decomptePause { 
             font-size: 2em; font-weight: bold; color: #a855f7; font-family: monospace; display: block; margin: 10px 0;
         }
-        #btnStopperPause { background-color: #10b981; color: white; width: 100%; padding: 15px; font-size: 1.1em; }
+        
+        /* --- CHANGEMENT : Bouton Reprendre Vert -> Violet/Rose vif --- */
+        #btnStopperPause { background-color: #d946ef; color: white; width: 100%; padding: 15px; font-size: 1.1em; }
 
         .game-container {
             text-align: center; width: 100%; display: flex; flex-direction: column; align-items: center;
@@ -115,10 +119,9 @@
         
         img {
             max-height: 50vh; max-width: 90vw; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.6); 
-            transition: opacity 0.5s ease-in-out, filter 0.3s ease; /* --- ANIMATION : Fondu image --- */
+            transition: opacity 0.5s ease-in-out, filter 0.3s ease; 
         }
 
-        /* --- ANIMATIONS : Secousse Dégât --- */
         .shake { animation: shakeImage 0.8s; }
         @keyframes shakeImage {
             10%, 90% { transform: translate3d(-1px, 0, 0); }
@@ -127,11 +130,11 @@
             40%, 60% { transform: translate3d(4px, 0, 0); }
         }
 
-        /* --- ANIMATIONS : Brillance Bonus --- */
         .glow { animation: glowImage 0.8s; }
         @keyframes glowImage {
             0% { box-shadow: 0 8px 20px rgba(0,0,0,0.6); }
-            50% { box-shadow: 0 0 40px #4ade80, 0 0 10px #10b981; }
+            /* --- CHANGEMENT : Pulsation Verte -> Pulsation Rose fuchsia --- */
+            50% { box-shadow: 0 0 40px #f472b6, 0 0 10px #d946ef; } 
             100% { box-shadow: 0 8px 20px rgba(0,0,0,0.6); }
         }
 
@@ -161,7 +164,9 @@
 
         #btnMinus { background-color: #f59e0b; color: white; } 
         #btnBoutique { background-color: #ec4899; color: white; } 
-        #btnPlus { background-color: #10b981; color: white; } 
+        
+        /* --- CHANGEMENT : Bouton Plus Vert -> Violet/Rose vif --- */
+        #btnPlus { background-color: #d946ef; color: white; } 
 
         .inventaire { font-size: 0.9em; color: #cbd5e1; margin-top: 10px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; font-weight: bold; }
 
@@ -172,7 +177,7 @@
         }
         .modal-content {
             background: #2c2f33; padding: 20px; border-radius: 15px; width: 90%; max-width: 320px; color: white; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.8);
-            animation: fadeInModal 0.4s ease-out; /* --- ANIMATION : Ouverture modale --- */
+            animation: fadeInModal 0.4s ease-out; 
         }
         @keyframes fadeInModal {
             from { opacity: 0; transform: scale(0.9); }
@@ -282,7 +287,7 @@
         <div class="modal-content alerte">
             <h3 id="titreAlerte" style="color: #fbbf24;">Alerte</h3>
             <p id="texteAlerte">Message</p>
-            <button onclick="fermerModal('modalAlerte')" class="menu-btn" style="background:#3b82f6;">OK</button>
+            <button onclick="fermerModal('modalAlerte')" class="menu-btn" style="background:#a855f7;">OK</button> 
         </div>
     </div>
 
@@ -371,17 +376,14 @@
             }
         });
 
-        // --- ANIMATION : Trigger Animations ---
-        // Cette fonction ajoute une classe temporairement pour déclencher l'animation
         function triggerAnimation(className) {
             imageElement.classList.add(className);
             setTimeout(() => {
                 imageElement.classList.remove(className);
-            }, 800); // Durée de l'animation CSS
+            }, 800); 
         }
 
         function mettreAJourInterface() {
-            // L'image change avec un fondu doux (CSS)
             imageElement.src = gameState.pvActuels + ".jpg"; 
             let basePetite = (gameState.pvActuels >= 5) ? 1 : 0;
             let baseGrande = (gameState.pvActuels >= 7) ? 1 : 0;
@@ -390,7 +392,6 @@
             document.getElementById("txtGrandes").innerText = gameState.nbGrandesSurprises + baseGrande;
             repasDisplay.innerText = "🍔 Repas : " + gameState.repasRestants; 
             
-            // Mise à jour de la boutique en temps réel
             coeursJaunesDispos.innerText = Math.max(0, gameState.pvActuels - 5);
             piecesBoutiqueDispos.innerText = localPieces;
 
@@ -430,7 +431,6 @@
                 let gainedPieces = Math.floor(elapsedSeconds / 60) * 5;
                 localPieces = gameState.piecesBase + gainedPieces;
                 
-                // Cumulé + session actuelle
                 let totalSeconds = (gameState.tempsTravailCumule || 0) + elapsedSeconds;
                 chronoAffichage.innerText = formaterTemps(totalSeconds);
                 piecesDisplay.innerText = "🪙 Pièces : " + localPieces;
@@ -466,7 +466,6 @@
 
         setInterval(tickLocal, 500);
 
-        // --- GESTION DU TEMPS ET DES PAUSES ---
         btnStart.addEventListener("click", () => {
             sendUpdate({
                 pvActuels: 5, piecesBase: 0, repasRestants: 2, nbPetitesSurprises: 0, nbGrandesSurprises: 0, 
@@ -513,11 +512,9 @@
         btnPause.addEventListener("click", () => window.ouvrirModal("modalChoixPause"));
 
 
-        // --- ACTIONS PV ET BOUTIQUE ---
         btnMinus.addEventListener("click", () => {
             if (gameState.modeJeu !== 'travail') return;
             
-            // --- ANIMATION : Trigger Shake ---
             triggerAnimation('shake');
             
             if (gameState.pvActuels > 5) sendUpdate({ pvActuels: 5 });
@@ -527,7 +524,6 @@
         btnPlus.addEventListener("click", () => {
             if (gameState.modeJeu !== 'travail') return;
             
-            // --- ANIMATION : Trigger Glow ---
             triggerAnimation('glow');
             
             sendUpdate({ pvActuels: Math.min(10, gameState.pvActuels + 2) });
@@ -537,7 +533,6 @@
             window.ouvrirModal("modalBoutique");
         });
 
-        // --- GESTION BOUTIQUE SÉPARÉE ---
         document.getElementById("btnAchatPetiteCoeur").addEventListener("click", () => {
             if (gameState.pvActuels - 5 >= 2) {
                 sendUpdate({ pvActuels: gameState.pvActuels - 2, nbPetitesSurprises: gameState.nbPetitesSurprises + 1 });
