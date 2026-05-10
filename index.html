@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chlorévisiomètre Pro Animé + Ambiance Rose/Violette</title>
+    <title>Chlorévisiomètre Pro Animé + Ambiance Rose</title>
     <style>
         body {
             display: flex;
@@ -38,7 +38,6 @@
             font-size: 2.2em;
             font-weight: bold;
             font-family: monospace;
-            /* --- CHANGEMENT : Vert -> Rose brillant --- */
             color: #f472b6; 
         }
 
@@ -64,9 +63,9 @@
         button:active { transform: scale(0.95); }
         button:disabled { background-color: #6b7280 !important; opacity: 0.5; cursor: not-allowed; transform: none; }
 
-        /* --- CHANGEMENT : Bouton Démarrer Vert -> Violet/Rose vif --- */
         #btnStart { background-color: #d946ef; color: white; } 
-        #btnPause { background-color: #a855f7; color: white; } 
+        /* --- CHANGEMENT : Violet -> Rose --- */
+        #btnPause { background-color: #ec4899; color: white; } 
         #btnStop { background-color: #ef4444; color: white; }
 
         .status-bar {
@@ -93,8 +92,9 @@
 
         #panelPause {
             display: none;
-            background: rgba(168, 85, 247, 0.15);
-            border: 2px solid #a855f7;
+            /* --- CHANGEMENT : Fond Violet -> Fond Rose --- */
+            background: rgba(236, 72, 153, 0.15);
+            border: 2px solid #ec4899;
             padding: 15px;
             border-radius: 10px;
             width: 90%;
@@ -102,13 +102,12 @@
             margin-bottom: 15px;
             text-align: center;
         }
-        #titrePanelPause { margin: 0 0 10px 0; color: #a855f7; }
+        #titrePanelPause { margin: 0 0 10px 0; color: #ec4899; }
         
         #decomptePause { 
-            font-size: 2em; font-weight: bold; color: #a855f7; font-family: monospace; display: block; margin: 10px 0;
+            font-size: 2em; font-weight: bold; color: #ec4899; font-family: monospace; display: block; margin: 10px 0;
         }
         
-        /* --- CHANGEMENT : Bouton Reprendre Vert -> Violet/Rose vif --- */
         #btnStopperPause { background-color: #d946ef; color: white; width: 100%; padding: 15px; font-size: 1.1em; }
 
         .game-container {
@@ -133,7 +132,6 @@
         .glow { animation: glowImage 0.8s; }
         @keyframes glowImage {
             0% { box-shadow: 0 8px 20px rgba(0,0,0,0.6); }
-            /* --- CHANGEMENT : Pulsation Verte -> Pulsation Rose fuchsia --- */
             50% { box-shadow: 0 0 40px #f472b6, 0 0 10px #d946ef; } 
             100% { box-shadow: 0 8px 20px rgba(0,0,0,0.6); }
         }
@@ -164,8 +162,6 @@
 
         #btnMinus { background-color: #f59e0b; color: white; } 
         #btnBoutique { background-color: #ec4899; color: white; } 
-        
-        /* --- CHANGEMENT : Bouton Plus Vert -> Violet/Rose vif --- */
         #btnPlus { background-color: #d946ef; color: white; } 
 
         .inventaire { font-size: 0.9em; color: #cbd5e1; margin-top: 10px; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 5px; font-weight: bold; }
@@ -186,7 +182,8 @@
 
         .modal-content.boutique { border: 2px solid #ec4899; max-width: 350px; }
         .modal-content.alerte { border: 2px solid #fbbf24; }
-        .modal-content.choix-pause { border: 2px solid #a855f7; }
+        /* --- CHANGEMENT : Bordure modale pause Violet -> Rose --- */
+        .modal-content.choix-pause { border: 2px solid #ec4899; }
 
         .modal-content h3 { margin-top: 0; }
         .modal-content p { font-size: 0.95em; line-height: 1.5; color: #cbd5e1; white-space: pre-wrap; }
@@ -249,9 +246,9 @@
 
     <div id="modalChoixPause" class="modal-overlay">
         <div class="modal-content choix-pause">
-            <h3 style="color: #a855f7;">⏸️ Menu Pause</h3>
+            <h3 style="color: #ec4899;">⏸️ Menu Pause</h3>
             <p>Choisis le type de pause que tu souhaites prendre :</p>
-            <button id="btnChoixCafe" class="menu-btn" style="background:#a855f7;">🪙 Pause<br><small style="font-weight: normal;">(Coûte 30 pièces/minute)</small></button>
+            <button id="btnChoixCafe" class="menu-btn" style="background:#ec4899;">🪙 Pause<br><small style="font-weight: normal;">(Coûte 30 pièces/minute)</small></button>
             <button id="btnChoixRepas" class="menu-btn" style="background:#f97316;">🍔 Pause Repas<br><small style="font-weight: normal;">(Gratuit : 30 minutes garanties)</small></button>
             <button onclick="fermerModal('modalChoixPause')" class="menu-btn" style="background:#6b7280; margin-top:20px;">Annuler</button>
         </div>
@@ -410,7 +407,8 @@
                     btnPause.disabled = true; btnMinus.disabled = true; btnBoutique.disabled = true; btnPlus.disabled = true;
                     panelPause.style.display = "block"; imageElement.classList.add("en-pause");
                     if (gameState.modeJeu === 'pause_cafe') {
-                        titrePanelPause.innerText = "🪙 EN PAUSE"; titrePanelPause.style.color = "#a855f7"; burgerLoader.style.display = "none";
+                        // --- CHANGEMENT : Texte de pause en Rose ---
+                        titrePanelPause.innerText = "🪙 EN PAUSE"; titrePanelPause.style.color = "#ec4899"; burgerLoader.style.display = "none";
                     } else {
                         titrePanelPause.innerText = "🍔 BON APPÉTIT"; titrePanelPause.style.color = "#f97316"; burgerLoader.style.display = "block";
                     }
