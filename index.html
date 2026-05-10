@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chlorévisiomètre Pro + Boutique</title>
+    <title>Chlorévisiomètre Pro + Boutique Séparée</title>
     <style>
         body {
             display: flex;
@@ -154,7 +154,7 @@
         .modal-content {
             background: #2c2f33; padding: 20px; border-radius: 15px; width: 90%; max-width: 320px; color: white; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.8);
         }
-        .modal-content.boutique { border: 2px solid #ec4899; }
+        .modal-content.boutique { border: 2px solid #ec4899; max-width: 350px; }
         .modal-content.alerte { border: 2px solid #fbbf24; }
         .modal-content.choix-pause { border: 2px solid #a855f7; }
 
@@ -217,7 +217,6 @@
         </div>
     </div>
 
-    <!-- Modales -->
     <div id="modalChoixPause" class="modal-overlay">
         <div class="modal-content choix-pause">
             <h3 style="color: #a855f7;">⏸️ Menu Pause</h3>
@@ -231,15 +230,24 @@
     <div id="modalBoutique" class="modal-overlay">
         <div class="modal-content boutique">
             <h3 style="color: #ec4899;">🛒 Boutique</h3>
-            <p>Dépense tes cœurs bonus (PV 6-10) 💛 OU tes pièces accumulées 🪙 !</p>
+            <p>Choisis ton moyen de paiement :</p>
             
             <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; margin-bottom: 15px;">
                 <span style="color: #fbbf24;">💛 Cœurs dispos : <span id="coeursJaunesDispos">0</span></span><br>
                 <span style="color: #fbbf24;">🪙 Pièces dispos : <span id="piecesBoutiqueDispos">0</span></span>
             </div>
 
-            <button id="btnAchatPetite" class="menu-btn" style="background:#ec4899;">🎁 Petite Surprise<br><small style="font-weight: normal;">(2 cœurs 💛 OU 300 pièces 🪙)</small></button>
-            <button id="btnAchatGrande" class="menu-btn" style="background:#ec4899;">🎀 Grande Surprise<br><small style="font-weight: normal;">(3 cœurs 💛 OU 600 pièces 🪙)</small></button>
+            <h4 style="margin: 10px 0 5px 0; color: #cbd5e1; text-align: left;">🎁 Petite Surprise</h4>
+            <div style="display: flex; gap: 8px;">
+                <button id="btnAchatPetiteCoeur" class="menu-btn" style="background:#ec4899; margin-top:0; padding: 10px;">2 💛</button>
+                <button id="btnAchatPetitePiece" class="menu-btn" style="background:#f59e0b; margin-top:0; padding: 10px;">300 🪙</button>
+            </div>
+
+            <h4 style="margin: 15px 0 5px 0; color: #cbd5e1; text-align: left;">🎀 Grande Surprise</h4>
+            <div style="display: flex; gap: 8px;">
+                <button id="btnAchatGrandeCoeur" class="menu-btn" style="background:#ec4899; margin-top:0; padding: 10px;">3 💛</button>
+                <button id="btnAchatGrandePiece" class="menu-btn" style="background:#f59e0b; margin-top:0; padding: 10px;">600 🪙</button>
+            </div>
             
             <button onclick="fermerModal('modalBoutique')" class="menu-btn" style="background:#6b7280; margin-top:20px;">Fermer</button>
         </div>
@@ -281,7 +289,7 @@
             nbGrandesSurprises: 0,
             modeJeu: 'attente',
             timestampMode: null,
-            tempsTravailCumule: 0 // Nouvelle variable pour mémoriser le temps
+            tempsTravailCumule: 0 
         };
 
         let localPieces = 0; 
@@ -342,9 +350,14 @@
             imageElement.src = gameState.pvActuels + ".jpg"; 
             let basePetite = (gameState.pvActuels >= 5) ? 1 : 0;
             let baseGrande = (gameState.pvActuels >= 7) ? 1 : 0;
+            
             document.getElementById("txtPetites").innerText = gameState.nbPetitesSurprises + basePetite;
             document.getElementById("txtGrandes").innerText = gameState.nbGrandesSurprises + baseGrande;
             repasDisplay.innerText = "🍔 Repas : " + gameState.repasRestants; 
+            
+            // Mise à jour de la boutique en temps réel
+            coeursJaunesDispos.innerText = Math.max(0, gameState.pvActuels - 5);
+            piecesBoutiqueDispos.innerText = localPieces;
 
             if (gameState.modeJeu === 'attente') {
                 btnStart.disabled = false;
@@ -382,32 +395,37 @@
                 let gainedPieces = Math.floor(elapsedSeconds / 60) * 5;
                 localPieces = gameState.piecesBase + gainedPieces;
                 
-                // On affiche le cumulé + le temps de la session en cours
+                // Le chrono affiche le temps cumulé des anciennes sessions de travail + le temps actuel
                 let totalSeconds = (gameState.tempsTravailCumule || 0) + elapsedSeconds;
                 chronoAffichage.innerText = formaterTemps(totalSeconds);
                 piecesDisplay.innerText = "🪙 Pièces : " + localPieces;
+                piecesBoutiqueDispos.innerText = localPieces; // Actu boutique
             } 
             else if (gameState.modeJeu === 'pause_cafe') {
                 let spentPieces = Math.floor(elapsedSeconds / 2); 
                 localPieces = gameState.piecesBase - spentPieces;
                 let tempsRestant = (gameState.piecesBase * 2) - elapsedSeconds;
+                
                 if (tempsRestant <= 0 && !isTransitioning) {
                     isTransitioning = true; sortirDePause(0);
                     setTimeout(() => isTransitioning = false, 2000);
                 } else {
                     decomptePause.innerText = formaterTemps(tempsRestant);
                     piecesDisplay.innerText = "🪙 Pièces : " + localPieces;
-                    // Le chrono principal reste figé sur le temps de travail total
+                    // Fige le chrono global
                     chronoAffichage.innerText = formaterTemps(gameState.tempsTravailCumule);
                 }
             }
             else if (gameState.modeJeu === 'pause_repas') {
+                localPieces = gameState.piecesBase;
                 let tempsRestant = 1800 - elapsedSeconds; 
+                
                 if (tempsRestant <= 0 && !isTransitioning) {
                     isTransitioning = true; sortirDePause(gameState.piecesBase);
                     setTimeout(() => isTransitioning = false, 2000);
                 } else {
                     decomptePause.innerText = formaterTemps(tempsRestant);
+                    // Fige le chrono global
                     chronoAffichage.innerText = formaterTemps(gameState.tempsTravailCumule);
                 }
             }
@@ -415,15 +433,56 @@
 
         setInterval(tickLocal, 500);
 
+        // --- GESTION DU TEMPS ET DES PAUSES ---
         btnStart.addEventListener("click", () => {
             sendUpdate({
                 pvActuels: 5, piecesBase: 0, repasRestants: 2, nbPetitesSurprises: 0, nbGrandesSurprises: 0, 
-                modeJeu: 'travail', timestampMode: serverTimestamp(), tempsTravailCumule: 0 // Reset complet
+                modeJeu: 'travail', timestampMode: serverTimestamp(), tempsTravailCumule: 0 
             });
         });
 
         btnStop.addEventListener("click", () => sendUpdate({ modeJeu: 'attente', timestampMode: null }));
 
+        // Cette fonction "sauvegarde" la session de travail en cours avant de partir en pause
+        function commitTravail() {
+            let nowCorrected = Date.now() + serverTimeOffset;
+            let elapsedSeconds = Math.floor((nowCorrected - gameState.timestampMode) / 1000);
+            return {
+                tempsTravailCumule: (gameState.tempsTravailCumule || 0) + elapsedSeconds,
+                piecesBase: localPieces,
+                timestampMode: serverTimestamp()
+            };
+        }
+
+        document.getElementById("btnChoixCafe").addEventListener("click", () => {
+            if (localPieces < 1) return;
+            window.fermerModal("modalChoixPause");
+            
+            let update = commitTravail();
+            update.modeJeu = 'pause_cafe';
+            sendUpdate(update);
+        });
+
+        document.getElementById("btnChoixRepas").addEventListener("click", () => {
+            if (gameState.repasRestants <= 0) return;
+            window.fermerModal("modalChoixPause");
+            
+            let update = commitTravail();
+            update.modeJeu = 'pause_repas';
+            update.repasRestants = gameState.repasRestants - 1;
+            sendUpdate(update);
+        });
+
+        function sortirDePause(piecesRestantes) { 
+            // On ne touche pas à tempsTravailCumule, on le conserve pour reprendre la suite !
+            sendUpdate({ modeJeu: 'travail', piecesBase: piecesRestantes, timestampMode: serverTimestamp() }); 
+        }
+        
+        document.getElementById("btnStopperPause").addEventListener("click", () => sortirDePause(localPieces));
+        btnPause.addEventListener("click", () => window.ouvrirModal("modalChoixPause"));
+
+
+        // --- ACTIONS PV ET BOUTIQUE ---
         btnMinus.addEventListener("click", () => {
             if (gameState.modeJeu !== 'travail') return;
             if (gameState.pvActuels > 5) sendUpdate({ pvActuels: 5 });
@@ -435,81 +494,37 @@
             sendUpdate({ pvActuels: Math.min(10, gameState.pvActuels + 2) });
         });
 
-        btnPause.addEventListener("click", () => window.ouvrirModal("modalChoixPause"));
-
-        // Fonction pour sauvegarder le temps de travail avant de changer de mode
-        function preparerChangementMode(nouveauMode) {
-            let nowCorrected = Date.now() + serverTimeOffset;
-            let segmentTravail = Math.floor((nowCorrected - gameState.timestampMode) / 1000);
-            return {
-                tempsTravailCumule: (gameState.tempsTravailCumule || 0) + segmentTravail,
-                timestampMode: serverTimestamp()
-            };
-        }
-
-        document.getElementById("btnChoixCafe").addEventListener("click", () => {
-            if (localPieces < 1) return;
-            window.fermerModal("modalChoixPause");
-            let update = preparerChangementMode();
-            update.modeJeu = 'pause_cafe';
-            update.piecesBase = localPieces;
-            sendUpdate(update);
-        });
-
-        document.getElementById("btnChoixRepas").addEventListener("click", () => {
-            if (gameState.repasRestants <= 0) return;
-            window.fermerModal("modalChoixPause");
-            let update = preparerChangementMode();
-            update.modeJeu = 'pause_repas';
-            update.piecesBase = localPieces;
-            update.repasRestants = gameState.repasRestants - 1;
-            sendUpdate(update);
-        });
-
-        function sortirDePause(p) { 
-            sendUpdate({ modeJeu: 'travail', piecesBase: p, timestampMode: serverTimestamp() }); 
-        }
-        
-        document.getElementById("btnStopperPause").addEventListener("click", () => sortirDePause(localPieces));
-
         btnBoutique.addEventListener("click", () => {
-            coeursJaunesDispos.innerText = Math.max(0, gameState.pvActuels - 5);
-            piecesBoutiqueDispos.innerText = localPieces;
             window.ouvrirModal("modalBoutique");
         });
 
-        document.getElementById("btnAchatPetite").addEventListener("click", () => {
-            let coeurs = Math.max(0, gameState.pvActuels - 5);
-            if (coeurs >= 2) {
+        document.getElementById("btnAchatPetiteCoeur").addEventListener("click", () => {
+            if (gameState.pvActuels - 5 >= 2) {
                 sendUpdate({ pvActuels: gameState.pvActuels - 2, nbPetitesSurprises: gameState.nbPetitesSurprises + 1 });
                 window.afficherAlerte("🎁 Succès", "Petite surprise achetée avec 2 cœurs !");
-            } 
-            else if (localPieces >= 300) {
-                sendUpdate({ 
-                    piecesBase: localPieces - 300, 
-                    nbPetitesSurprises: gameState.nbPetitesSurprises + 1,
-                    timestampMode: serverTimestamp() 
-                });
-                window.afficherAlerte("🎁 Succès", "Petite surprise achetée avec 300 pièces !");
-            } 
-            else window.afficherAlerte("❌ Erreur", "Pas assez de cœurs (2) ni de pièces (300) !");
+            } else window.afficherAlerte("❌ Erreur", "Tu n'as pas assez de cœurs jaunes ! (Il t'en faut 2)");
         });
 
-        document.getElementById("btnAchatGrande").addEventListener("click", () => {
-            let coeurs = Math.max(0, gameState.pvActuels - 5);
-            if (coeurs >= 3) {
+        document.getElementById("btnAchatPetitePiece").addEventListener("click", () => {
+            if (localPieces >= 300) {
+                // On retire 300 de la base, SANS réinitialiser le chronomètre de travail !
+                sendUpdate({ piecesBase: gameState.piecesBase - 300, nbPetitesSurprises: gameState.nbPetitesSurprises + 1 });
+                window.afficherAlerte("🎁 Succès", "Petite surprise achetée avec 300 pièces !");
+            } else window.afficherAlerte("❌ Erreur", "Tu n'as pas assez de pièces ! (Il t'en faut 300)");
+        });
+
+        document.getElementById("btnAchatGrandeCoeur").addEventListener("click", () => {
+            if (gameState.pvActuels - 5 >= 3) {
                 sendUpdate({ pvActuels: gameState.pvActuels - 3, nbGrandesSurprises: gameState.nbGrandesSurprises + 1 });
                 window.afficherAlerte("🎀 Succès", "Grande surprise achetée avec 3 cœurs !");
-            } 
-            else if (localPieces >= 600) {
-                sendUpdate({ 
-                    piecesBase: localPieces - 600, 
-                    nbGrandesSurprises: gameState.nbGrandesSurprises + 1,
-                    timestampMode: serverTimestamp()
-                });
+            } else window.afficherAlerte("❌ Erreur", "Tu n'as pas assez de cœurs jaunes ! (Il t'en faut 3)");
+        });
+
+        document.getElementById("btnAchatGrandePiece").addEventListener("click", () => {
+            if (localPieces >= 600) {
+                sendUpdate({ piecesBase: gameState.piecesBase - 600, nbGrandesSurprises: gameState.nbGrandesSurprises + 1 });
                 window.afficherAlerte("🎀 Succès", "Grande surprise achetée avec 600 pièces !");
-            } 
-            else window.afficherAlerte("❌ Erreur", "Pas assez de cœurs (3) ni de pièces (600) !");
+            } else window.afficherAlerte("❌ Erreur", "Tu n'as pas assez de pièces ! (Il t'en faut 600)");
         });
 
     </script>
