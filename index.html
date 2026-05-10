@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>❤️Chlorévisiomètre</title>
+    <title>Chlorévisiomètre Pro Animé</title>
     <style>
         body {
             display: flex;
@@ -54,11 +54,12 @@
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            transition: transform 0.1s;
+            transition: all 0.2s ease-in-out; /* --- ANIMATION : Transition douce --- */
             flex: 1;
             touch-action: manipulation; 
         }
 
+        button:not(:disabled):hover { transform: scale(1.05); /* --- ANIMATION : Pulsation souris --- */ }
         button:active { transform: scale(0.95); }
         button:disabled { background-color: #6b7280 !important; opacity: 0.5; cursor: not-allowed; transform: none; }
 
@@ -113,7 +114,25 @@
         .image-wrapper { position: relative; display: inline-block; }
         
         img {
-            max-height: 50vh; max-width: 90vw; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.6); transition: filter 0.3s ease; 
+            max-height: 50vh; max-width: 90vw; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.6); 
+            transition: opacity 0.5s ease-in-out, filter 0.3s ease; /* --- ANIMATION : Fondu image --- */
+        }
+
+        /* --- ANIMATIONS : Secousse Dégât --- */
+        .shake { animation: shakeImage 0.8s; }
+        @keyframes shakeImage {
+            10%, 90% { transform: translate3d(-1px, 0, 0); }
+            20%, 80% { transform: translate3d(2px, 0, 0); }
+            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
+            40%, 60% { transform: translate3d(4px, 0, 0); }
+        }
+
+        /* --- ANIMATIONS : Brillance Bonus --- */
+        .glow { animation: glowImage 0.8s; }
+        @keyframes glowImage {
+            0% { box-shadow: 0 8px 20px rgba(0,0,0,0.6); }
+            50% { box-shadow: 0 0 40px #4ade80, 0 0 10px #10b981; }
+            100% { box-shadow: 0 8px 20px rgba(0,0,0,0.6); }
         }
 
         .en-pause { filter: grayscale(100%) opacity(0.5); }
@@ -153,7 +172,13 @@
         }
         .modal-content {
             background: #2c2f33; padding: 20px; border-radius: 15px; width: 90%; max-width: 320px; color: white; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+            animation: fadeInModal 0.4s ease-out; /* --- ANIMATION : Ouverture modale --- */
         }
+        @keyframes fadeInModal {
+            from { opacity: 0; transform: scale(0.9); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
         .modal-content.boutique { border: 2px solid #ec4899; max-width: 350px; }
         .modal-content.alerte { border: 2px solid #fbbf24; }
         .modal-content.choix-pause { border: 2px solid #a855f7; }
@@ -229,7 +254,7 @@
 
     <div id="modalBoutique" class="modal-overlay">
         <div class="modal-content boutique">
-            <h3 style="color: #ec4899;">🛒 Boutique</h3>
+            <h3 style="color: #ec4899;">🛒 Boutique Pro</h3>
             <p>Choisis ton moyen de paiement :</p>
             
             <div style="background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; margin-bottom: 15px;">
@@ -346,7 +371,17 @@
             }
         });
 
+        // --- ANIMATION : Trigger Animations ---
+        // Cette fonction ajoute une classe temporairement pour déclencher l'animation
+        function triggerAnimation(className) {
+            imageElement.classList.add(className);
+            setTimeout(() => {
+                imageElement.classList.remove(className);
+            }, 800); // Durée de l'animation CSS
+        }
+
         function mettreAJourInterface() {
+            // L'image change avec un fondu doux (CSS)
             imageElement.src = gameState.pvActuels + ".jpg"; 
             let basePetite = (gameState.pvActuels >= 5) ? 1 : 0;
             let baseGrande = (gameState.pvActuels >= 7) ? 1 : 0;
@@ -395,11 +430,11 @@
                 let gainedPieces = Math.floor(elapsedSeconds / 60) * 5;
                 localPieces = gameState.piecesBase + gainedPieces;
                 
-                // Le chrono affiche le temps cumulé des anciennes sessions de travail + le temps actuel
+                // Cumulé + session actuelle
                 let totalSeconds = (gameState.tempsTravailCumule || 0) + elapsedSeconds;
                 chronoAffichage.innerText = formaterTemps(totalSeconds);
                 piecesDisplay.innerText = "🪙 Pièces : " + localPieces;
-                piecesBoutiqueDispos.innerText = localPieces; // Actu boutique
+                piecesBoutiqueDispos.innerText = localPieces;
             } 
             else if (gameState.modeJeu === 'pause_cafe') {
                 let spentPieces = Math.floor(elapsedSeconds / 2); 
@@ -412,7 +447,6 @@
                 } else {
                     decomptePause.innerText = formaterTemps(tempsRestant);
                     piecesDisplay.innerText = "🪙 Pièces : " + localPieces;
-                    // Fige le chrono global
                     chronoAffichage.innerText = formaterTemps(gameState.tempsTravailCumule);
                 }
             }
@@ -425,7 +459,6 @@
                     setTimeout(() => isTransitioning = false, 2000);
                 } else {
                     decomptePause.innerText = formaterTemps(tempsRestant);
-                    // Fige le chrono global
                     chronoAffichage.innerText = formaterTemps(gameState.tempsTravailCumule);
                 }
             }
@@ -443,7 +476,6 @@
 
         btnStop.addEventListener("click", () => sendUpdate({ modeJeu: 'attente', timestampMode: null }));
 
-        // Cette fonction "sauvegarde" la session de travail en cours avant de partir en pause
         function commitTravail() {
             let nowCorrected = Date.now() + serverTimeOffset;
             let elapsedSeconds = Math.floor((nowCorrected - gameState.timestampMode) / 1000);
@@ -474,7 +506,6 @@
         });
 
         function sortirDePause(piecesRestantes) { 
-            // On ne touche pas à tempsTravailCumule, on le conserve pour reprendre la suite !
             sendUpdate({ modeJeu: 'travail', piecesBase: piecesRestantes, timestampMode: serverTimestamp() }); 
         }
         
@@ -485,12 +516,20 @@
         // --- ACTIONS PV ET BOUTIQUE ---
         btnMinus.addEventListener("click", () => {
             if (gameState.modeJeu !== 'travail') return;
+            
+            // --- ANIMATION : Trigger Shake ---
+            triggerAnimation('shake');
+            
             if (gameState.pvActuels > 5) sendUpdate({ pvActuels: 5 });
             else if (gameState.pvActuels > 1) sendUpdate({ pvActuels: gameState.pvActuels - 1 });
         });
 
         btnPlus.addEventListener("click", () => {
             if (gameState.modeJeu !== 'travail') return;
+            
+            // --- ANIMATION : Trigger Glow ---
+            triggerAnimation('glow');
+            
             sendUpdate({ pvActuels: Math.min(10, gameState.pvActuels + 2) });
         });
 
@@ -498,33 +537,33 @@
             window.ouvrirModal("modalBoutique");
         });
 
+        // --- GESTION BOUTIQUE SÉPARÉE ---
         document.getElementById("btnAchatPetiteCoeur").addEventListener("click", () => {
             if (gameState.pvActuels - 5 >= 2) {
                 sendUpdate({ pvActuels: gameState.pvActuels - 2, nbPetitesSurprises: gameState.nbPetitesSurprises + 1 });
                 window.afficherAlerte("🎁 Succès", "Petite surprise achetée avec 2 cœurs !");
-            } else window.afficherAlerte("❌ Erreur", "Tu n'as pas assez de cœurs jaunes ! (Il t'en faut 2)");
+            } else window.afficherAlerte("❌ Erreur", "Tu n'as pas assez de cœurs jaunes !");
         });
 
         document.getElementById("btnAchatPetitePiece").addEventListener("click", () => {
             if (localPieces >= 300) {
-                // On retire 300 de la base, SANS réinitialiser le chronomètre de travail !
                 sendUpdate({ piecesBase: gameState.piecesBase - 300, nbPetitesSurprises: gameState.nbPetitesSurprises + 1 });
                 window.afficherAlerte("🎁 Succès", "Petite surprise achetée avec 300 pièces !");
-            } else window.afficherAlerte("❌ Erreur", "Tu n'as pas assez de pièces ! (Il t'en faut 300)");
+            } else window.afficherAlerte("❌ Erreur", "Tu n'as pas assez de pièces !");
         });
 
         document.getElementById("btnAchatGrandeCoeur").addEventListener("click", () => {
             if (gameState.pvActuels - 5 >= 3) {
                 sendUpdate({ pvActuels: gameState.pvActuels - 3, nbGrandesSurprises: gameState.nbGrandesSurprises + 1 });
                 window.afficherAlerte("🎀 Succès", "Grande surprise achetée avec 3 cœurs !");
-            } else window.afficherAlerte("❌ Erreur", "Tu n'as pas assez de cœurs jaunes ! (Il t'en faut 3)");
+            } else window.afficherAlerte("❌ Erreur", "Tu n'as pas assez de cœurs jaunes !");
         });
 
         document.getElementById("btnAchatGrandePiece").addEventListener("click", () => {
             if (localPieces >= 600) {
                 sendUpdate({ piecesBase: gameState.piecesBase - 600, nbGrandesSurprises: gameState.nbGrandesSurprises + 1 });
                 window.afficherAlerte("🎀 Succès", "Grande surprise achetée avec 600 pièces !");
-            } else window.afficherAlerte("❌ Erreur", "Tu n'as pas assez de pièces ! (Il t'en faut 600)");
+            } else window.afficherAlerte("❌ Erreur", "Tu n'as pas assez de pièces !");
         });
 
     </script>
