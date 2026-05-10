@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chlorévisiomètre Pro - Glassmorphism</title>
+    <title>Chlorévisiomètre Pro - Dual Outer Glow Effect</title>
     <style>
         /* --- ARRIÈRE-PLAN --- */
         body {
@@ -33,13 +33,52 @@
             pointer-events: none; 
         }
 
-        /* --- EFFET VERRE DÉPOLI (GLASSMORPHISM) --- */
-        .glass-panel {
-            background: rgba(15, 15, 20, 0.5);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
+        /* --- EFFET : AURA EXTERNE DOUBLE (STATIQUE DOUCE + DYNAMIQUE INTENSE) --- */
+        .glow-track {
+            position: relative;
+            isolation: isolate; /* Force le halo à rester strictement derrière */
+            --glow-color: 255, 255, 255; /* Blanc par défaut */
+            background: #111114; /* Fond sombre et OPAQUE */
+            border: 1px solid rgba(255, 255, 255, 0.08); /* Bordure subtile */
             border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* Génération de l'aura double derrière la boîte opaque */
+        .glow-track::before {
+            content: "";
+            position: absolute;
+            inset: -4px; /* Épaisseur du halo dépassant de l'élément */
+            border-radius: inherit; 
+            /* COMBINAISON DE DEUX LUEURS EXTERNES */
+            background:
+                /* 1. Lueur Externe STATIQUE (Douce, constante, visible tout autour) */
+                radial-gradient(ellipse at center, rgba(var(--glow-color), 0.15) 0%, rgba(var(--glow-color), 0.1) 40%, transparent 75%),
+                /* 2. Lueur Externe DYNAMIQUE (Intense, suit le curseur, devient visible au survol) */
+                radial-gradient(120px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(var(--glow-color), 0.0) 0%, rgba(var(--glow-color), 0.0) 50%); /* Commencer cachée */
+            z-index: -1; /* Placée DERRIÈRE le fond opaque */
+            pointer-events: none;
+            filter: blur(12px); /* C'est ce flou qui crée l'effet d'aura externe douce */
+            transition: background 0.3s ease; /* Pour un fade-in doux de la lueur dynamique */
+        }
+
+        /* Au survol : On allume lueur externe dynamique intense */
+        .glow-track:hover::before {
+            background:
+                /* Maintenir lueur statique */
+                radial-gradient(ellipse at center, rgba(var(--glow-color), 0.15) 0%, rgba(var(--glow-color), 0.1) 40%, transparent 75%),
+                /* Allumer lueur dynamique intense qui suit le curseur */
+                radial-gradient(120px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(var(--glow-color), 1.0) 0%, transparent 50%);
+        }
+
+        /* On désactive le halo pour les boutons grisés/désactivés */
+        button:disabled.glow-track::before {
+            display: none;
+        }
+
+        /* --- EFFET VERRE DÉPOLI (GLASSMORPHISM) RÉDUIT --- */
+        .glass-panel {
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
         }
 
@@ -52,6 +91,7 @@
             padding: 15px 20px;
             width: 90%;
             max-width: 400px;
+            --glow-color: 168, 85, 247; /* Aura violette globale header */
         }
 
         #chrono {
@@ -68,41 +108,70 @@
             width: 100%;
         }
 
-        /* --- BOUTONS TRANSPARENTS --- */
+        /* --- BOUTONS OPAQUES --- */
         button {
             padding: 12px 10px;
             font-size: 0.95em;
             font-weight: bold;
             border-radius: 8px;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: transform 0.1s ease, background 0.3s ease, border-color 0.3s ease;
             flex: 1;
             color: white;
-            background: rgba(20, 20, 25, 0.6); 
             backdrop-filter: blur(4px);
-            border: 1px solid transparent;
         }
 
         button:active { transform: scale(0.95); }
-        button:disabled { background: rgba(30, 30, 35, 0.4) !important; border-color: rgba(255,255,255,0.05) !important; color: rgba(255,255,255,0.3); cursor: not-allowed; transform: none; }
+        button:disabled { background: #1a1a1e !important; color: rgba(255,255,255,0.3); cursor: not-allowed; transform: none; }
 
-        #btnStart { border-color: rgba(16, 185, 129, 0.5); }
-        #btnStart:hover:not(:disabled) { background: rgba(16, 185, 129, 0.2); border-color: #10b981; }
+        /* --- ATTRIBUTION DES COULEURS (LUEUR + THEME) POUR CHAQUE ÉLÉMENT --- */
+        
+        /* Boutons principaux */
+        #btnStart { --glow-color: 16, 185, 129; border-color: rgba(16, 185, 129, 0.4); } /* Vert */
+        #btnStart:hover:not(:disabled) { background: rgba(16, 185, 129, 0.15); border-color: #10b981; }
 
-        #btnPause { border-color: rgba(236, 72, 153, 0.5); }
-        #btnPause:hover:not(:disabled) { background: rgba(236, 72, 153, 0.2); border-color: #ec4899; }
+        #btnPause { --glow-color: 236, 72, 153; border-color: rgba(236, 72, 153, 0.4); } /* Rose */
+        #btnPause:hover:not(:disabled) { background: rgba(236, 72, 153, 0.15); border-color: #ec4899; }
 
-        #btnStop { border-color: rgba(239, 68, 68, 0.5); }
-        #btnStop:hover:not(:disabled) { background: rgba(239, 68, 68, 0.2); border-color: #ef4444; }
+        #btnStop { --glow-color: 239, 68, 68; border-color: rgba(239, 68, 68, 0.4); } /* Rouge */
+        #btnStop:hover:not(:disabled) { background: rgba(239, 68, 68, 0.15); border-color: #ef4444; }
 
-        #btnMinus { border-color: rgba(245, 158, 11, 0.5); }
-        #btnMinus:hover:not(:disabled) { background: rgba(245, 158, 11, 0.2); border-color: #f59e0b; }
+        #btnMinus { --glow-color: 245, 158, 11; border-color: rgba(245, 158, 11, 0.4); } /* Orange */
+        #btnMinus:hover:not(:disabled) { background: rgba(245, 158, 11, 0.15); border-color: #f59e0b; }
 
-        #btnBoutique { border-color: rgba(236, 72, 153, 0.5); }
-        #btnBoutique:hover:not(:disabled) { background: rgba(236, 72, 153, 0.2); border-color: #ec4899; }
+        #btnBoutique { --glow-color: 236, 72, 153; border-color: rgba(236, 72, 153, 0.4); } /* Rose */
+        #btnBoutique:hover:not(:disabled) { background: rgba(236, 72, 153, 0.15); border-color: #ec4899; }
 
-        #btnPlus { border-color: rgba(217, 70, 239, 0.5); }
-        #btnPlus:hover:not(:disabled) { background: rgba(217, 70, 239, 0.2); border-color: #d946ef; }
+        #btnPlus { --glow-color: 217, 70, 239; border-color: rgba(217, 70, 239, 0.4); } /* Violet Intense */
+        #btnPlus:hover:not(:disabled) { background: rgba(217, 70, 239, 0.15); border-color: #d946ef; }
+
+        /* Badges statuts */
+        .pieces-display { --glow-color: 251, 191, 36; color: #fbbf24; border-color: rgba(251, 191, 36, 0.4); } /* Jaune */
+        .pieces-display:hover { background: rgba(251, 191, 36, 0.2); }
+        
+        .repas-display { --glow-color: 249, 115, 22; color: #f97316; border-color: rgba(249, 115, 22, 0.4); } /* Orange */
+        .repas-display:hover { background: rgba(249, 115, 22, 0.2); }
+
+        /* Image centrale */
+        #imageWrapper { --glow-color: 168, 85, 247; /* Aura violette autour de l'image */ }
+
+        /* Fenêtres Modales & Panneaux */
+        #panelPause { --glow-color: 236, 72, 153; border: 1px solid rgba(236, 72, 153, 0.4); }
+        .choix-pause { --glow-color: 236, 72, 153; border: 1px solid rgba(236, 72, 153, 0.6); }
+        .boutique { --glow-color: 236, 72, 153; border: 1px solid rgba(236, 72, 153, 0.6); }
+        .alerte { --glow-color: 251, 191, 36; border: 1px solid rgba(251, 191, 36, 0.6); }
+        .inventaire { --glow-color: 255, 255, 255; } /* Blanc */
+
+        /* Boutons internes Modales */
+        #btnChoixCafe, #btnAchatPetiteCoeur, #btnAchatGrandeCoeur { --glow-color: 236, 72, 153; }
+        #btnChoixRepas { --glow-color: 249, 115, 22; }
+        #btnAchatPetitePiece, #btnAchatGrandePiece { --glow-color: 245, 158, 11; }
+        .btn-modal-annuler { --glow-color: 107, 114, 128; border-color: rgba(107, 114, 128, 0.5); }
+        .btn-modal-annuler:hover { background: rgba(107, 114, 128, 0.3); border-color: #6b7280; }
+        .btn-modal-ok { --glow-color: 168, 85, 247; border-color: rgba(168, 85, 247, 0.5); }
+        .btn-modal-ok:hover { background: rgba(168, 85, 247, 0.3); border-color: #a855f7; }
+
+        /* ------------------------------------------------------------- */
 
         .status-bar {
             display: flex;
@@ -125,15 +194,8 @@
             transition: all 0.3s ease;
         }
 
-        .pieces-display { color: #fbbf24; background: rgba(251, 191, 36, 0.1); border: 1px solid rgba(251, 191, 36, 0.5); }
-        .pieces-display:hover { background: rgba(251, 191, 36, 0.25); }
-        
-        .repas-display { color: #f97316; background: rgba(249, 115, 22, 0.1); border: 1px solid rgba(249, 115, 22, 0.5); }
-        .repas-display:hover { background: rgba(249, 115, 22, 0.25); }
-
         #panelPause {
             display: none;
-            border: 1px solid rgba(236, 72, 153, 0.5);
             padding: 15px;
             width: 90%;
             max-width: 400px;
@@ -142,13 +204,19 @@
         }
         #titrePanelPause { margin: 0 0 10px 0; color: #ec4899; text-shadow: 0 0 8px rgba(236, 72, 153, 0.5); }
         #decomptePause { font-size: 2em; font-weight: bold; color: #ec4899; font-family: monospace; display: block; margin: 10px 0; }
-        #btnStopperPause { border-color: rgba(217, 70, 239, 0.5); width: 100%; padding: 15px; font-size: 1.1em; }
-        #btnStopperPause:hover { background: rgba(217, 70, 239, 0.2); border-color: #d946ef; }
+        #btnStopperPause { --glow-color: 217, 70, 239; border-color: rgba(217, 70, 239, 0.5); width: 100%; padding: 15px; font-size: 1.1em; }
+        #btnStopperPause:hover { background: rgba(217, 70, 239, 0.3); border-color: #d946ef; }
 
         .game-container { text-align: center; width: 100%; display: flex; flex-direction: column; align-items: center; }
-        .image-wrapper { position: relative; display: inline-block; }
+        
+        .image-wrapper { 
+            position: relative; 
+            display: inline-block; 
+            border-radius: 15px; 
+        }
         
         img {
+            display: block;
             max-height: 50vh; max-width: 90vw; border-radius: 15px; 
             box-shadow: 0 10px 30px rgba(0,0,0,0.8); 
             transition: opacity 0.5s ease-in-out, filter 0.3s ease; 
@@ -191,7 +259,7 @@
 
         .inventaire { 
             font-size: 0.9em; color: #cbd5e1; margin-top: 10px; 
-            background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; 
+            padding: 10px; border-radius: 8px; 
             border: 1px solid rgba(255,255,255,0.05); font-weight: bold; 
         }
 
@@ -203,10 +271,7 @@
         }
         
         .modal-content {
-            background: rgba(15, 15, 20, 0.7);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            padding: 20px; border-radius: 15px; width: 90%; max-width: 320px; color: white; text-align: center; 
+            padding: 20px; width: 90%; max-width: 320px; color: white; text-align: center; 
             box-shadow: 0 10px 40px rgba(0,0,0,0.8);
             animation: fadeInModal 0.4s ease-out; 
         }
@@ -215,17 +280,10 @@
             to { opacity: 1; transform: scale(1); }
         }
 
-        .modal-content.boutique { border: 1px solid rgba(236, 72, 153, 0.6); max-width: 350px; }
-        .modal-content.alerte { border: 1px solid rgba(251, 191, 36, 0.6); }
-        .modal-content.choix-pause { border: 1px solid rgba(236, 72, 153, 0.6); }
-
         .modal-content h3 { margin-top: 0; }
         .modal-content p { font-size: 0.95em; line-height: 1.5; color: #cbd5e1; white-space: pre-wrap; }
         
         .menu-btn { width: 100%; margin-top: 10px; padding: 12px; font-size: 1em; }
-        
-        .btn-modal-annuler { border-color: rgba(107, 114, 128, 0.5); }
-        .btn-modal-annuler:hover { background: rgba(107, 114, 128, 0.2); border-color: #6b7280; }
 
     </style>
 </head>
@@ -233,49 +291,49 @@
 
     <canvas id="bgCanvas"></canvas>
 
-    <div class="header glass-panel">
+    <div class="header glass-panel glow-track">
         <div id="chrono">00:00:00</div>
         <div class="header-buttons">
-            <button id="btnStart">Démarrer</button>
-            <button id="btnPause" disabled>Pause</button>
-            <button id="btnStop" disabled>Stopper</button>
+            <button id="btnStart" class="glow-track">Démarrer</button>
+            <button id="btnPause" disabled class="glow-track">Pause</button>
+            <button id="btnStop" disabled class="glow-track">Stopper</button>
         </div>
     </div>
     
     <div class="status-bar">
-        <div id="piecesDisplay" class="status-badge pieces-display">🪙 Pièces : 0</div>
-        <div id="repasDisplay" class="status-badge repas-display">🍔 Repas : 2</div>
+        <div id="piecesDisplay" class="status-badge pieces-display glow-track">🪙 Pièces : 0</div>
+        <div id="repasDisplay" class="status-badge repas-display glow-track">🍔 Repas : 2</div>
     </div>
 
-    <div id="panelPause" class="glass-panel">
+    <div id="panelPause" class="glass-panel glow-track">
         <h3 id="titrePanelPause">🪙 EN PAUSE</h3>
         <span id="decomptePause">00:00:00</span>
-        <button id="btnStopperPause">▶️ Reprendre le travail</button>
+        <button id="btnStopperPause" class="glow-track">▶️ Reprendre le travail</button>
     </div>
 
     <div class="game-container" id="gameContainer">
-        <div class="image-wrapper" id="imageWrapper">
+        <div class="image-wrapper glow-track" id="imageWrapper">
             <img id="trackerImage" src="5.jpg" alt="État actuel du Chlorévisiomètre">
             <div id="burgerLoader" class="burger-loader">🍔</div>
         </div>
         
-        <div class="controls glass-panel">
+        <div class="controls glass-panel glow-track">
             <div class="action-buttons">
-                <button id="btnMinus" class="action-btn" disabled>
+                <button id="btnMinus" class="action-btn glow-track" disabled>
                     <span>👎 Distraction</span>
                     <small>-1 PV</small>
                 </button>
-                <button id="btnBoutique" class="action-btn" disabled>
+                <button id="btnBoutique" class="action-btn glow-track" disabled>
                     <span>🛒 Boutique</span>
                     <small>Dépenser</small>
                 </button>
-                <button id="btnPlus" class="action-btn" disabled>
+                <button id="btnPlus" class="action-btn glow-track" disabled>
                     <span>👍 Focus (1h)</span>
                     <small>+2 PV</small>
                 </button>
             </div>
             
-            <div id="inventaire" class="inventaire">
+            <div id="inventaire" class="inventaire glow-track">
                 🎁 Petites surprises : <span id="txtPetites">1</span> <br>
                 🎀 Grandes surprises : <span id="txtGrandes">0</span>
             </div>
@@ -285,48 +343,62 @@
     </div>
 
     <div id="modalChoixPause" class="modal-overlay">
-        <div class="modal-content choix-pause">
+        <div class="modal-content choix-pause glass-panel glow-track">
             <h3 style="color: #ec4899;">⏸️ Menu Pause</h3>
             <p>Choisis le type de pause que tu souhaites prendre :</p>
-            <button id="btnChoixCafe" class="menu-btn border-pink" style="border-color: rgba(236, 72, 153, 0.5);" onmouseover="this.style.background='rgba(236, 72, 153, 0.2)'; this.style.borderColor='#ec4899'" onmouseout="this.style.background='rgba(20, 20, 25, 0.6)'; this.style.borderColor='rgba(236, 72, 153, 0.5)'">🪙 Pause<br><small style="font-weight: normal;">(Coûte 30 pièces/minute)</small></button>
-            <button id="btnChoixRepas" class="menu-btn border-orange" style="border-color: rgba(249, 115, 22, 0.5);" onmouseover="this.style.background='rgba(249, 115, 22, 0.2)'; this.style.borderColor='#f97316'" onmouseout="this.style.background='rgba(20, 20, 25, 0.6)'; this.style.borderColor='rgba(249, 115, 22, 0.5)'">🍔 Pause Repas<br><small style="font-weight: normal;">(Gratuit : 30 min)</small></button>
-            <button onclick="fermerModal('modalChoixPause')" class="menu-btn btn-modal-annuler" style="margin-top:20px;">Annuler</button>
+            <button id="btnChoixCafe" class="menu-btn glow-track">🪙 Pause<br><small style="font-weight: normal;">(Coûte 30 pièces/minute)</small></button>
+            <button id="btnChoixRepas" class="menu-btn glow-track">🍔 Pause Repas<br><small style="font-weight: normal;">(Gratuit : 30 min)</small></button>
+            <button onclick="fermerModal('modalChoixPause')" class="menu-btn btn-modal-annuler glow-track" style="margin-top:20px;">Annuler</button>
         </div>
     </div>
 
     <div id="modalBoutique" class="modal-overlay">
-        <div class="modal-content boutique">
+        <div class="modal-content boutique glass-panel glow-track">
             <h3 style="color: #ec4899;">🛒 Boutique Pro</h3>
             <p>Choisis ton moyen de paiement :</p>
             
-            <div style="background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05);">
+            <div style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05);">
                 <span style="color: #fbbf24; font-weight: bold;">💛 Cœurs dispos : <span id="coeursJaunesDispos">0</span></span><br>
                 <span style="color: #fbbf24; font-weight: bold;">🪙 Pièces dispos : <span id="piecesBoutiqueDispos">0</span></span>
             </div>
 
             <h4 style="margin: 10px 0 5px 0; color: #cbd5e1; text-align: left;">🎁 Petite Surprise</h4>
             <div style="display: flex; gap: 8px;">
-                <button id="btnAchatPetiteCoeur" class="menu-btn" style="border-color: rgba(236, 72, 153, 0.5); margin-top:0; padding: 10px;" onmouseover="this.style.background='rgba(236, 72, 153, 0.2)'; this.style.borderColor='#ec4899'" onmouseout="this.style.background='rgba(20, 20, 25, 0.6)'; this.style.borderColor='rgba(236, 72, 153, 0.5)'">2 💛</button>
-                <button id="btnAchatPetitePiece" class="menu-btn" style="border-color: rgba(245, 158, 11, 0.5); margin-top:0; padding: 10px;" onmouseover="this.style.background='rgba(245, 158, 11, 0.2)'; this.style.borderColor='#f59e0b'" onmouseout="this.style.background='rgba(20, 20, 25, 0.6)'; this.style.borderColor='rgba(245, 158, 11, 0.5)'">300 🪙</button>
+                <button id="btnAchatPetiteCoeur" class="menu-btn glow-track" style="margin-top:0; padding: 10px;">2 💛</button>
+                <button id="btnAchatPetitePiece" class="menu-btn glow-track" style="margin-top:0; padding: 10px;">300 🪙</button>
             </div>
 
             <h4 style="margin: 15px 0 5px 0; color: #cbd5e1; text-align: left;">🎀 Grande Surprise</h4>
             <div style="display: flex; gap: 8px;">
-                <button id="btnAchatGrandeCoeur" class="menu-btn" style="border-color: rgba(236, 72, 153, 0.5); margin-top:0; padding: 10px;" onmouseover="this.style.background='rgba(236, 72, 153, 0.2)'; this.style.borderColor='#ec4899'" onmouseout="this.style.background='rgba(20, 20, 25, 0.6)'; this.style.borderColor='rgba(236, 72, 153, 0.5)'">3 💛</button>
-                <button id="btnAchatGrandePiece" class="menu-btn" style="border-color: rgba(245, 158, 11, 0.5); margin-top:0; padding: 10px;" onmouseover="this.style.background='rgba(245, 158, 11, 0.2)'; this.style.borderColor='#f59e0b'" onmouseout="this.style.background='rgba(20, 20, 25, 0.6)'; this.style.borderColor='rgba(245, 158, 11, 0.5)'">600 🪙</button>
+                <button id="btnAchatGrandeCoeur" class="menu-btn glow-track" style="margin-top:0; padding: 10px;">3 💛</button>
+                <button id="btnAchatGrandePiece" class="menu-btn glow-track" style="margin-top:0; padding: 10px;">600 🪙</button>
             </div>
             
-            <button onclick="fermerModal('modalBoutique')" class="menu-btn btn-modal-annuler" style="margin-top:20px;">Fermer</button>
+            <button onclick="fermerModal('modalBoutique')" class="menu-btn btn-modal-annuler glow-track" style="margin-top:20px;">Fermer</button>
         </div>
     </div>
 
     <div id="modalAlerte" class="modal-overlay">
-        <div class="modal-content alerte">
+        <div class="modal-content alerte glass-panel glow-track">
             <h3 id="titreAlerte" style="color: #fbbf24;">Alerte</h3>
             <p id="texteAlerte">Message</p>
-            <button onclick="fermerModal('modalAlerte')" class="menu-btn" style="border-color: rgba(168, 85, 247, 0.5);" onmouseover="this.style.background='rgba(168, 85, 247, 0.2)'; this.style.borderColor='#a855f7'" onmouseout="this.style.background='rgba(20, 20, 25, 0.6)'; this.style.borderColor='rgba(168, 85, 247, 0.5)'">OK</button> 
+            <button onclick="fermerModal('modalAlerte')" class="menu-btn btn-modal-ok glow-track">OK</button> 
         </div>
     </div>
+
+    <script>
+        // Ce petit script capture la position X et Y de la souris
+        // et l'injecte dans le CSS de l'élément pour déplacer le halo intense
+        document.querySelectorAll('.glow-track').forEach(element => {
+            element.addEventListener('mousemove', e => {
+                const rect = element.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                element.style.setProperty('--mouse-x', `${x}px`);
+                element.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+    </script>
 
     <script>
         const canvas = document.getElementById('bgCanvas');
@@ -347,8 +419,8 @@
             mouseY = e.clientY;
         });
 
-        // --- NOUVEAUX PARAMÈTRES (Mosaïque réduite et lueur plus resserrée) ---
-        const gridSize = 45; // Taille réduite (était 70)
+        // --- PARAMÈTRES (Mosaïque réduite et lueur plus resserrée) ---
+        const gridSize = 45; 
         const glowIntensity = 2; 
         const glowRadius = 320; // Portée réduite
         const gridRadius = 220; // Zone où la mosaïque s'active
@@ -382,10 +454,8 @@
                     const dist = Math.hypot(mouseX - centerX, mouseY - centerY);
 
                     if (dist < gridRadius) {
-                        // NOUVEAU RANDOMIZER : Scintillement homogène et indépendant pour chaque case
-                        // La seed (graine) est fixe pour chaque case
+                        // RANDOMIZER : Scintillement homogène et indépendant pour chaque case
                         const seed = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
-                        // On utilise la seed pour décaler la phase dans le temps
                         const pulse = Math.sin(time + seed);
 
                         // Seules les cases avec un pulse positif s'éclairent
