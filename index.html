@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>My Love</title>
+    <title>Chlorévisiomètre Pro - Multiplayer Duo</title>
     <style>
         /* --- MASQUER LES BARRES DE DÉFILEMENT GLOBALES --- */
         * { scrollbar-width: none; -ms-overflow-style: none; }
@@ -41,10 +41,20 @@
             background: radial-gradient(ellipse at center, rgba(var(--glow-color), 0.15) 0%, rgba(var(--glow-color), 0.1) 40%, transparent 75%), radial-gradient(120px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(var(--glow-color), 1.0) 0%, transparent 50%);
         }
 
-        /* --- LORS DU SURVOL D'UN BOUTON, LA LUEUR DE LA FENÊTRE S'ATTÉNUE POUR LAISSER LE BOUTON DOMINER --- */
         .glow-track:has(button:hover):not(button)::before {
             background: radial-gradient(ellipse at center, rgba(var(--glow-color), 0.15) 0%, rgba(var(--glow-color), 0.1) 40%, transparent 75%) !important; opacity: 0.6; 
         }
+
+        /* --- THEME PARTENAIRE (HUD ALTERNATIF) --- */
+        body.viewing-partner .header, 
+        body.viewing-partner .dashboard, 
+        body.viewing-partner .controls {
+            --glow-color: 59, 130, 246 !important; /* Cyan / Bleu vif */
+            border-color: rgba(59, 130, 246, 0.4);
+        }
+        #partnerIndicator { display: none; color: #3b82f6; text-transform: uppercase; font-size: 0.9em; letter-spacing: 2px; font-weight: bold; margin-bottom: 5px; text-shadow: 0 0 10px rgba(59, 130, 246, 0.8); }
+        body.viewing-partner #partnerIndicator { display: block; animation: pulseBlue 1.5s infinite; }
+        @keyframes pulseBlue { 0% { opacity: 0.7; } 50% { opacity: 1; text-shadow: 0 0 20px rgba(59, 130, 246, 1); } 100% { opacity: 0.7; } }
 
         /* --- TOUS LES BOUTONS TRANSPARENTS --- */
         button { 
@@ -69,7 +79,7 @@
         #btnConsommerGrande { --glow-color: 245, 158, 11; border-color: rgba(245, 158, 11, 0.4); color: #f59e0b; }
         #btnConsommerSouhait { --glow-color: 168, 85, 247; border-color: rgba(168, 85, 247, 0.4); color: #a855f7; }
 
-        /* --- BOUTONS ACTIONS EN BAS (LUEURS INDIVIDUELLES INTENSES) --- */
+        /* --- BOUTONS ACTIONS EN BAS --- */
         #btnMinus { --glow-color: 245, 158, 11; border-color: rgba(245, 158, 11, 0.6); box-shadow: 0 0 15px rgba(245, 158, 11, 0.3); background: rgba(245, 158, 11, 0.05) !important; }
         #btnBoutique { --glow-color: 236, 72, 153; border-color: rgba(236, 72, 153, 0.6); box-shadow: 0 0 15px rgba(236, 72, 153, 0.3); background: rgba(236, 72, 153, 0.05) !important; }
         #btnPlus { --glow-color: 16, 185, 129; border-color: rgba(16, 185, 129, 0.6); box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.05) !important; }
@@ -78,20 +88,39 @@
         #btnBoutique:hover:not(:disabled) { box-shadow: 0 0 25px rgba(236, 72, 153, 0.7); background: rgba(236, 72, 153, 0.15) !important; border-color: rgba(236, 72, 153, 0.9); }
         #btnPlus:hover:not(:disabled) { box-shadow: 0 0 25px rgba(16, 185, 129, 0.7); background: rgba(16, 185, 129, 0.15) !important; border-color: rgba(16, 185, 129, 0.9); }
 
+        /* --- BOUTONS FLOTTANTS --- */
+        #btnNotifBell { position: fixed; top: 20px; right: 20px; z-index: 9998; width: 55px; height: 55px; border-radius: 50%; display: flex; justify-content: center; align-items: center; font-size: 1.6em; padding: 0; flex: none; --glow-color: 255, 255, 255; background: rgba(0,0,0,0.4) !important; cursor: pointer; }
+        #notifBadge { position: absolute; top: -5px; right: -5px; background: #ef4444; color: white; font-size: 0.55em; font-family: sans-serif; font-weight: bold; padding: 4px 8px; border-radius: 15px; display: none; box-shadow: 0 0 10px rgba(239,68,68,0.8); }
+
+        #btnSwitchView { position: fixed; top: 20px; left: 20px; z-index: 9998; height: 55px; border-radius: 15px; display: flex; justify-content: center; align-items: center; font-size: 0.9em; padding: 0 15px; flex: none; background: rgba(0,0,0,0.4) !important; --glow-color: 59, 130, 246; border-color: rgba(59, 130, 246, 0.5); color: #3b82f6; cursor: pointer; max-width: 140px; }
+
+        /* --- HISTORIQUE NOTIFS LISTE --- */
+        .notif-item { background: rgba(255,255,255,0.03); border-left: 4px solid var(--n-color); border-radius: 8px; margin-bottom: 8px; transition: background 0.3s ease; display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0; }
+        .notif-main { padding: 12px; display: flex; gap: 12px; align-items: center; cursor: pointer; transition: background 0.2s; }
+        .notif-main:hover { background: rgba(255,255,255,0.05); }
+        .notif-item-icon { font-size: 1.8em; filter: drop-shadow(0 0 5px rgba(var(--n-color-rgb), 0.8)); }
+        .notif-item-content { display: flex; flex-direction: column; flex: 1; text-align: left; }
+        .notif-item-title { font-weight: bold; font-size: 0.9em; margin-bottom: 4px; display:flex; justify-content:space-between; align-items:center; }
+        .notif-item-text { font-size: 0.85em; color: #cbd5e1; }
+        .notif-item-time { font-size: 0.8em; color: #64748b; font-weight:normal; }
+
+        .notif-sublist { display: none; width: 100%; border-top: 1px solid rgba(255,255,255,0.1); background: rgba(0,0,0,0.2); }
+        .notif-item.expanded .notif-sublist { display: flex; flex-direction: column; }
+        .notif-sub-item { padding: 10px 12px 10px 45px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); cursor: pointer; transition: background 0.2s; flex-shrink: 0; }
+        .notif-sub-item:last-child { border-bottom: none; }
+        .notif-sub-item:hover { background: rgba(239, 68, 68, 0.2); }
+
         /* --- MODE PAUSE / FLATLINE / FAILING --- */
-        body.paused-mode .header, body.paused-mode .status-bar, body.paused-mode .dashboard, body.paused-mode .controls, body.paused-mode #rewardsDashboard {
-            filter: grayscale(1) opacity(0.25); pointer-events: none; transition: all 0.5s ease;
-        }
+        body.paused-mode .header, body.paused-mode .status-bar, body.paused-mode .dashboard, body.paused-mode .controls, body.paused-mode #rewardsDashboard { filter: grayscale(1) opacity(0.25); pointer-events: none; transition: all 0.5s ease; }
         body.flatline-theme #bgCanvas { filter: grayscale(1); }
         body.flatline-theme .header, body.flatline-theme .status-bar, body.flatline-theme .dashboard, body.flatline-theme .controls, body.flatline-theme #rewardsDashboard,
-        body.failing-theme .header, body.failing-theme .status-bar, body.failing-theme .dashboard, body.failing-theme .controls, body.failing-theme #rewardsDashboard {
-            filter: grayscale(1) opacity(0.15); pointer-events: none; transition: all 1s ease;
-        }
+        body.failing-theme .header, body.failing-theme .status-bar, body.failing-theme .dashboard, body.failing-theme .controls, body.failing-theme #rewardsDashboard { filter: grayscale(1) opacity(0.15); pointer-events: none; transition: all 1s ease; }
         body:not(.paused-mode):not(.flatline-theme):not(.failing-theme) .header, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme) .status-bar, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme) .dashboard, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme) .controls, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme) #rewardsDashboard { transition: all 0.5s ease; }
 
         /* --- UI COMPONENTS --- */
-        .header { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 15px; padding: 20px 25px; width: 92%; max-width: 480px; --glow-color: 249, 115, 22; }
+        .header { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 15px; padding: 20px 25px; width: 92%; max-width: 480px; --glow-color: 249, 115, 22; margin-top: 50px; }
         #chrono { font-size: 3.2em; font-weight: bold; font-family: monospace; color: #f472b6; text-shadow: 0 0 15px rgba(244, 114, 182, 0.6); }
+        body.viewing-partner #chrono { color: #3b82f6; text-shadow: 0 0 15px rgba(59, 130, 246, 0.6); }
         .header-buttons { display: flex; gap: 10px; width: 100%; }
         #btnStart { --glow-color: 16, 185, 129; border-color: rgba(16, 185, 129, 0.4); }
         #btnPause { --glow-color: 236, 72, 153; border-color: rgba(236, 72, 153, 0.4); }
@@ -109,9 +138,9 @@
         .heart-vital.active { filter: grayscale(0) opacity(1); color: #10b981; text-shadow: 0 0 15px #10b981; }
         .heart-bonus.active { filter: grayscale(0) opacity(1); color: #f59e0b; text-shadow: 0 0 20px #f59e0b; transform: rotate(10deg); }
 
-        /* --- CIBLE INPUT --- */
         .cible-container { margin-top: 10px; display: flex; justify-content: center; align-items: center; gap: 10px; background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); }
         .cible-prefix { color: #f472b6; font-weight: bold; font-family: monospace; font-size: 1.1em; }
+        body.viewing-partner .cible-prefix { color: #3b82f6; }
         #tacheInput { flex: 1; background: transparent; border: none; outline: none; color: white; font-family: monospace; font-size: 1.1em; text-align: left; }
         #tacheInput::placeholder { color: rgba(255,255,255,0.3); }
         #tacheDisplay { display: none; flex: 1; color: white; font-family: monospace; font-size: 1.1em; text-align: left; word-break: break-word; }
@@ -123,13 +152,10 @@
 
         /* --- MODALES --- */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(3px); }
-        
-        /* FOND TRANSPARENT POUR LE GAME OVER (Laisse voir les vagues derrière) */
         #modalGameOver.modal-overlay { background: transparent; backdrop-filter: none; }
-        
         .modal-content { padding: 35px; width: 85%; max-width: 480px; color: white; text-align: center; border-radius: 20px; background: rgba(0, 0, 0, 0) !important; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); max-height: 90vh; overflow-y: auto; }
         
-        /* --- INVENTAIRE NÉGOCIATION --- */
+        /* --- INVENTAIRE --- */
         .inv-row { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: left; transition: all 0.3s ease;}
         .inv-row.disabled-row { filter: grayscale(1); opacity: 0.4; pointer-events: none; } 
         .inv-icon { font-size: 2.5em; width: 60px; text-align: center; }
@@ -139,7 +165,7 @@
         .btn-consume { padding: 8px 15px; font-size: 0.85em; background: rgba(255, 255, 255, 0.05) !important; margin-top: 5px; }
         .btn-consume.souhait-btn { background: rgba(168, 85, 247, 0.2) !important; border-color: #a855f7; color: #a855f7; }
 
-        /* --- BLOCS RECOMPENSES ACTIVES (SUR ECRAN PRINCIPAL) --- */
+        /* --- BLOCS RECOMPENSES ACTIVES --- */
         .nego-block { background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #3b82f6; text-align: left; }
         .nego-actions { display: flex; gap: 8px; margin-top: 8px; align-items: center;}
         .btn-nego-acc { background: rgba(16, 185, 129, 0.2)!important; border-color: #10b981; color: #10b981; padding: 6px; font-size: 0.8em; }
@@ -183,12 +209,20 @@
 </head>
 <body>
 
-    <!-- CONTENEUR DES TOASTS (NOTIFICATIONS SYNC) -->
-    <div id="toastContainer" style="position:fixed; top:20px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:15px; pointer-events:none;"></div>
+    <!-- BOUTONS FLOTTANTS -->
+    <button id="btnSwitchView" class="glow-track" disabled>⏳ En attente...</button>
+    <button id="btnNotifBell" class="glow-track">
+        🔔
+        <span id="notifBadge">0</span>
+    </button>
+
+    <!-- CONTENEUR DES TOASTS -->
+    <div id="toastContainer" style="position:fixed; top:90px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:15px; pointer-events:auto;"></div>
 
     <canvas id="bgCanvas"></canvas>
 
     <div class="header glow-track">
+        <h3 id="partnerIndicator">HUD DU PARTENAIRE</h3>
         <div id="chrono">00:00:00</div>
         <div class="header-buttons">
             <button id="btnStart" class="glow-track">Démarrer</button>
@@ -242,7 +276,7 @@
             <button id="btnPlus" class="action-btn glow-track" disabled><span>👍 Focus</span><small>+2 PV</small></button>
         </div>
         
-        <!-- HUD COMPTEUR INVENTAIRE DE SESSION -->
+        <!-- HUD COMPTEUR INVENTAIRE -->
         <div id="inventaireHUD" style="display: flex; justify-content: space-evenly; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1); font-size: 1.1em; background: transparent;">
             <span style="display: flex; align-items: center; gap: 8px; color: #cbd5e1;">🎁 <span id="txtPetites" style="color: #10b981; font-weight: bold; text-shadow: 0 0 10px rgba(16,185,129,0.5);">0</span></span>
             <span style="display: flex; align-items: center; gap: 8px; color: #cbd5e1;">🎀 <span id="txtGrandes" style="color: #f59e0b; font-weight: bold; text-shadow: 0 0 10px rgba(245,158,11,0.5);">0</span></span>
@@ -264,6 +298,17 @@
             <p style="margin-bottom:20px; color:#cbd5e1; font-size:1.1em;">Quel surnom choisis-tu aujourd'hui mon amour ?</p>
             <input type="text" id="inputPseudo" autocomplete="new-password" placeholder="Ton surnom..." style="width:80%; max-width:300px; box-sizing:border-box; padding:15px; border-radius:10px; border:1px solid rgba(236, 72, 153, 0.5); background:rgba(0,0,0,0.5); color:white; font-size:1.2em; text-align:center; margin:0 auto 25px auto; display:block; outline:none;">
             <button id="btnValiderPseudo" class="glow-track" style="width:100%; --glow-color: 16, 185, 129; padding:15px; border-color:rgba(16, 185, 129, 0.5); color:#10b981; font-size:1.1em;">Entrer dans la session</button>
+        </div>
+    </div>
+
+    <!-- MODAL CENTRE DE NOTIFICATIONS -->
+    <div id="modalNotifs" class="modal-overlay" style="z-index:9999;">
+        <div class="modal-content glow-track" style="--glow-color: 255, 255, 255; width:90%; max-width:420px; padding: 25px;">
+            <h3 style="color:#ffffff; margin-top:0; margin-bottom: 20px; letter-spacing: 1px;">🔔 Centre de Notifications</h3>
+            <div id="notifsList" style="display:flex; flex-direction:column; max-height: 50vh; overflow-y:auto; margin-bottom:20px; text-align:left;">
+                <!-- Les notifs s'afficheront ici -->
+            </div>
+            <button onclick="document.getElementById('modalNotifs').style.display='none'" class="glow-track" style="width:100%; --glow-color: 239, 68, 68; color: #ef4444; border-color: rgba(239,68,68,0.4); padding:12px;">Fermer</button>
         </div>
     </div>
 
@@ -355,10 +400,11 @@
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
-        import { getDatabase, ref, set, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+        import { getDatabase, ref, set, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
-        // Pseudo Multijoueur - Vraiment vidé de force
-        let playerName = "";
+        let myPlayerName = "";
+        let viewedPlayerName = "";
+        
         window.addEventListener('DOMContentLoaded', () => {
             const pInput = document.getElementById('inputPseudo');
             pInput.value = "";
@@ -368,9 +414,39 @@
 
         document.getElementById('btnValiderPseudo').onclick = () => {
             let val = document.getElementById('inputPseudo').value.trim();
+            
+            // Commande secrète de réinitialisation
+            if (val.toUpperCase() === "RESET") {
+                set(gameRef, { players: {}, propositions: [], timers: [], notifsHistory: [] });
+                alert("Base de données totalement effacée ! Les slots sont de nouveau libres.");
+                document.getElementById('inputPseudo').value = "";
+                return;
+            }
+
             if (val) {
-                playerName = val;
+                let players = state.players || {};
+                let registeredPlayers = Object.keys(players);
+                
+                if (registeredPlayers.length >= 2 && !registeredPlayers.includes(val)) {
+                    alert(`⚠️ La session est complète !\n\nLes places sont prises par : ${registeredPlayers.join(' et ')}.\n\nPour vous reconnecter, veuillez utiliser exactement l'un de ces deux pseudos.\n(Astuce: tapez RESET pour tout effacer).`);
+                    return;
+                }
+
+                myPlayerName = val;
+                viewedPlayerName = myPlayerName;
                 document.getElementById('modalPseudo').style.display = 'none';
+                
+                // DECONNEXION AUTO : Supprime le noeud Firebase à la fermeture
+                const myPlayerRef = ref(db, 'sessionPartageeDuo/players/' + myPlayerName);
+                onDisconnect(myPlayerRef).remove();
+                
+                if (!players[myPlayerName]) {
+                    let updatedPlayers = Object.assign({}, state.players || {});
+                    updatedPlayers[myPlayerName] = { pvActuels: 5, modeJeu: 'attente', piecesBase: 0, tempsTravailCumule: 0, repasRestants: 2 };
+                    set(gameRef, { ...state, players: updatedPlayers });
+                } else {
+                    try { updateViewUI(); } catch(e) { console.error(e); }
+                }
             }
         };
 
@@ -386,29 +462,171 @@
 
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
-        const gameRef = ref(db, 'sessionPartagee');
-        const offsetRef = ref(db, ".info/serverTimeOffset");
+        const gameRef = ref(db, 'sessionPartageeDuo');
 
-        let state = { pvActuels: 5, modeJeu: 'attente', piecesBase: 0, tempsTravailCumule: 0, repasRestants: 2, propositions: [], timers: [] };
-        let sOff = 0; let localPieces = 0; let isFirstLoad = true; 
+        let state = { players: {}, propositions: [], timers: [], notifsHistory: [] };
+        let localPieces = 0; let isFirstLoad = true; 
         let lastAnimId = 0; let lastToastId = 0;
         let currentNegoId = null;
+        
+        let localLastReadTime = parseInt(localStorage.getItem('lastReadTime')) || 0;
+        window.expandedNotifs = new Set();
         
         window.currentPv = 5;
         window.fxState = 'normal';
         window.isDead = false;
 
-        onValue(offsetRef, s => sOff = s.val() || 0);
-
         function format(s) {
-            if(s < 0) s = 0;
+            if(isNaN(s) || s < 0) s = 0;
             let h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
             return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
         }
 
+        // --- GESTION DU SWITCH ---
+        document.getElementById('btnSwitchView').onclick = () => {
+            let players = state.players || {};
+            let partnerName = Object.keys(players).find(k => k !== myPlayerName);
+            
+            if (viewedPlayerName === myPlayerName && partnerName) {
+                viewedPlayerName = partnerName;
+            } else {
+                viewedPlayerName = myPlayerName;
+            }
+            try { updateViewUI(); } catch(e) { console.error(e); }
+        };
+
+        // --- GESTION ANTI-BUG DES NOTIFICATIONS ---
+        window.deleteNotif = function(e, id) {
+            if(e) e.stopPropagation();
+            let history = Object.values(state.notifsHistory || {}).filter(x => x != null && x.id !== id);
+            set(gameRef, { ...state, notifsHistory: history });
+        };
+
+        window.handleGroupClick = function(e, title, groupKey) {
+            if(e) e.stopPropagation();
+            if(window.expandedNotifs.has(groupKey)) {
+                let history = Object.values(state.notifsHistory || {}).filter(x => x != null && x.title !== title);
+                window.expandedNotifs.delete(groupKey);
+                set(gameRef, { ...state, notifsHistory: history });
+            } else {
+                window.expandedNotifs.add(groupKey);
+                renderNotifs(Object.values(state.notifsHistory || {}).filter(x => x != null));
+            }
+        };
+
+        function buildNotifPatch(title, text, colorCode, icon) {
+            let id = Date.now() + Math.floor(Math.random() * 1000);
+            let timeStr = new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+            let newNotif = { id, title, text, colorCode, icon, timeStr };
+            
+            let history = Object.values(state.notifsHistory || {}).filter(x => x != null);
+            history.unshift(newNotif);
+            history = history.slice(0, 50); 
+            
+            return { lastToast: newNotif, notifsHistory: history };
+        }
+
+        function renderNotifs(rawHistory) {
+            const nList = document.getElementById('notifsList');
+            nList.innerHTML = "";
+            
+            if(rawHistory.length === 0) {
+                nList.innerHTML = "<p style='text-align:center; color:#64748b; font-style:italic;'>Aucune notification récente.</p>";
+                return;
+            }
+
+            let groupedHistory = [];
+            rawHistory.sort((a, b) => b.id - a.id).forEach(notif => {
+                if (groupedHistory.length > 0 && groupedHistory[groupedHistory.length - 1].title === notif.title) {
+                    groupedHistory[groupedHistory.length - 1].subItems.push(notif);
+                } else {
+                    groupedHistory.push({ ...notif, subItems: [notif] });
+                }
+            });
+
+            groupedHistory.forEach(group => {
+                let div = document.createElement('div');
+                div.className = "notif-item";
+                
+                let groupKey = group.title + "-" + group.id;
+                
+                if(window.expandedNotifs.has(groupKey)) div.classList.add('expanded');
+
+                div.style.setProperty('--n-color', `rgb(${group.colorCode})`);
+                div.style.setProperty('--n-color-rgb', group.colorCode);
+                
+                if(group.id > localLastReadTime) div.style.background = 'rgba(255,255,255,0.1)';
+                
+                let isStacked = group.subItems.length > 1;
+                let badgeHtml = isStacked ? `<span style="background:#ef4444; color:white; font-size:0.8em; padding:2px 6px; border-radius:10px; margin-left:8px;">x${group.subItems.length}</span>` : '';
+                
+                let subHtml = "";
+                if (isStacked) {
+                    subHtml = `<div class="notif-sublist">`;
+                    group.subItems.forEach(sub => {
+                        subHtml += `
+                            <div class="notif-sub-item" onclick="window.deleteNotif(event, ${sub.id})">
+                                <span style="color:#cbd5e1; font-size:0.85em;">${sub.text}</span>
+                                <span style="color:#64748b; font-size:0.8em; margin-left:10px;">${sub.timeStr} <span style="color:#ef4444; opacity:0.8; margin-left:5px;">❌</span></span>
+                            </div>
+                        `;
+                    });
+                    subHtml += `</div>`;
+                }
+
+                let mainClick = isStacked ? `onclick="window.handleGroupClick(event, '${group.title}', '${groupKey}')"` : `onclick="window.deleteNotif(event, ${group.id})"`;
+                let expandIcon = isStacked ? (window.expandedNotifs.has(groupKey) ? `<span style="color:#ef4444; opacity:0.8;">❌</span>` : `▼`) : `<span style="color:#ef4444; opacity:0.8;">❌</span>`;
+
+                div.innerHTML = `
+                    <div class="notif-main" ${mainClick}>
+                        <div class="notif-item-icon">${group.icon}</div>
+                        <div class="notif-item-content">
+                            <div class="notif-item-title">
+                                <span><span style="color:rgb(${group.colorCode})">${group.title}</span>${badgeHtml}</span>
+                                <span class="notif-item-time">${group.timeStr} <span style="font-size:0.8em; margin-left:5px;">${expandIcon}</span></span>
+                            </div>
+                            <div class="notif-item-text">${group.text}</div>
+                        </div>
+                    </div>
+                    ${subHtml}
+                `;
+                nList.appendChild(div);
+            });
+        }
+
         window.showNotification = function(title, text, colorCode, icon) {
+            const container = document.getElementById('toastContainer');
+            
+            let existingToast = null;
+            for (let i = 0; i < container.children.length; i++) {
+                if (container.children[i].getAttribute('data-title') === title) {
+                    existingToast = container.children[i];
+                    break;
+                }
+            }
+
+            if (existingToast) {
+                let countEl = existingToast.querySelector('.toast-count');
+                let newCount = parseInt(countEl.innerText || "1") + 1;
+                countEl.innerText = newCount;
+                countEl.style.display = 'inline-block';
+                existingToast.querySelector('.toast-text').innerText = text;
+                
+                clearTimeout(existingToast.hideTimeout);
+                existingToast.style.transform = 'scale(1.05)';
+                setTimeout(() => existingToast.style.transform = 'translateX(0) scale(1)', 150);
+                
+                existingToast.hideTimeout = setTimeout(() => {
+                    existingToast.style.transform = 'translateX(150%)';
+                    existingToast.style.opacity = '0';
+                    setTimeout(() => existingToast.remove(), 500);
+                }, 4500);
+                return;
+            }
+
             const toast = document.createElement('div');
             toast.className = 'glow-track';
+            toast.setAttribute('data-title', title);
             toast.style.setProperty('--glow-color', colorCode);
             toast.style.background = 'rgba(10, 10, 14, 0.9)';
             toast.style.border = `1px solid rgba(${colorCode}, 0.5)`;
@@ -422,29 +640,51 @@
             toast.style.transition = 'all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55)'; 
             toast.style.transform = 'translateX(150%)'; 
             toast.style.opacity = '0';
+            toast.style.cursor = 'pointer'; 
             
             toast.innerHTML = `
                 <div style="font-size:2.2em; filter: drop-shadow(0 0 8px rgba(${colorCode},0.8));">${icon}</div>
-                <div style="text-align: left;">
-                    <strong style="display:block; font-size:1.1em; color:rgb(${colorCode}); margin-bottom:2px; text-transform:uppercase; letter-spacing:1px;">${title}</strong>
-                    <span style="font-size:0.9em; color:#cbd5e1;">${text}</span>
+                <div style="text-align: left; flex:1;">
+                    <strong style="display:flex; align-items:center; font-size:1.1em; color:rgb(${colorCode}); margin-bottom:2px; text-transform:uppercase; letter-spacing:1px;">
+                        ${title} <span class="toast-count" style="background:#ef4444; color:white; font-size:0.7em; padding:2px 6px; border-radius:10px; margin-left:8px; display:none;">1</span>
+                    </strong>
+                    <span class="toast-text" style="font-size:0.9em; color:#cbd5e1;">${text}</span>
                 </div>
             `;
             
-            document.getElementById('toastContainer').appendChild(toast);
+            container.appendChild(toast);
             void toast.offsetWidth;
             toast.style.transform = 'translateX(0)';
             toast.style.opacity = '1';
             
-            setTimeout(() => {
+            toast.onclick = () => {
+                clearTimeout(toast.hideTimeout);
+                toast.style.transform = 'translateX(150%)';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 500);
+            };
+            
+            toast.hideTimeout = setTimeout(() => {
                 toast.style.transform = 'translateX(150%)';
                 toast.style.opacity = '0';
                 setTimeout(() => toast.remove(), 500);
             }, 4500);
         };
 
+        document.getElementById('btnNotifBell').onclick = () => {
+            document.getElementById('modalNotifs').style.display = 'flex';
+            
+            let history = Object.values(state.notifsHistory || {}).filter(x => x != null);
+            if(history.length > 0) {
+                localLastReadTime = Math.max(...history.map(n => n.id));
+                localStorage.setItem('lastReadTime', localLastReadTime);
+                document.getElementById('notifBadge').style.display = 'none';
+                document.querySelectorAll('.notif-item').forEach(el => el.style.background = 'rgba(255,255,255,0.03)');
+            }
+        };
+
         function triggerSharedAnim(cssClass, colorName) {
-            let animEvent = { id: Date.now(), className: cssClass, color: colorName };
+            let animEvent = { id: Date.now(), className: cssClass, color: colorName, target: viewedPlayerName };
             set(gameRef, { ...state, lastAnimation: animEvent });
         }
 
@@ -467,55 +707,101 @@
             if(window.spawnWave) window.spawnWave(colorName, 'radial');
         }
 
+        // --- CIBLE ---
         document.getElementById('tacheInput').addEventListener('keydown', (e) => {
             if(e.key === 'Enter' && e.target.value.trim() !== "") {
                 let txt = e.target.value.trim();
-                let toast = { id: Date.now(), title: "Nouvelle Cible", text: `${playerName} a défini : ${txt}`, colorCode: "236, 72, 153", icon: "🎯" };
-                set(gameRef, { ...state, tacheActuelle: txt, tacheEnCours: true, lastToast: toast });
+                let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} a défini : ${txt}` : `${myPlayerName} a défini la cible de ${viewedPlayerName}`;
+                updateViewedPlayer({ tacheActuelle: txt, tacheEnCours: true }, ["Nouvelle Cible", textLog, "236, 72, 153", "🎯"]);
             }
         });
 
         document.getElementById('btnTerminerTache').onclick = () => {
-            let toast = { id: Date.now(), title: "Cible Atteinte", text: `${playerName} a terminé : ${state.tacheActuelle}`, colorCode: "16, 185, 129", icon: "✅" };
-            set(gameRef, { ...state, tacheActuelle: "", tacheEnCours: false, lastToast: toast });
+            let vState = (state.players || {})[viewedPlayerName] || {};
+            let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} a terminé : ${vState.tacheActuelle}` : `${myPlayerName} a terminé la cible de ${viewedPlayerName}`;
+            updateViewedPlayer({ tacheActuelle: "", tacheEnCours: false }, ["Cible Atteinte", textLog, "16, 185, 129", "✅"]);
         };
-
-        function updateCibleUI() {
-            const input = document.getElementById('tacheInput');
-            const display = document.getElementById('tacheDisplay');
-            const btnTerminer = document.getElementById('btnTerminerTache');
-            
-            if (state.tacheEnCours) {
-                input.style.display = 'none';
-                display.style.display = 'inline';
-                display.innerText = state.tacheActuelle;
-                btnTerminer.style.display = 'inline-block';
-            } else {
-                input.style.display = 'inline';
-                if(document.activeElement !== input) input.value = state.tacheActuelle || "";
-                display.style.display = 'none';
-                btnTerminer.style.display = 'none';
-            }
-        }
 
         ['defPetite', 'defGrande', 'defSouhait'].forEach(id => {
             document.getElementById(id).addEventListener('change', (e) => {
                 let patch = {}; patch[id] = e.target.value;
-                set(gameRef, { ...state, ...patch });
+                updateViewedPlayer(patch);
             });
         });
 
-        function checkRewardsVisibility() {
-            const hasProps = state.propositions && state.propositions.length > 0;
-            const now = Date.now() + sOff;
-            const hasTimers = state.timers && state.timers.some(t => t.end > now);
-            document.getElementById('rewardsDashboard').style.display = (hasProps || hasTimers) ? 'flex' : 'none';
-        }
+        // --- UPDATES UI (SECURISÉ) ---
+        function updateViewUI() {
+            if(!myPlayerName) return;
+            let players = state.players || {};
+            let partnerName = Object.keys(players).find(k => k !== myPlayerName);
+            let btnSwitch = document.getElementById('btnSwitchView');
 
-        function updateButtonsState() {
-            const modeJeuSafe = state.modeJeu || 'attente';
+            if (partnerName) {
+                btnSwitch.disabled = false;
+                if (viewedPlayerName === myPlayerName) {
+                    btnSwitch.innerHTML = `👁️ Voir ${partnerName}`;
+                    document.body.classList.remove('viewing-partner');
+                } else {
+                    btnSwitch.innerHTML = `🏠 Mon HUD`;
+                    document.body.classList.add('viewing-partner');
+                }
+            } else {
+                btnSwitch.disabled = true;
+                btnSwitch.innerHTML = `⏳ En attente...`;
+                viewedPlayerName = myPlayerName;
+                document.body.classList.remove('viewing-partner');
+            }
+
+            let vState = players[viewedPlayerName] || {};
+            
+            // CORRECTION CRASH: On force les PV à 5 si undefined (ex: juste après création)
+            window.currentPv = (vState.pvActuels !== undefined && vState.pvActuels !== null) ? Number(vState.pvActuels) : 5; 
+            
+            const input = document.getElementById('tacheInput');
+            const display = document.getElementById('tacheDisplay');
+            const btnTerminer = document.getElementById('btnTerminerTache');
+            
+            if (vState.tacheEnCours) {
+                input.style.display = 'none';
+                display.style.display = 'inline';
+                display.innerText = vState.tacheActuelle;
+                btnTerminer.style.display = 'inline-block';
+            } else {
+                input.style.display = 'inline';
+                if(document.activeElement !== input) input.value = vState.tacheActuelle || "";
+                display.style.display = 'none';
+                btnTerminer.style.display = 'none';
+            }
+
+            if (document.activeElement !== document.getElementById('defPetite')) document.getElementById('defPetite').value = vState.defPetite || "";
+            if (document.activeElement !== document.getElementById('defGrande')) document.getElementById('defGrande').value = vState.defGrande || "";
+            if (document.activeElement !== document.getElementById('defSouhait')) document.getElementById('defSouhait').value = vState.defSouhait || "";
+            
+            document.querySelectorAll('.heart-vital').forEach((h, i) => i < window.currentPv ? h.classList.add('active') : h.classList.remove('active'));
+            document.querySelectorAll('.heart-bonus').forEach((h, i) => i + 5 < window.currentPv ? h.classList.add('active') : h.classList.remove('active'));
+            
+            document.getElementById('invP_stock').innerText = Number(vState.nbPetitesSurprises) || 0;
+            document.getElementById('invG_stock').innerText = Number(vState.nbGrandesSurprises) || 0;
+            document.getElementById('invS_stock').innerText = Number(vState.nbSouhaits) || 0;
+
+            document.getElementById('invP_cons').innerText = Number(vState.consommePetites) || 0;
+            document.getElementById('invG_cons').innerText = Number(vState.consommeGrandes) || 0;
+            document.getElementById('invS_cons').innerText = Number(vState.consommeSouhaits) || 0;
+            
+            if(document.getElementById('txtPetites')) document.getElementById('txtPetites').innerText = Number(vState.sessionPetites) || 0;
+            if(document.getElementById('txtGrandes')) document.getElementById('txtGrandes').innerText = Number(vState.sessionGrandes) || 0;
+            if(document.getElementById('txtSouhaits')) document.getElementById('txtSouhaits').innerText = Number(vState.sessionSouhaits) || 0;
+
+            document.getElementById('repasDisplay').innerText = "🍔 Repas : " + (Number(vState.repasRestants) || 0);
+
+            document.getElementById('rowPetite').classList.toggle('disabled-row', (Number(vState.nbPetitesSurprises) || 0) <= 0);
+            document.getElementById('rowGrande').classList.toggle('disabled-row', (Number(vState.nbGrandesSurprises) || 0) <= 0);
+            document.getElementById('rowSouhait').classList.toggle('disabled-row', (Number(vState.nbSouhaits) || 0) <= 0);
+            
+            const modeJeuSafe = vState.modeJeu || 'attente';
             const isTr = modeJeuSafe === 'travail';
-            const dead = (state.pvActuels || 0) <= 0;
+            const isPa = modeJeuSafe.includes('pause');
+            const dead = window.currentPv <= 0;
 
             document.getElementById('btnStart').disabled = modeJeuSafe !== 'attente' || dead;
             document.getElementById('btnStop').disabled = modeJeuSafe === 'attente';
@@ -524,74 +810,16 @@
             document.getElementById('btnPlus').disabled = !isTr || dead;
             document.getElementById('btnBoutique').disabled = !isTr || dead;
             
-            document.getElementById('buy1S').disabled = (state.pvActuels || 0) < 7;
+            document.getElementById('buy1S').disabled = window.currentPv < 7;
             document.getElementById('buy1P').disabled = localPieces < 300;
-            document.getElementById('buy2S').disabled = (state.pvActuels || 0) < 8;
+            document.getElementById('buy2S').disabled = window.currentPv < 8;
             document.getElementById('buy2P').disabled = localPieces < 600;
             document.getElementById('optCafe').disabled = localPieces < 1;
-            document.getElementById('optRepas').disabled = (state.repasRestants || 0) <= 0;
+            document.getElementById('optRepas').disabled = (Number(vState.repasRestants) || 0) <= 0;
 
-            document.getElementById('btnConsommerPetite').disabled = (state.nbPetitesSurprises || 0) <= 0;
-            document.getElementById('btnConsommerGrande').disabled = (state.nbGrandesSurprises || 0) <= 0;
-            document.getElementById('btnConsommerSouhait').disabled = (state.nbSouhaits || 0) <= 0;
-        }
-
-        onValue(gameRef, snap => {
-            const data = snap.val(); if(!data) return; 
-
-            if (data.lastToast && data.lastToast.id !== lastToastId) {
-                lastToastId = data.lastToast.id;
-                if (Date.now() - data.lastToast.id < 5000) {
-                    showNotification(data.lastToast.title, data.lastToast.text, data.lastToast.colorCode, data.lastToast.icon);
-                }
-            }
-
-            if (data.lastAnimation && data.lastAnimation.id !== lastAnimId) {
-                lastAnimId = data.lastAnimation.id;
-                if (Date.now() - data.lastAnimation.id < 5000) {
-                    window.triggerDashAnim(data.lastAnimation.className, data.lastAnimation.color);
-                }
-            }
-            
-            state = data;
-            isFirstLoad = false;
-            window.currentPv = state.pvActuels || 0; 
-            
-            updateCibleUI();
-
-            if (document.activeElement !== document.getElementById('defPetite')) document.getElementById('defPetite').value = state.defPetite || "";
-            if (document.activeElement !== document.getElementById('defGrande')) document.getElementById('defGrande').value = state.defGrande || "";
-            if (document.activeElement !== document.getElementById('defSouhait')) document.getElementById('defSouhait').value = state.defSouhait || "";
-            
-            document.querySelectorAll('.heart-vital').forEach((h, i) => i < state.pvActuels ? h.classList.add('active') : h.classList.remove('active'));
-            document.querySelectorAll('.heart-bonus').forEach((h, i) => i + 5 < state.pvActuels ? h.classList.add('active') : h.classList.remove('active'));
-            
-            document.getElementById('invP_stock').innerText = state.nbPetitesSurprises || 0;
-            document.getElementById('invG_stock').innerText = state.nbGrandesSurprises || 0;
-            document.getElementById('invS_stock').innerText = state.nbSouhaits || 0;
-
-            document.getElementById('invP_cons').innerText = state.consommePetites || 0;
-            document.getElementById('invG_cons').innerText = state.consommeGrandes || 0;
-            document.getElementById('invS_cons').innerText = state.consommeSouhaits || 0;
-            
-            if(document.getElementById('txtPetites')) document.getElementById('txtPetites').innerText = state.sessionPetites || 0;
-            if(document.getElementById('txtGrandes')) document.getElementById('txtGrandes').innerText = state.sessionGrandes || 0;
-            if(document.getElementById('txtSouhaits')) document.getElementById('txtSouhaits').innerText = state.sessionSouhaits || 0;
-
-            document.getElementById('repasDisplay').innerText = "🍔 Repas : " + (state.repasRestants || 0);
-
-            document.getElementById('rowPetite').classList.toggle('disabled-row', (state.nbPetitesSurprises || 0) <= 0);
-            document.getElementById('rowGrande').classList.toggle('disabled-row', (state.nbGrandesSurprises || 0) <= 0);
-            document.getElementById('rowSouhait').classList.toggle('disabled-row', (state.nbSouhaits || 0) <= 0);
-            
-            updateTimersUI();
-            updatePropositionsUI();
-            checkRewardsVisibility();
-            updateButtonsState();
-
-            const modeJeuSafe = state.modeJeu || 'attente';
-            const isPa = modeJeuSafe.includes('pause');
-            const dead = (state.pvActuels || 0) <= 0;
+            document.getElementById('btnConsommerPetite').disabled = (Number(vState.nbPetitesSurprises) || 0) <= 0;
+            document.getElementById('btnConsommerGrande').disabled = (Number(vState.nbGrandesSurprises) || 0) <= 0;
+            document.getElementById('btnConsommerSouhait').disabled = (Number(vState.nbSouhaits) || 0) <= 0;
 
             if(isPa) {
                 document.body.classList.add('paused-mode');
@@ -613,10 +841,9 @@
                 document.getElementById('panelPause').style.display = 'none';
             }
 
-            if (dead && !window.isDead) {
+            if (dead && !window.isDead && viewedPlayerName === myPlayerName) {
                 window.isDead = true;
                 window.fxState = 'failing';
-                
                 document.body.classList.add('failing-theme');
                 
                 const goModal = document.getElementById('modalGameOver');
@@ -624,6 +851,10 @@
                 
                 goModal.style.display = 'flex';
                 goContent.className = 'modal-content glow-track anim-shake pulse-red-loop';
+
+                // CORRECTION DU CRASH GAME OVER : Utilise bien "myPlayerName"
+                let rootPatch = buildNotifPatch("ARRÊT CARDIAQUE", `${myPlayerName} a perdu le focus.`, "239, 68, 68", "💀");
+                set(gameRef, { ...state, ...rootPatch });
 
                 window.flatlineTimeout = setTimeout(() => {
                     if(!window.isDead) return;
@@ -641,51 +872,107 @@
                 document.body.classList.remove('flatline-theme');
                 document.getElementById('modalGameOver').style.display = 'none';
             }
+        }
+
+        onValue(gameRef, snap => {
+            const data = snap.val() || { players: {} };
+            
+            if (data.lastAnimation && data.lastAnimation.id !== lastAnimId) {
+                lastAnimId = data.lastAnimation.id;
+                if (Date.now() - data.lastAnimation.id < 5000 && data.lastAnimation.target === viewedPlayerName) {
+                    window.triggerDashAnim(data.lastAnimation.className, data.lastAnimation.color);
+                }
+            }
+            
+            const rawHistory = Object.values(data.notifsHistory || {}).filter(n => n != null);
+            let unreadCount = 0;
+            rawHistory.forEach(n => { if(n.id > localLastReadTime) unreadCount++; });
+            
+            const badge = document.getElementById('notifBadge');
+            if(unreadCount > 0) {
+                badge.style.display = 'block';
+                badge.innerText = unreadCount > 99 ? '99+' : unreadCount;
+            } else {
+                badge.style.display = 'none';
+            }
+
+            if (data.lastToast && data.lastToast.id !== lastToastId) {
+                lastToastId = data.lastToast.id;
+                if (Date.now() - data.lastToast.id < 5000) {
+                    window.showNotification(data.lastToast.title, data.lastToast.text, data.lastToast.colorCode, data.lastToast.icon);
+                }
+            }
+
+            renderNotifs(rawHistory);
+            state = data;
+            
+            if (!isFirstLoad && viewedPlayerName) {
+                let vState = state.players[viewedPlayerName] || {};
+                if (vState.recompense5Obtenue && !window.r5) { window.r5 = true; showRewardAnim('petite'); }
+                if (vState.recompense7Obtenue && !window.r7) { window.r7 = true; showRewardAnim('grande'); }
+                if (vState.recompense10Obtenue && !window.r10) { window.r10 = true; showRewardAnim('souhait'); }
+                if (!vState.recompense5Obtenue) window.r5 = false;
+                if (!vState.recompense7Obtenue) window.r7 = false;
+                if (!vState.recompense10Obtenue) window.r10 = false;
+            }
+
+            try { updateTimersUI(); } catch(e) {}
+            try { updatePropositionsUI(); } catch(e) {}
+            try { updateViewUI(); } catch(e) {}
+            isFirstLoad = false;
         });
 
+        function updateViewedPlayer(patchObj, notifParams = null) {
+            if(!viewedPlayerName) return;
+            let players = Object.assign({}, state.players || {}); 
+            let targetState = players[viewedPlayerName] || {};
+            players[viewedPlayerName] = { ...targetState, ...patchObj };
+            
+            let rootPatch = { players };
+            if (notifParams) {
+                Object.assign(rootPatch, buildNotifPatch(...notifParams));
+            }
+            set(gameRef, { ...state, ...rootPatch });
+        }
+
         const launch = () => {
-            let toast = { id: Date.now(), title: "Session Démarrée", text: `${playerName} a lancé le chrono !`, colorCode: "16, 185, 129", icon: "🚀" };
-            set(gameRef, { 
-                ...state, 
+            let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} a lancé le chrono !` : `${myPlayerName} a lancé le chrono de ${viewedPlayerName} !`;
+            document.getElementById('toastContainer').innerHTML = ""; 
+            
+            updateViewedPlayer({ 
                 pvActuels: 5, piecesBase: 0, repasRestants: 2, 
                 recompense5Obtenue: false, recompense7Obtenue: false, recompense10Obtenue: false,
                 sessionPetites: 0, sessionGrandes: 0, sessionSouhaits: 0,
-                modeJeu: 'travail', timestampMode: serverTimestamp(), tempsTravailCumule: 0,
-                lastToast: toast
-            });
+                modeJeu: 'travail', timestampMode: Date.now(), tempsTravailCumule: 0
+            }, ["Session Démarrée", textLog, "16, 185, 129", "🚀"]);
         };
 
-        const applyPvChange = (newPv, extraPatch = {}, customToast = null) => {
-            let current = state.pvActuels || 0;
+        const applyPvChange = (newPv, extraPatch = {}, notifParams = null) => {
+            let vState = (state.players || {})[viewedPlayerName] || {};
+            let current = vState.pvActuels || 0;
             let patch = { pvActuels: newPv, ...extraPatch };
             
-            let pS = extraPatch.nbPetitesSurprises !== undefined ? extraPatch.nbPetitesSurprises : (state.nbPetitesSurprises || 0);
-            let gS = extraPatch.nbGrandesSurprises !== undefined ? extraPatch.nbGrandesSurprises : (state.nbGrandesSurprises || 0);
-            let sH = extraPatch.nbSouhaits !== undefined ? extraPatch.nbSouhaits : (state.nbSouhaits || 0);
+            let pS = extraPatch.nbPetitesSurprises !== undefined ? extraPatch.nbPetitesSurprises : (vState.nbPetitesSurprises || 0);
+            let gS = extraPatch.nbGrandesSurprises !== undefined ? extraPatch.nbGrandesSurprises : (vState.nbGrandesSurprises || 0);
+            let sH = extraPatch.nbSouhaits !== undefined ? extraPatch.nbSouhaits : (vState.nbSouhaits || 0);
 
-            let sesP = extraPatch.sessionPetites !== undefined ? extraPatch.sessionPetites : (state.sessionPetites || 0);
-            let sesG = extraPatch.sessionGrandes !== undefined ? extraPatch.sessionGrandes : (state.sessionGrandes || 0);
-            let sesS = extraPatch.sessionSouhaits !== undefined ? extraPatch.sessionSouhaits : (state.sessionSouhaits || 0);
+            let sesP = extraPatch.sessionPetites !== undefined ? extraPatch.sessionPetites : (vState.sessionPetites || 0);
+            let sesG = extraPatch.sessionGrandes !== undefined ? extraPatch.sessionGrandes : (vState.sessionGrandes || 0);
+            let sesS = extraPatch.sessionSouhaits !== undefined ? extraPatch.sessionSouhaits : (vState.sessionSouhaits || 0);
 
-            let unlockToast = null;
-            if (newPv >= 5 && !state.recompense5Obtenue) { pS += 1; sesP += 1; patch.recompense5Obtenue = true; unlockToast = {title: "Focus Atteint", text: `${playerName} a débloqué : Petite Surprise !`, colorCode: "16, 185, 129", icon: "🎁"}; showRewardAnim('petite'); }
-            if (newPv >= 7 && !state.recompense7Obtenue) { gS += 1; sesG += 1; patch.recompense7Obtenue = true; unlockToast = {title: "Focus Atteint", text: `${playerName} a débloqué : Grande Surprise !`, colorCode: "245, 158, 11", icon: "🎀"}; showRewardAnim('grande'); }
-            if (newPv >= 10 && !state.recompense10Obtenue) { sH += 1; sesS += 1; patch.recompense10Obtenue = true; unlockToast = {title: "Focus Maximal", text: `${playerName} a débloqué : Souhait !`, colorCode: "168, 85, 247", icon: "🪔"}; showRewardAnim('souhait'); }
+            let unlockParams = null;
+            if (newPv >= 5 && !vState.recompense5Obtenue) { pS += 1; sesP += 1; patch.recompense5Obtenue = true; unlockParams = ["Focus Atteint", `${viewedPlayerName} a débloqué : Petite Surprise !`, "16, 185, 129", "🎁"]; }
+            if (newPv >= 7 && !vState.recompense7Obtenue) { gS += 1; sesG += 1; patch.recompense7Obtenue = true; unlockParams = ["Focus Atteint", `${viewedPlayerName} a débloqué : Grande Surprise !`, "245, 158, 11", "🎀"]; }
+            if (newPv >= 10 && !vState.recompense10Obtenue) { sH += 1; sesS += 1; patch.recompense10Obtenue = true; unlockParams = ["Focus Maximal", `${viewedPlayerName} a débloqué : Souhait !`, "168, 85, 247", "🪔"]; }
 
-            if (current >= 10 && newPv < 10 && state.recompense10Obtenue) { sH = Math.max(0, sH - 1); sesS = Math.max(0, sesS - 1); patch.recompense10Obtenue = false; }
-            if (current >= 7 && newPv < 7 && state.recompense7Obtenue) { gS = Math.max(0, gS - 1); sesG = Math.max(0, sesG - 1); patch.recompense7Obtenue = false; }
-            if (current >= 5 && newPv < 5 && state.recompense5Obtenue) { pS = Math.max(0, pS - 1); sesP = Math.max(0, sesP - 1); patch.recompense5Obtenue = false; }
+            if (current >= 10 && newPv < 10 && vState.recompense10Obtenue) { sH = Math.max(0, sH - 1); sesS = Math.max(0, sesS - 1); patch.recompense10Obtenue = false; }
+            if (current >= 7 && newPv < 7 && vState.recompense7Obtenue) { gS = Math.max(0, gS - 1); sesG = Math.max(0, sesG - 1); patch.recompense7Obtenue = false; }
+            if (current >= 5 && newPv < 5 && vState.recompense5Obtenue) { pS = Math.max(0, pS - 1); sesP = Math.max(0, sesP - 1); patch.recompense5Obtenue = false; }
 
             patch.nbPetitesSurprises = pS; patch.nbGrandesSurprises = gS; patch.nbSouhaits = sH;
             patch.sessionPetites = sesP; patch.sessionGrandes = sesG; patch.sessionSouhaits = sesS;
             
-            if(unlockToast) {
-                patch.lastToast = { id: Date.now(), ...unlockToast };
-            } else if (customToast) {
-                patch.lastToast = { id: Date.now(), ...customToast };
-            }
-            
-            set(gameRef, { ...state, ...patch });
+            updateViewedPlayer(patch, unlockParams || notifParams);
         };
 
         document.getElementById('btnRestartGO').onclick = () => {
@@ -696,67 +983,88 @@
             setTimeout(() => flash.remove(), 1200);
             
             triggerSharedAnim('anim-flash-green', 'green');
+            document.getElementById('toastContainer').innerHTML = ""; 
             
-            let toast = { id: Date.now(), title: "Réanimation", text: `${playerName} a utilisé le défibrillateur !`, colorCode: "16, 185, 129", icon: "⚡" };
-            set(gameRef, { 
-                ...state, 
+            updateViewedPlayer({ 
                 pvActuels: 5, piecesBase: 0, repasRestants: 2, 
                 recompense5Obtenue: false, recompense7Obtenue: false, recompense10Obtenue: false,
                 sessionPetites: 0, sessionGrandes: 0, sessionSouhaits: 0,
-                modeJeu: 'travail', timestampMode: serverTimestamp(), tempsTravailCumule: 0,
-                lastToast: toast
-            });
+                modeJeu: 'travail', timestampMode: Date.now(), tempsTravailCumule: 0
+            }, ["Réanimation", `${viewedPlayerName} a été réanimé !`, "16, 185, 129", "⚡"]);
         };
 
         document.getElementById('btnStart').onclick = launch;
         document.getElementById('btnStop').onclick = () => {
-            let toast = { id: Date.now(), title: "Session Stoppée", text: `${playerName} a arrêté le chrono.`, colorCode: "239, 68, 68", icon: "🛑" };
-            set(gameRef, { ...state, modeJeu: 'attente', lastToast: toast });
+            let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} a arrêté le chrono.` : `${myPlayerName} a arrêté le chrono de ${viewedPlayerName}.`;
+            updateViewedPlayer({ modeJeu: 'attente' }, ["Session Stoppée", textLog, "239, 68, 68", "🛑"]);
         };
+        
         document.getElementById('btnInventaire').onclick = () => document.getElementById('modalInventaire').style.display='flex';
         
         document.getElementById('btnMinus').onclick = () => {
-            let current = state.pvActuels || 0;
+            let vState = (state.players || {})[viewedPlayerName] || {};
+            let current = vState.pvActuels || 0;
             triggerSharedAnim('anim-shake-red', 'red');
-            let toast = { title: "Alerte Distraction", text: `${playerName} a perdu le focus (-1 PV).`, colorCode: "239, 68, 68", icon: "💔" };
-            applyPvChange(current > 5 ? 5 : Math.max(0, current - 1), {}, toast);
+            let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} a perdu le focus (-1 PV).` : `${myPlayerName} a retiré 1 PV à ${viewedPlayerName}.`;
+            let notifParams = ["Alerte Distraction", textLog, "239, 68, 68", "💔"];
+            applyPvChange(current > 5 ? 5 : Math.max(0, current - 1), {}, notifParams);
         };
         
         document.getElementById('btnPlus').onclick = () => {
-            let current = state.pvActuels || 0; let newPv = Math.min(10, current + 2);
-            let customToast = null;
+            let vState = (state.players || {})[viewedPlayerName] || {};
+            let current = vState.pvActuels || 0; let newPv = Math.min(10, current + 2);
+            let notifParams = null;
             if(newPv === 10 && current < 10) {
                 triggerSharedAnim('anim-flash-yellow', 'yellow');
-                customToast = { title: "FOCUS MAXIMAL", text: `${playerName} a atteint 10/10 ! 🔥`, colorCode: "251, 191, 36", icon: "👑" };
+                notifParams = ["FOCUS MAXIMAL", `${viewedPlayerName} a atteint 10/10 ! 🔥`, "251, 191, 36", "👑"];
             } else if (newPv < 10) {
                 triggerSharedAnim('anim-flash-green', 'green');
-                customToast = { title: "Focus Maintenu", text: `${playerName} a regagné de la vie (+2 PV).`, colorCode: "16, 185, 129", icon: "💚" };
+                let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} a regagné de la vie (+2 PV).` : `${myPlayerName} a donné du focus à ${viewedPlayerName} (+2 PV).`;
+                notifParams = ["Focus Maintenu", textLog, "16, 185, 129", "💚"];
             }
-            applyPvChange(newPv, {}, customToast);
+            applyPvChange(newPv, {}, notifParams);
         };
         
         document.getElementById('btnPause').onclick = () => document.getElementById('modalChoixPause').style.display='flex';
         document.getElementById('btnBoutique').onclick = () => document.getElementById('modalBoutique').style.display='flex';
 
         document.getElementById('optCafe').onclick = () => {
-            const elap = Math.floor((Date.now() + sOff - state.timestampMode)/1000);
-            let toast = { id: Date.now(), title: "Pause", text: `${playerName} prend un café ☕`, colorCode: "251, 191, 36", icon: "☕" };
-            set(gameRef, { ...state, modeJeu: 'pause_cafe', timestampMode: serverTimestamp(), piecesBase: localPieces, tempsTravailCumule: (state.tempsTravailCumule || 0) + elap, lastToast: toast });
+            let vState = (state.players || {})[viewedPlayerName] || {};
+            
+            let tMode = Number(vState.timestampMode);
+            if (isNaN(tMode) || tMode <= 0) tMode = Date.now();
+
+            const elap = Math.max(0, Math.floor((Date.now() - tMode)/1000));
+            let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} prend un café ☕` : `${myPlayerName} a mis ${viewedPlayerName} en pause café ☕`;
+            
+            updateViewedPlayer({ 
+                modeJeu: 'pause_cafe', timestampMode: Date.now(), piecesBase: localPieces, tempsTravailCumule: (vState.tempsTravailCumule || 0) + elap
+            }, ["Pause", textLog, "251, 191, 36", "☕"]);
             document.getElementById('modalChoixPause').style.display='none';
         };
+        
         document.getElementById('optRepas').onclick = () => {
-            if((state.repasRestants || 0) <= 0) return;
-            const elap = Math.floor((Date.now() + sOff - state.timestampMode)/1000);
-            let toast = { id: Date.now(), title: "Pause", text: `${playerName} part manger 🍔`, colorCode: "249, 115, 22", icon: "🍔" };
-            set(gameRef, { ...state, modeJeu: 'pause_repas', repasRestants: state.repasRestants - 1, timestampMode: serverTimestamp(), piecesBase: localPieces, tempsTravailCumule: (state.tempsTravailCumule || 0) + elap, lastToast: toast });
+            let vState = (state.players || {})[viewedPlayerName] || {};
+            if((vState.repasRestants || 0) <= 0) return;
+            
+            let tMode = Number(vState.timestampMode);
+            if (isNaN(tMode) || tMode <= 0) tMode = Date.now();
+
+            const elap = Math.max(0, Math.floor((Date.now() - tMode)/1000));
+            let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} part manger 🍔` : `${myPlayerName} a mis ${viewedPlayerName} en pause repas 🍔`;
+            
+            updateViewedPlayer({ 
+                modeJeu: 'pause_repas', repasRestants: vState.repasRestants - 1, timestampMode: Date.now(), piecesBase: localPieces, tempsTravailCumule: (vState.tempsTravailCumule || 0) + elap
+            }, ["Pause", textLog, "249, 115, 22", "🍔"]);
             document.getElementById('modalChoixPause').style.display='none';
         };
+        
         document.getElementById('btnStopperPause').onclick = () => {
-            let toast = { id: Date.now(), title: "Reprise", text: `${playerName} est de retour au travail !`, colorCode: "16, 185, 129", icon: "▶️" };
-            set(gameRef, { ...state, modeJeu: 'travail', timestampMode: serverTimestamp(), piecesBase: localPieces, lastToast: toast });
+            let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} est de retour au travail !` : `${myPlayerName} a relancé le HUD de ${viewedPlayerName}.`;
+            updateViewedPlayer({ modeJeu: 'travail', timestampMode: Date.now(), piecesBase: localPieces }, ["Reprise", textLog, "16, 185, 129", "▶️"]);
         };
 
-        const handleShopPurchase = (action, logText, animType) => { 
+        const handleShopPurchase = (action, animType) => { 
             if(action()) {
                 showRewardAnim(animType);
                 document.getElementById('modalBoutique').style.display = 'none'; 
@@ -765,68 +1073,88 @@
         
         document.getElementById('buy1P').onclick = () => handleShopPurchase(() => {
             if(localPieces >= 300) {
-                let toast = { id: Date.now(), title: "Achat Boutique", text: `${playerName} a obtenu : Petite Surprise !`, colorCode: "236, 72, 153", icon: "🛒" };
-                set(gameRef, {...state, piecesBase: state.piecesBase - 300, nbPetitesSurprises: (state.nbPetitesSurprises || 0) + 1, sessionPetites: (state.sessionPetites || 0) + 1, lastToast: toast});
+                let vState = (state.players || {})[viewedPlayerName] || {};
+                let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} a acheté : Petite Surprise !` : `${myPlayerName} a offert une Petite Surprise à ${viewedPlayerName} !`;
+                updateViewedPlayer({
+                    piecesBase: vState.piecesBase - 300, nbPetitesSurprises: (vState.nbPetitesSurprises || 0) + 1, sessionPetites: (vState.sessionPetites || 0) + 1
+                }, ["Achat Boutique", textLog, "236, 72, 153", "🛒"]);
                 return true;
             } return false;
-        }, "Petite Surprise", "petite");
+        }, "petite");
+
         document.getElementById('buy2P').onclick = () => handleShopPurchase(() => {
             if(localPieces >= 600) {
-                let toast = { id: Date.now(), title: "Achat Boutique", text: `${playerName} a obtenu : Grande Surprise !`, colorCode: "236, 72, 153", icon: "🛒" };
-                set(gameRef, {...state, piecesBase: state.piecesBase - 600, nbGrandesSurprises: (state.nbGrandesSurprises || 0) + 1, sessionGrandes: (state.sessionGrandes || 0) + 1, lastToast: toast});
+                let vState = (state.players || {})[viewedPlayerName] || {};
+                let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} a acheté : Grande Surprise !` : `${myPlayerName} a offert une Grande Surprise à ${viewedPlayerName} !`;
+                updateViewedPlayer({
+                    piecesBase: vState.piecesBase - 600, nbGrandesSurprises: (vState.nbGrandesSurprises || 0) + 1, sessionGrandes: (vState.sessionGrandes || 0) + 1
+                }, ["Achat Boutique", textLog, "236, 72, 153", "🛒"]);
                 return true;
             } return false;
-        }, "Grande Surprise", "grande");
+        }, "grande");
 
         document.getElementById('buy1S').onclick = () => handleShopPurchase(() => {
-            if(state.pvActuels >= 7) {
-                let toast = { title: "Achat Boutique", text: `${playerName} a obtenu : Petite Surprise !`, colorCode: "236, 72, 153", icon: "🛒" };
-                applyPvChange(state.pvActuels - 2, { nbPetitesSurprises: (state.nbPetitesSurprises || 0) + 1, sessionPetites: (state.sessionPetites || 0) + 1 }, toast);
+            let vState = (state.players || {})[viewedPlayerName] || {};
+            if(vState.pvActuels >= 7) {
+                let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} a acheté : Petite Surprise !` : `${myPlayerName} a échangé du focus pour offrir une Petite Surprise à ${viewedPlayerName} !`;
+                applyPvChange(vState.pvActuels - 2, { nbPetitesSurprises: (vState.nbPetitesSurprises || 0) + 1, sessionPetites: (vState.sessionPetites || 0) + 1 }, ["Achat Boutique", textLog, "236, 72, 153", "🛒"]);
                 return true;
             } return false;
-        }, "Petite Surprise", "petite");
+        }, "petite");
+
         document.getElementById('buy2S').onclick = () => handleShopPurchase(() => {
-            if(state.pvActuels >= 8) {
-                let toast = { title: "Achat Boutique", text: `${playerName} a obtenu : Grande Surprise !`, colorCode: "236, 72, 153", icon: "🛒" };
-                applyPvChange(state.pvActuels - 3, { nbGrandesSurprises: (state.nbGrandesSurprises || 0) + 1, sessionGrandes: (state.sessionGrandes || 0) + 1 }, toast);
+            let vState = (state.players || {})[viewedPlayerName] || {};
+            if(vState.pvActuels >= 8) {
+                let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} a acheté : Grande Surprise !` : `${myPlayerName} a échangé du focus pour offrir une Grande Surprise à ${viewedPlayerName} !`;
+                applyPvChange(vState.pvActuels - 3, { nbGrandesSurprises: (vState.nbGrandesSurprises || 0) + 1, sessionGrandes: (vState.sessionGrandes || 0) + 1 }, ["Achat Boutique", textLog, "236, 72, 153", "🛒"]);
                 return true;
             } return false;
-        }, "Grande Surprise", "grande");
+        }, "grande");
 
         function proposerItem(typeKey, nameField) {
-            let currentNb = state[typeKey] || 0;
+            let vState = (state.players || {})[viewedPlayerName] || {};
+            let currentNb = vState[typeKey] || 0;
             if (currentNb <= 0) return;
             let val = document.getElementById(nameField).value.trim();
             if(!val) val = "Récompense Mystère";
             
-            let props = state.propositions || [];
-            props.push({ id: Date.now(), type: typeKey, text: val, author: playerName });
+            let props = Object.values(state.propositions || {}).filter(x => x != null);
+            props.push({ id: Date.now(), type: typeKey, text: val, author: myPlayerName, target: viewedPlayerName });
             
-            let toast = { id: Date.now(), title: "Nouvelle Proposition", text: `${playerName} propose : ${val}`, colorCode: "59, 130, 246", icon: "💬" };
-            let patch = { propositions: props, lastToast: toast };
-            patch[typeKey] = currentNb - 1; 
-            patch[nameField] = ""; 
+            let patch = {}; patch[typeKey] = currentNb - 1; patch[nameField] = ""; 
             
-            set(gameRef, { ...state, ...patch });
+            let players = Object.assign({}, state.players || {});
+            players[viewedPlayerName] = { ...vState, ...patch };
+            
+            let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} propose : ${val}` : `${myPlayerName} utilise le stock de ${viewedPlayerName} pour proposer : ${val}`;
+            let rootPatch = { players, propositions: props, ...buildNotifPatch("Nouvelle Proposition", textLog, "59, 130, 246", "💬") };
+            
+            set(gameRef, { ...state, ...rootPatch });
             document.getElementById(nameField).value = ""; 
         }
 
         window.accepterNego = function(pId) {
-            let props = state.propositions || [];
+            let props = Object.values(state.propositions || {}).filter(x => x != null);
             let p = props.find(x => x.id === pId);
             if(!p) return;
             
+            let vState = (state.players || {})[p.target] || {}; 
             let patch = {};
-            if(p.type==='nbPetitesSurprises') patch.consommePetites = (state.consommePetites||0)+1;
-            else patch.consommeGrandes = (state.consommeGrandes||0)+1;
+            if(p.type==='nbPetitesSurprises') patch.consommePetites = (vState.consommePetites||0)+1;
+            else patch.consommeGrandes = (vState.consommeGrandes||0)+1;
 
-            let timers = state.timers || [];
-            timers.push({ id: Date.now(), name: p.text, end: Date.now() + sOff + 86400000, color: p.type==='nbPetitesSurprises'?'#10b981':'#f59e0b' });
-            patch.timers = timers;
-            patch.propositions = props.filter(x => x.id !== pId);
+            let timers = Object.values(state.timers || {}).filter(x => x != null);
+            timers.push({ id: Date.now(), name: p.text, end: Date.now() + 86400000, color: p.type==='nbPetitesSurprises'?'#10b981':'#f59e0b' });
             
-            let toast = { id: Date.now(), title: "Accord Validé", text: `"${p.text}" accepté ! 24h pour le faire !`, colorCode: "16, 185, 129", icon: "🤝" };
-            set(gameRef, { ...state, ...patch, lastToast: toast });
+            let players = Object.assign({}, state.players || {});
+            players[p.target] = { ...vState, ...patch };
+
+            let textLog = myPlayerName === p.target ? `L'accord de ${myPlayerName} sur "${p.text}" est validé !` : `${myPlayerName} a accepté l'idée : "${p.text}" !`;
+            
+            set(gameRef, { 
+                ...state, players, timers, propositions: props.filter(x => x.id !== pId), 
+                ...buildNotifPatch("Accord Validé", textLog, "16, 185, 129", "🤝") 
+            });
         };
 
         window.ouvrirContrePropo = function(pId, oldText) {
@@ -837,13 +1165,16 @@
 
         document.getElementById('btnValiderNego').onclick = () => {
             let val = document.getElementById('inputNego').value.trim();
-            let props = state.propositions || [];
+            let props = Object.values(state.propositions || {}).filter(x => x != null);
             let idx = props.findIndex(x => x.id === currentNegoId);
             if(idx !== -1 && val) {
                 props[idx].text = val;
-                props[idx].author = playerName;
-                let toast = { id: Date.now(), title: "Contre-Proposition", text: `${playerName} propose : ${val}`, colorCode: "236, 72, 153", icon: "⚖️" };
-                set(gameRef, { ...state, propositions: props, lastToast: toast });
+                props[idx].author = myPlayerName;
+                set(gameRef, { 
+                    ...state, 
+                    propositions: props,
+                    ...buildNotifPatch("Contre-Proposition", `${myPlayerName} propose : ${val}`, "236, 72, 153", "⚖️")
+                });
             }
             document.getElementById('modalNego').style.display = 'none';
         };
@@ -851,7 +1182,9 @@
         function updatePropositionsUI() {
             const container = document.getElementById('propositionsList');
             container.innerHTML = "";
-            (state.propositions || []).forEach(p => {
+            
+            let props = Object.values(state.propositions || {}).filter(x => x != null);
+            props.forEach(p => {
                 let color = p.type === 'nbPetitesSurprises' ? '#10b981' : '#f59e0b';
                 let div = document.createElement('div');
                 div.className = "nego-block";
@@ -868,18 +1201,21 @@
         }
 
         document.getElementById('btnConsommerSouhait').onclick = () => {
-            let currentNb = state.nbSouhaits || 0;
+            let vState = (state.players || {})[viewedPlayerName] || {};
+            let currentNb = vState.nbSouhaits || 0;
             if (currentNb <= 0) return;
             let val = document.getElementById('defSouhait').value.trim() || "Souhait Mystère";
             
-            let timers = state.timers || [];
-            timers.push({ id: Date.now(), name: val, end: Date.now() + sOff + 86400000, color: '#a855f7' });
+            let timers = Object.values(state.timers || {}).filter(x => x != null);
+            timers.push({ id: Date.now(), name: val, end: Date.now() + 86400000, color: '#a855f7' });
             
-            let toast = { id: Date.now(), title: "Souhait Utilisé", text: `"${val}" lancé ! 24h pour réaliser !`, colorCode: "168, 85, 247", icon: "🪔" };
-            set(gameRef, { 
-                ...state, timers: timers, nbSouhaits: currentNb - 1, consommeSouhaits: (state.consommeSouhaits||0) + 1,
-                defSouhait: "", lastToast: toast
-            });
+            let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} a lancé un Souhait !` : `${myPlayerName} a validé le Souhait de ${viewedPlayerName} !`;
+            
+            updateViewedPlayer({ 
+                nbSouhaits: currentNb - 1, consommeSouhaits: (vState.consommeSouhaits||0) + 1, defSouhait: ""
+            }, ["Souhait Utilisé", textLog, "168, 85, 247", "🪔"]);
+            
+            set(gameRef, { ...state, timers }); 
             document.getElementById('defSouhait').value = "";
         };
 
@@ -887,19 +1223,24 @@
         document.getElementById('btnConsommerGrande').onclick = () => proposerItem('nbGrandesSurprises', 'defGrande');
 
         window.terminerTimer = function(tId) {
-            let timers = state.timers || [];
+            let timers = Object.values(state.timers || {}).filter(x => x != null);
             let completed = timers.find(t => t.id === tId);
             timers = timers.filter(t => t.id !== tId);
-            let toast = { id: Date.now(), title: "Récompense Effectuée !", text: `"${completed ? completed.name : 'Tâche'}" a été validée !`, colorCode: "16, 185, 129", icon: "🎉" };
-            set(gameRef, { ...state, timers: timers, lastToast: toast });
+            set(gameRef, { 
+                ...state, 
+                timers: timers,
+                ...buildNotifPatch("Récompense Effectuée !", `"${completed ? completed.name : 'Tâche'}" a été validée par ${myPlayerName} !`, "16, 185, 129", "🎉")
+            });
         };
 
         function updateTimersUI() {
             const container = document.getElementById('timersList');
-            const now = Date.now() + sOff;
-            let activeTimers = (state.timers || []).filter(t => t.end > now);
+            const now = Date.now();
             
-            if(state.timers && activeTimers.length !== state.timers.length) {
+            let timers = Object.values(state.timers || {}).filter(x => x != null);
+            let activeTimers = timers.filter(t => t.end > now);
+            
+            if(timers.length !== activeTimers.length) {
                 set(gameRef, { ...state, timers: activeTimers });
             }
 
@@ -929,26 +1270,56 @@
             });
         }
 
+        function checkRewardsVisibility() {
+            let props = Object.values(state.propositions || {}).filter(x => x != null);
+            let timers = Object.values(state.timers || {}).filter(x => x != null);
+            const now = Date.now();
+            const hasTimers = timers.some(t => t.end > now);
+            document.getElementById('rewardsDashboard').style.display = (props.length > 0 || hasTimers) ? 'flex' : 'none';
+        }
+
+        // --- BOUCLE PRINCIPALE 100% BLINDÉE ---
         setInterval(() => {
-            updateTimersUI();
-            checkRewardsVisibility();
-            updateButtonsState();
-            const modeJeuSafe = state.modeJeu || 'attente';
-            if(modeJeuSafe === 'attente' || !state.timestampMode) return;
-            const now = Date.now() + sOff; const elap = Math.floor((now - state.timestampMode)/1000);
+            if(!myPlayerName || !viewedPlayerName) return;
+            
+            let vState = {};
+            try { vState = state.players[viewedPlayerName] || {}; } catch(e) {}
+            
+            const modeJeuSafe = vState.modeJeu || 'attente';
+            
+            try { updateTimersUI(); } catch(e) {}
+            try { checkRewardsVisibility(); } catch(e) {}
+            try { updateViewUI(); } catch(e) {}
+            
+            if(modeJeuSafe === 'attente') {
+                document.getElementById('chrono').innerText = "00:00:00";
+                document.getElementById('piecesDisplay').innerText = "🪙 Pièces : " + (Number(vState.piecesBase) || 0);
+                return;
+            }
+            
+            let tMode = Number(vState.timestampMode);
+            if (isNaN(tMode) || tMode <= 0) tMode = Date.now(); // ANTI BUG : Remplace une heure invalide par l'heure actuelle
+            
+            const elap = Math.max(0, Math.floor((Date.now() - tMode) / 1000));
+            const cumule = Number(vState.tempsTravailCumule) || 0;
+            const baseP = Number(vState.piecesBase) || 0;
+
             if(modeJeuSafe === 'travail') {
-                localPieces = (state.piecesBase || 0) + Math.floor(elap / 60) * 5;
-                document.getElementById('chrono').innerText = format((state.tempsTravailCumule || 0) + elap);
+                localPieces = baseP + Math.floor(elap / 60) * 5;
+                document.getElementById('chrono').innerText = format(cumule + elap);
                 document.getElementById('piecesDisplay').innerText = "🪙 Pièces : " + localPieces;
             } else if(modeJeuSafe === 'pause_cafe') {
-                localPieces = Math.max(0, (state.piecesBase || 0) - Math.floor(elap * 0.5));
-                let tRem = Math.floor((state.piecesBase || 0) / 0.5) - elap;
+                document.getElementById('chrono').innerText = format(cumule);
+                localPieces = Math.max(0, baseP - Math.floor(elap * 0.5));
+                let tRem = Math.floor(baseP / 0.5) - elap;
                 document.getElementById('decomptePause').innerText = format(tRem);
                 document.getElementById('piecesDisplay').innerText = "🪙 Pièces : " + localPieces;
-                if(tRem <= 0) document.getElementById('btnStopperPause').click();
+                if(tRem <= 0 && viewedPlayerName === myPlayerName) document.getElementById('btnStopperPause').click();
             } else if(modeJeuSafe === 'pause_repas') {
-                let tRem = 1800 - elap; document.getElementById('decomptePause').innerText = format(tRem);
-                if(tRem <= 0) document.getElementById('btnStopperPause').click();
+                document.getElementById('chrono').innerText = format(cumule);
+                let tRem = 1800 - elap; 
+                document.getElementById('decomptePause').innerText = format(tRem);
+                if(tRem <= 0 && viewedPlayerName === myPlayerName) document.getElementById('btnStopperPause').click();
             }
         }, 500);
     </script>
@@ -983,7 +1354,11 @@
             ctx.clearRect(0,0,w,h);
             
             let isMax = window.currentPv >= 10;
-            let baseR = isMax ? 251 : 236; let baseG = isMax ? 191 : 72; let baseB = isMax ? 36 : 153;
+            let isPartner = document.body.classList.contains('viewing-partner');
+            
+            let baseR = isMax ? 251 : (isPartner ? 59 : 236); 
+            let baseG = isMax ? 191 : (isPartner ? 130 : 72); 
+            let baseB = isMax ? 36 : (isPartner ? 246 : 153);
             
             if (document.body.classList.contains('paused-mode')) { baseR = 255; baseG = 255; baseB = 255; }
             if (window.fxState === 'failing') { baseR = 239; baseG = 68; baseB = 68; }
