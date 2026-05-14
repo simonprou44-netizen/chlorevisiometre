@@ -3,295 +3,192 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chlorévisiomètre Pro - Dual Outer Glow Effect</title>
+    <title>My Love</title>
     <style>
-        /* --- ARRIÈRE-PLAN --- */
+        /* --- MASQUER LES BARRES DE DÉFILEMENT GLOBALES --- */
+        * { scrollbar-width: none; -ms-overflow-style: none; }
+        *::-webkit-scrollbar { display: none; }
+
+        /* --- BASE & FOND --- */
         body {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            min-height: 100vh;
-            margin: 0;
-            padding: 20px 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: white;
-            user-select: none; 
-            -webkit-user-select: none;
-            background-color: #0a0a0c; 
-            overflow-x: hidden;
+            display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+            min-height: 100vh; margin: 0; padding: 20px 0; box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: white;
+            background-color: #0a0a0c; overflow-x: hidden;
+            transition: filter 0.5s ease;
         }
+        #bgCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; transition: filter 1s ease; }
 
-        #bgCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            pointer-events: none; 
-        }
-
-        /* --- EFFET : AURA EXTERNE DOUBLE (STATIQUE DOUCE + DYNAMIQUE INTENSE) --- */
+        /* --- EFFET : AURA EXTERNE ET TRANSPARENCE ABSOLUE --- */
         .glow-track {
-            position: relative;
-            isolation: isolate; /* Force le halo à rester strictement derrière */
-            --glow-color: 255, 255, 255; /* Blanc par défaut */
-            background: #111114; /* Fond sombre et OPAQUE */
-            border: 1px solid rgba(255, 255, 255, 0.08); /* Bordure subtile */
-            border-radius: 12px;
-        }
-
-        /* Génération de l'aura double derrière la boîte opaque */
-        .glow-track::before {
-            content: "";
-            position: absolute;
-            inset: -4px; /* Épaisseur du halo dépassant de l'élément */
-            border-radius: inherit; 
-            /* COMBINAISON DE DEUX LUEURS EXTERNES */
-            background:
-                /* 1. Lueur Externe STATIQUE (Douce, constante, visible tout autour) */
-                radial-gradient(ellipse at center, rgba(var(--glow-color), 0.15) 0%, rgba(var(--glow-color), 0.1) 40%, transparent 75%),
-                /* 2. Lueur Externe DYNAMIQUE (Intense, suit le curseur, devient visible au survol) */
-                radial-gradient(120px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(var(--glow-color), 0.0) 0%, rgba(var(--glow-color), 0.0) 50%); /* Commencer cachée */
-            z-index: -1; /* Placée DERRIÈRE le fond opaque */
-            pointer-events: none;
-            filter: blur(12px); /* C'est ce flou qui crée l'effet d'aura externe douce */
-            transition: background 0.3s ease; /* Pour un fade-in doux de la lueur dynamique */
-        }
-
-        /* Au survol : On allume lueur externe dynamique intense */
-        .glow-track:hover::before {
-            background:
-                /* Maintenir lueur statique */
-                radial-gradient(ellipse at center, rgba(var(--glow-color), 0.15) 0%, rgba(var(--glow-color), 0.1) 40%, transparent 75%),
-                /* Allumer lueur dynamique intense qui suit le curseur */
-                radial-gradient(120px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(var(--glow-color), 1.0) 0%, transparent 50%);
-        }
-
-        /* On désactive le halo pour les boutons grisés/désactivés */
-        button:disabled.glow-track::before {
-            display: none;
-        }
-
-        /* --- EFFET VERRE DÉPOLI (GLASSMORPHISM) RÉDUIT --- */
-        .glass-panel {
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-        }
-
-        .header {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-            padding: 15px 20px;
-            width: 90%;
-            max-width: 400px;
-            --glow-color: 168, 85, 247; /* Aura violette globale header */
-        }
-
-        #chrono {
-            font-size: 2.2em;
-            font-weight: bold;
-            font-family: monospace;
-            color: #f472b6; 
-            text-shadow: 0 0 10px rgba(244, 114, 182, 0.5);
-        }
-
-        .header-buttons {
-            display: flex;
-            gap: 8px;
-            width: 100%;
-        }
-
-        /* --- BOUTONS OPAQUES --- */
-        button {
-            padding: 12px 10px;
-            font-size: 0.95em;
-            font-weight: bold;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: transform 0.1s ease, background 0.3s ease, border-color 0.3s ease;
-            flex: 1;
-            color: white;
-            backdrop-filter: blur(4px);
-        }
-
-        button:active { transform: scale(0.95); }
-        button:disabled { background: #1a1a1e !important; color: rgba(255,255,255,0.3); cursor: not-allowed; transform: none; }
-
-        /* --- ATTRIBUTION DES COULEURS (LUEUR + THEME) POUR CHAQUE ÉLÉMENT --- */
-        
-        /* Boutons principaux */
-        #btnStart { --glow-color: 16, 185, 129; border-color: rgba(16, 185, 129, 0.4); } /* Vert */
-        #btnStart:hover:not(:disabled) { background: rgba(16, 185, 129, 0.15); border-color: #10b981; }
-
-        #btnPause { --glow-color: 236, 72, 153; border-color: rgba(236, 72, 153, 0.4); } /* Rose */
-        #btnPause:hover:not(:disabled) { background: rgba(236, 72, 153, 0.15); border-color: #ec4899; }
-
-        #btnStop { --glow-color: 239, 68, 68; border-color: rgba(239, 68, 68, 0.4); } /* Rouge */
-        #btnStop:hover:not(:disabled) { background: rgba(239, 68, 68, 0.15); border-color: #ef4444; }
-
-        #btnMinus { --glow-color: 245, 158, 11; border-color: rgba(245, 158, 11, 0.4); } /* Orange */
-        #btnMinus:hover:not(:disabled) { background: rgba(245, 158, 11, 0.15); border-color: #f59e0b; }
-
-        #btnBoutique { --glow-color: 236, 72, 153; border-color: rgba(236, 72, 153, 0.4); } /* Rose */
-        #btnBoutique:hover:not(:disabled) { background: rgba(236, 72, 153, 0.15); border-color: #ec4899; }
-
-        #btnPlus { --glow-color: 217, 70, 239; border-color: rgba(217, 70, 239, 0.4); } /* Violet Intense */
-        #btnPlus:hover:not(:disabled) { background: rgba(217, 70, 239, 0.15); border-color: #d946ef; }
-
-        /* Badges statuts */
-        .pieces-display { --glow-color: 251, 191, 36; color: #fbbf24; border-color: rgba(251, 191, 36, 0.4); } /* Jaune */
-        .pieces-display:hover { background: rgba(251, 191, 36, 0.2); }
-        
-        .repas-display { --glow-color: 249, 115, 22; color: #f97316; border-color: rgba(249, 115, 22, 0.4); } /* Orange */
-        .repas-display:hover { background: rgba(249, 115, 22, 0.2); }
-
-        /* Image centrale */
-        #imageWrapper { --glow-color: 168, 85, 247; /* Aura violette autour de l'image */ }
-
-        /* Fenêtres Modales & Panneaux */
-        #panelPause { --glow-color: 236, 72, 153; border: 1px solid rgba(236, 72, 153, 0.4); }
-        .choix-pause { --glow-color: 236, 72, 153; border: 1px solid rgba(236, 72, 153, 0.6); }
-        .boutique { --glow-color: 236, 72, 153; border: 1px solid rgba(236, 72, 153, 0.6); }
-        .alerte { --glow-color: 251, 191, 36; border: 1px solid rgba(251, 191, 36, 0.6); }
-        .inventaire { --glow-color: 255, 255, 255; } /* Blanc */
-
-        /* Boutons internes Modales */
-        #btnChoixCafe, #btnAchatPetiteCoeur, #btnAchatGrandeCoeur { --glow-color: 236, 72, 153; }
-        #btnChoixRepas { --glow-color: 249, 115, 22; }
-        #btnAchatPetitePiece, #btnAchatGrandePiece { --glow-color: 245, 158, 11; }
-        .btn-modal-annuler { --glow-color: 107, 114, 128; border-color: rgba(107, 114, 128, 0.5); }
-        .btn-modal-annuler:hover { background: rgba(107, 114, 128, 0.3); border-color: #6b7280; }
-        .btn-modal-ok { --glow-color: 168, 85, 247; border-color: rgba(168, 85, 247, 0.5); }
-        .btn-modal-ok:hover { background: rgba(168, 85, 247, 0.3); border-color: #a855f7; }
-
-        /* ------------------------------------------------------------- */
-
-        .status-bar {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-            width: 90%;
-            max-width: 400px;
-            justify-content: center;
-        }
-
-        .status-badge {
-            font-size: 1.05em;
-            font-weight: bold;
-            padding: 6px 12px;
-            border-radius: 20px;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            backdrop-filter: blur(8px);
+            position: relative; isolation: isolate; --glow-color: 255, 255, 255;
+            background: rgba(0, 0, 0, 0) !important;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 15px;
             transition: all 0.3s ease;
-        }
-
-        #panelPause {
-            display: none;
-            padding: 15px;
-            width: 90%;
-            max-width: 400px;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        #titrePanelPause { margin: 0 0 10px 0; color: #ec4899; text-shadow: 0 0 8px rgba(236, 72, 153, 0.5); }
-        #decomptePause { font-size: 2em; font-weight: bold; color: #ec4899; font-family: monospace; display: block; margin: 10px 0; }
-        #btnStopperPause { --glow-color: 217, 70, 239; border-color: rgba(217, 70, 239, 0.5); width: 100%; padding: 15px; font-size: 1.1em; }
-        #btnStopperPause:hover { background: rgba(217, 70, 239, 0.3); border-color: #d946ef; }
-
-        .game-container { text-align: center; width: 100%; display: flex; flex-direction: column; align-items: center; }
-        
-        .image-wrapper { 
-            position: relative; 
-            display: inline-block; 
-            border-radius: 15px; 
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
         }
         
-        img {
-            display: block;
-            max-height: 50vh; max-width: 90vw; border-radius: 15px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8); 
-            transition: opacity 0.5s ease-in-out, filter 0.3s ease; 
+        .glow-track::before {
+            content: ""; position: absolute; inset: -4px; border-radius: inherit;
+            background: radial-gradient(ellipse at center, rgba(var(--glow-color), 0.15) 0%, rgba(var(--glow-color), 0.1) 40%, transparent 75%);
+            z-index: -1; pointer-events: none; filter: blur(12px); 
+            transition: background 0.3s ease, opacity 0.3s ease; opacity: 1; 
         }
 
-        .shake { animation: shakeImage 0.8s; }
-        @keyframes shakeImage {
-            10%, 90% { transform: translate3d(-1px, 0, 0); }
-            20%, 80% { transform: translate3d(2px, 0, 0); }
-            30%, 50%, 70% { transform: translate3d(-4px, 0, 0); }
-            40%, 60% { transform: translate3d(4px, 0, 0); }
+        .glow-track:hover:not(:disabled)::before {
+            background: radial-gradient(ellipse at center, rgba(var(--glow-color), 0.15) 0%, rgba(var(--glow-color), 0.1) 40%, transparent 75%), radial-gradient(120px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(var(--glow-color), 1.0) 0%, transparent 50%);
         }
 
-        .glow { animation: glowImage 0.8s; }
-        @keyframes glowImage {
-            0% { box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
-            50% { box-shadow: 0 0 50px #f472b6, 0 0 20px #d946ef; } 
-            100% { box-shadow: 0 10px 30px rgba(0,0,0,0.8); }
+        /* --- LORS DU SURVOL D'UN BOUTON, LA LUEUR DE LA FENÊTRE S'ATTÉNUE POUR LAISSER LE BOUTON DOMINER --- */
+        .glow-track:has(button:hover):not(button)::before {
+            background: radial-gradient(ellipse at center, rgba(var(--glow-color), 0.15) 0%, rgba(var(--glow-color), 0.1) 40%, transparent 75%) !important; opacity: 0.6; 
         }
 
-        .en-pause { filter: grayscale(100%) opacity(0.5); }
-
-        .burger-loader {
-            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            font-size: 5em; display: none; z-index: 10; filter: drop-shadow(0px 4px 10px rgba(0,0,0,0.8));
-            animation: eatBurger 2s steps(4, end) infinite;
+        /* --- TOUS LES BOUTONS TRANSPARENTS --- */
+        button { 
+            padding: 14px 10px; font-size: 1.05em; font-weight: bold; border-radius: 10px; cursor: pointer; transition: all 0.2s ease; flex: 1; color: white; 
+            background: rgba(0, 0, 0, 0) !important; border: 1px solid transparent; 
         }
-        @keyframes eatBurger {
-            0% { clip-path: inset(0 0% 0 0); opacity: 1; }
-            90% { clip-path: inset(0 100% 0 0); opacity: 1; }
-            100% { clip-path: inset(0 100% 0 0); opacity: 0; }
-        }
-
-        .controls {
-            margin-top: 15px; padding: 15px; width: 90%; max-width: 400px;
-        }
-
-        .action-buttons { display: flex; gap: 8px; margin-bottom: 10px; }
-        .action-btn { padding: 10px 5px; font-size: 0.9em; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
-
-        .inventaire { 
-            font-size: 0.9em; color: #cbd5e1; margin-top: 10px; 
-            padding: 10px; border-radius: 8px; 
-            border: 1px solid rgba(255,255,255,0.05); font-weight: bold; 
-        }
-
-        #messageFin { display: none; margin-top: 15px; color: #fcd34d; font-weight: bold; font-size: 1.2em; text-align: center; }
-
-        .modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.7); display: none; align-items: center; justify-content: center; z-index: 100;
-        }
+        button:active:not(:disabled) { transform: scale(0.96); }
         
-        .modal-content {
-            padding: 20px; width: 90%; max-width: 320px; color: white; text-align: center; 
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-            animation: fadeInModal 0.4s ease-out; 
-        }
-        @keyframes fadeInModal {
-            from { opacity: 0; transform: scale(0.9); }
-            to { opacity: 1; transform: scale(1); }
+        button:disabled.glow-track, button:disabled {
+            background: rgba(0, 0, 0, 0) !important; color: rgba(255, 255, 255, 0.2) !important; border-color: rgba(255, 255, 255, 0.05) !important;
+            --glow-color: 200, 200, 200 !important; cursor: not-allowed !important; transform: none !important; opacity: 0.5 !important;
+            box-shadow: none !important;
         }
 
-        .modal-content h3 { margin-top: 0; }
-        .modal-content p { font-size: 0.95em; line-height: 1.5; color: #cbd5e1; white-space: pre-wrap; }
+        /* --- STYLES DES BOUTONS CLASSIQUES --- */
+        #optCafe { --glow-color: 251, 191, 36; border-color: rgba(251, 191, 36, 0.4); }
+        #optRepas { --glow-color: 249, 115, 22; border-color: rgba(249, 115, 22, 0.4); }
+        .btn-star { --glow-color: 245, 158, 11; color: #f59e0b; border-color: rgba(245,158,11,0.4); }
+        .btn-piece { --glow-color: 251, 191, 36; color: #fbbf24; border-color: rgba(251,191,36,0.4); }
         
-        .menu-btn { width: 100%; margin-top: 10px; padding: 12px; font-size: 1em; }
+        #btnConsommerPetite { --glow-color: 16, 185, 129; border-color: rgba(16, 185, 129, 0.4); color: #10b981; }
+        #btnConsommerGrande { --glow-color: 245, 158, 11; border-color: rgba(245, 158, 11, 0.4); color: #f59e0b; }
+        #btnConsommerSouhait { --glow-color: 168, 85, 247; border-color: rgba(168, 85, 247, 0.4); color: #a855f7; }
 
+        /* --- BOUTONS ACTIONS EN BAS (LUEURS INDIVIDUELLES INTENSES) --- */
+        #btnMinus { --glow-color: 245, 158, 11; border-color: rgba(245, 158, 11, 0.6); box-shadow: 0 0 15px rgba(245, 158, 11, 0.3); background: rgba(245, 158, 11, 0.05) !important; }
+        #btnBoutique { --glow-color: 236, 72, 153; border-color: rgba(236, 72, 153, 0.6); box-shadow: 0 0 15px rgba(236, 72, 153, 0.3); background: rgba(236, 72, 153, 0.05) !important; }
+        #btnPlus { --glow-color: 16, 185, 129; border-color: rgba(16, 185, 129, 0.6); box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.05) !important; }
+
+        #btnMinus:hover:not(:disabled) { box-shadow: 0 0 25px rgba(245, 158, 11, 0.7); background: rgba(245, 158, 11, 0.15) !important; border-color: rgba(245, 158, 11, 0.9); }
+        #btnBoutique:hover:not(:disabled) { box-shadow: 0 0 25px rgba(236, 72, 153, 0.7); background: rgba(236, 72, 153, 0.15) !important; border-color: rgba(236, 72, 153, 0.9); }
+        #btnPlus:hover:not(:disabled) { box-shadow: 0 0 25px rgba(16, 185, 129, 0.7); background: rgba(16, 185, 129, 0.15) !important; border-color: rgba(16, 185, 129, 0.9); }
+
+        /* --- MODE PAUSE / FLATLINE / FAILING --- */
+        body.paused-mode .header, body.paused-mode .status-bar, body.paused-mode .dashboard, body.paused-mode .controls, body.paused-mode #rewardsDashboard {
+            filter: grayscale(1) opacity(0.25); pointer-events: none; transition: all 0.5s ease;
+        }
+        body.flatline-theme #bgCanvas { filter: grayscale(1); }
+        body.flatline-theme .header, body.flatline-theme .status-bar, body.flatline-theme .dashboard, body.flatline-theme .controls, body.flatline-theme #rewardsDashboard,
+        body.failing-theme .header, body.failing-theme .status-bar, body.failing-theme .dashboard, body.failing-theme .controls, body.failing-theme #rewardsDashboard {
+            filter: grayscale(1) opacity(0.15); pointer-events: none; transition: all 1s ease;
+        }
+        body:not(.paused-mode):not(.flatline-theme):not(.failing-theme) .header, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme) .status-bar, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme) .dashboard, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme) .controls, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme) #rewardsDashboard { transition: all 0.5s ease; }
+
+        /* --- UI COMPONENTS --- */
+        .header { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 15px; padding: 20px 25px; width: 92%; max-width: 480px; --glow-color: 249, 115, 22; }
+        #chrono { font-size: 3.2em; font-weight: bold; font-family: monospace; color: #f472b6; text-shadow: 0 0 15px rgba(244, 114, 182, 0.6); }
+        .header-buttons { display: flex; gap: 10px; width: 100%; }
+        #btnStart { --glow-color: 16, 185, 129; border-color: rgba(16, 185, 129, 0.4); }
+        #btnPause { --glow-color: 236, 72, 153; border-color: rgba(236, 72, 153, 0.4); }
+        #btnStop { --glow-color: 239, 68, 68; border-color: rgba(239, 68, 68, 0.4); }
+
+        .status-bar { display: flex; gap: 10px; margin-bottom: 15px; width: 92%; max-width: 480px; justify-content: space-between; align-items: center; }
+        .status-badge { font-size: 0.95em; font-weight: bold; padding: 10px 14px; border-radius: 20px; display: flex; align-items: center; justify-content: center; gap: 5px; flex: 1; text-align: center; }
+        .pieces-display { --glow-color: 251, 191, 36; color: #fbbf24; border-color: rgba(251, 191, 36, 0.3); }
+        .repas-display { --glow-color: 249, 115, 22; color: #f97316; border-color: rgba(249, 115, 22, 0.3); }
+        #btnInventaire { --glow-color: 168, 85, 247; color: #a855f7; border-color: rgba(168, 85, 247, 0.3); margin: 0; padding: 10px 14px; flex: 1.2; }
+
+        .dashboard { width: 92%; max-width: 480px; padding: 25px 25px; text-align: center; margin-bottom: 15px; --glow-color: 236, 72, 153; }
+        .heart-container { display: flex; justify-content: center; gap: 12px; margin-bottom: 15px; }
+        .heart { font-size: 30px; filter: grayscale(1) opacity(0.2); transition: all 0.4s ease; }
+        .heart-vital.active { filter: grayscale(0) opacity(1); color: #10b981; text-shadow: 0 0 15px #10b981; }
+        .heart-bonus.active { filter: grayscale(0) opacity(1); color: #f59e0b; text-shadow: 0 0 20px #f59e0b; transform: rotate(10deg); }
+
+        /* --- CIBLE INPUT --- */
+        .cible-container { margin-top: 10px; display: flex; justify-content: center; align-items: center; gap: 10px; background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); }
+        .cible-prefix { color: #f472b6; font-weight: bold; font-family: monospace; font-size: 1.1em; }
+        #tacheInput { flex: 1; background: transparent; border: none; outline: none; color: white; font-family: monospace; font-size: 1.1em; text-align: left; }
+        #tacheInput::placeholder { color: rgba(255,255,255,0.3); }
+        #tacheDisplay { display: none; flex: 1; color: white; font-family: monospace; font-size: 1.1em; text-align: left; word-break: break-word; }
+        #btnTerminerTache { display: none; padding: 6px 12px; font-size: 0.85em; background: rgba(16, 185, 129, 0.2) !important; border: 1px solid #10b981; color: #10b981; flex: 0; white-space: nowrap; }
+
+        .controls { padding: 20px; width: 92%; max-width: 480px; --glow-color: 16, 185, 129; margin-bottom: 15px;}
+        .action-buttons { display: flex; gap: 10px; }
+        .action-btn { padding: 12px 5px; font-size: 0.95em; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; }
+
+        /* --- MODALES --- */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(3px); }
+        
+        /* FOND TRANSPARENT POUR LE GAME OVER (Laisse voir les vagues derrière) */
+        #modalGameOver.modal-overlay { background: transparent; backdrop-filter: none; }
+        
+        .modal-content { padding: 35px; width: 85%; max-width: 480px; color: white; text-align: center; border-radius: 20px; background: rgba(0, 0, 0, 0) !important; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); max-height: 90vh; overflow-y: auto; }
+        
+        /* --- INVENTAIRE NÉGOCIATION --- */
+        .inv-row { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: left; transition: all 0.3s ease;}
+        .inv-row.disabled-row { filter: grayscale(1); opacity: 0.4; pointer-events: none; } 
+        .inv-icon { font-size: 2.5em; width: 60px; text-align: center; }
+        .inv-details { flex: 1; display: flex; flex-direction: column; gap: 5px; }
+        .inv-details input { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 6px 10px; border-radius: 5px; width: 100%; box-sizing: border-box; font-size: 0.9em; outline: none; }
+        .inv-stats { font-size: 0.85em; color: #cbd5e1; display: flex; justify-content: space-between; }
+        .btn-consume { padding: 8px 15px; font-size: 0.85em; background: rgba(255, 255, 255, 0.05) !important; margin-top: 5px; }
+        .btn-consume.souhait-btn { background: rgba(168, 85, 247, 0.2) !important; border-color: #a855f7; color: #a855f7; }
+
+        /* --- BLOCS RECOMPENSES ACTIVES (SUR ECRAN PRINCIPAL) --- */
+        .nego-block { background: rgba(0,0,0,0.4); padding: 12px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #3b82f6; text-align: left; }
+        .nego-actions { display: flex; gap: 8px; margin-top: 8px; align-items: center;}
+        .btn-nego-acc { background: rgba(16, 185, 129, 0.2)!important; border-color: #10b981; color: #10b981; padding: 6px; font-size: 0.8em; }
+        .btn-nego-ct { background: rgba(236, 72, 153, 0.2)!important; border-color: #ec4899; color: #ec4899; padding: 6px; font-size: 0.8em; }
+
+        .active-timer { background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; margin-bottom: 10px; border-left: 3px solid #f472b6; text-align: left;}
+        .timer-header { display: flex; justify-content: space-between; font-size: 0.9em; margin-bottom: 5px; align-items: center; }
+        .timer-gauge-bg { background: rgba(255,255,255,0.1); height: 6px; border-radius: 3px; overflow: hidden; margin-top: 5px; }
+        .timer-gauge-fill { background: #f472b6; height: 100%; transition: width 1s linear; }
+
+        /* --- ANIMATIONS FX --- */
+        @keyframes shakeDash { 0% { transform: translate(0, 0) rotate(0deg); } 20% { transform: translate(-8px, 4px) rotate(-2deg); } 40% { transform: translate(8px, -4px) rotate(2deg); } 60% { transform: translate(-8px, -4px) rotate(-2deg); } 80% { transform: translate(8px, 4px) rotate(2deg); } 100% { transform: translate(0, 0) rotate(0deg); } }
+        .anim-shake { animation: shakeDash 0.4s cubic-bezier(.36,.07,.19,.97) both; }
+        @keyframes flashGreenDash { 0% { box-shadow: 0 0 0 transparent; border-color: rgba(255,255,255,0.15); } 30% { box-shadow: 0 0 50px rgba(16, 185, 129, 0.7); border-color: #10b981; } 100% { box-shadow: 0 0 0 transparent; border-color: rgba(255,255,255,0.15); } }
+        .anim-flash-green { animation: flashGreenDash 0.8s ease-out both; }
+        @keyframes flashYellowDash { 0% { box-shadow: 0 0 0 transparent; border-color: rgba(255,255,255,0.15); } 30% { box-shadow: 0 0 60px rgba(251, 191, 36, 0.8); border-color: #fbbf24; } 100% { box-shadow: 0 0 0 transparent; border-color: rgba(255,255,255,0.15); } }
+        .anim-flash-yellow { animation: flashYellowDash 0.8s ease-out both; }
+        @keyframes flashRedDash { 0% { box-shadow: 0 0 0 transparent; border-color: rgba(255,255,255,0.15); } 30% { box-shadow: 0 0 30px rgba(239, 68, 68, 0.7); border-color: #ef4444; } 100% { box-shadow: 0 0 0 transparent; border-color: rgba(255,255,255,0.15); } }
+        .anim-shake-red { animation: shakeDash 0.4s cubic-bezier(.36,.07,.19,.97) both, flashRedDash 0.8s ease-out both; }
+        
+        @keyframes pulseRedLoop { 0% { box-shadow: 0 0 30px rgba(239, 68, 68, 0.5), inset 0 0 20px rgba(239, 68, 68, 0.3); border-color: rgba(239, 68, 68, 0.5); } 50% { box-shadow: 0 0 120px rgba(239, 68, 68, 1), inset 0 0 60px rgba(239, 68, 68, 0.8); border-color: rgba(239, 68, 68, 1); } 100% { box-shadow: 0 0 30px rgba(239, 68, 68, 0.5), inset 0 0 20px rgba(239, 68, 68, 0.3); border-color: rgba(239, 68, 68, 0.5); } }
+        .pulse-red-loop { animation: pulseRedLoop 0.6s infinite !important; --glow-color: 239, 68, 68 !important; }
+        @keyframes pulseWhiteLoop { 0% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.2); border-color: rgba(255,255,255,0.2); } 50% { box-shadow: 0 0 60px rgba(255, 255, 255, 0.7); border-color: rgba(255,255,255,0.9); } 100% { box-shadow: 0 0 20px rgba(255, 255, 255, 0.2); border-color: rgba(255,255,255,0.2); } }
+        .pulse-white-loop { animation: pulseWhiteLoop 1.8s infinite !important; --glow-color: 255, 255, 255 !important; }
+
+        .flash-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; pointer-events: none; animation: massiveFlashGreen 1.2s ease-out forwards; background: rgba(16, 185, 129, 0.9); }
+        @keyframes massiveFlashGreen { 0% { opacity: 1; backdrop-filter: blur(20px); } 100% { opacity: 0; backdrop-filter: blur(0px); } }
+
+        /* --- ANIMATION RÉCOMPENSE CENTRALE --- */
+        .reward-anim { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(16, 185, 129, 0.15); border: 2px solid #10b981; padding: 25px 40px; border-radius: 15px; font-size: 1.3em; font-weight: bold; color: white; text-align: center; box-shadow: 0 0 30px rgba(16, 185, 129, 0.4); z-index: 1000; pointer-events: none; backdrop-filter: blur(8px); animation: floatUpFade 2.5s ease-out forwards; }
+        .reward-anim.grande-anim { background: rgba(245, 158, 11, 0.15); border-color: #f59e0b; box-shadow: 0 0 30px rgba(245, 158, 11, 0.4); }
+        .reward-anim.souhait-anim { background: rgba(168, 85, 247, 0.15); border-color: #a855f7; box-shadow: 0 0 30px rgba(168, 85, 247, 0.4); color: #e9d5ff; }
+        .reward-icon { font-size: 2.5em; display: block; margin-bottom: 10px; }
+        @keyframes floatUpFade { 0% { opacity: 0; transform: translate(-50%, -30%) scale(0.8); } 15% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); } 25% { opacity: 1; transform: translate(-50%, -50%) scale(1); } 80% { opacity: 1; transform: translate(-50%, -60%); } 100% { opacity: 0; transform: translate(-50%, -80%); } }
+
+        .burger-loader { position: relative; display: inline-block; font-size: 4em; line-height: 1; margin: 15px 0; }
+        .burger-ghost { opacity: 0.15; filter: grayscale(1); }
+        .burger-full { position: absolute; left: 0; top: 0; overflow: hidden; white-space: nowrap; animation: eatBurger 2.5s steps(5) infinite; }
+        @keyframes eatBurger { 0% { width: 100%; } 100% { width: 0%; } }
     </style>
 </head>
 <body>
 
+    <!-- CONTENEUR DES TOASTS (NOTIFICATIONS SYNC) -->
+    <div id="toastContainer" style="position:fixed; top:20px; right:20px; z-index:9999; display:flex; flex-direction:column; gap:15px; pointer-events:none;"></div>
+
     <canvas id="bgCanvas"></canvas>
 
-    <div class="header glass-panel glow-track">
+    <div class="header glow-track">
         <div id="chrono">00:00:00</div>
         <div class="header-buttons">
             <button id="btnStart" class="glow-track">Démarrer</button>
@@ -302,188 +199,180 @@
     
     <div class="status-bar">
         <div id="piecesDisplay" class="status-badge pieces-display glow-track">🪙 Pièces : 0</div>
+        <button id="btnInventaire" class="status-badge glow-track">🧰 Inventaire</button>
         <div id="repasDisplay" class="status-badge repas-display glow-track">🍔 Repas : 2</div>
     </div>
 
-    <div id="panelPause" class="glass-panel glow-track">
-        <h3 id="titrePanelPause">🪙 EN PAUSE</h3>
-        <span id="decomptePause">00:00:00</span>
-        <button id="btnStopperPause" class="glow-track">▶️ Reprendre le travail</button>
+    <!-- PANNEAU PAUSE -->
+    <div id="panelPause" class="glow-track" style="display:none; width:92%; max-width:480px; text-align:center; padding:25px; margin-bottom:15px; --glow-color: 255, 255, 255;">
+        <h3 id="titrePause" style="color:#ec4899; margin:0; letter-spacing:2px;">🪙 PAUSE</h3>
+        <div id="burgerLoading" class="burger-loader" style="display:none;">
+            <div class="burger-ghost">🍔</div>
+            <div class="burger-full">🍔</div>
+        </div>
+        <span id="decomptePause" style="font-size:2.8em; font-family:monospace; color:#ec4899; display:block; margin:10px 0;">00:00:00</span>
+        <button id="btnStopperPause" class="glow-track" style="width:100%; margin-top:10px; --glow-color: 217,70,239; border-color: rgba(217,70,239,0.4); padding:15px;">▶️ REPRENDRE LE TRAVAIL</button>
     </div>
 
-    <div class="game-container" id="gameContainer">
-        <div class="image-wrapper glow-track" id="imageWrapper">
-            <img id="trackerImage" src="5.jpg" alt="État actuel du Chlorévisiomètre">
-            <div id="burgerLoader" class="burger-loader">🍔</div>
+    <div class="dashboard glow-track" id="mainDashboard">
+        <div class="gauge-section">
+            <div id="vHearts" class="heart-container">
+                <span class="heart heart-vital">❤</span><span class="heart heart-vital">❤</span><span class="heart heart-vital">❤</span><span class="heart heart-vital">❤</span><span class="heart heart-vital">❤</span>
+            </div>
+        </div>
+        <div class="gauge-section">
+            <div id="bHearts" class="heart-container">
+                <span class="heart heart-bonus">✦</span><span class="heart heart-bonus">✦</span><span class="heart heart-bonus">✦</span><span class="heart heart-bonus">✦</span><span class="heart heart-bonus">✦</span>
+            </div>
         </div>
         
-        <div class="controls glass-panel glow-track">
-            <div class="action-buttons">
-                <button id="btnMinus" class="action-btn glow-track" disabled>
-                    <span>👎 Distraction</span>
-                    <small>-1 PV</small>
-                </button>
-                <button id="btnBoutique" class="action-btn glow-track" disabled>
-                    <span>🛒 Boutique</span>
-                    <small>Dépenser</small>
-                </button>
-                <button id="btnPlus" class="action-btn glow-track" disabled>
-                    <span>👍 Focus (1h)</span>
-                    <small>+2 PV</small>
-                </button>
-            </div>
-            
-            <div id="inventaire" class="inventaire glow-track">
-                🎁 Petites surprises : <span id="txtPetites">1</span> <br>
-                🎀 Grandes surprises : <span id="txtGrandes">0</span>
-            </div>
-
-            <p id="messageFin">Session terminée ! Excellent travail ! 🎉</p>
+        <!-- SYSTEME CIBLE -->
+        <div class="cible-container">
+            <span class="cible-prefix">> CIBLE:</span>
+            <input type="text" id="tacheInput" placeholder="Saisir puis taper Entrée..." autocomplete="new-password" spellcheck="false">
+            <span id="tacheDisplay"></span>
+            <button id="btnTerminerTache" class="glow-track" style="--glow-color: 16, 185, 129;">✅ Terminer</button>
         </div>
     </div>
 
+    <div class="controls glow-track">
+        <div class="action-buttons">
+            <button id="btnMinus" class="action-btn glow-track" disabled><span>👎 Distraction</span><small>-1 PV</small></button>
+            <button id="btnBoutique" class="action-btn glow-track" disabled><span>🛒 Boutique</span><small>Échanger</small></button>
+            <button id="btnPlus" class="action-btn glow-track" disabled><span>👍 Focus</span><small>+2 PV</small></button>
+        </div>
+        
+        <!-- HUD COMPTEUR INVENTAIRE DE SESSION -->
+        <div id="inventaireHUD" style="display: flex; justify-content: space-evenly; align-items: center; margin-top: 15px; padding-top: 15px; border-top: 1px solid rgba(255, 255, 255, 0.1); font-size: 1.1em; background: transparent;">
+            <span style="display: flex; align-items: center; gap: 8px; color: #cbd5e1;">🎁 <span id="txtPetites" style="color: #10b981; font-weight: bold; text-shadow: 0 0 10px rgba(16,185,129,0.5);">0</span></span>
+            <span style="display: flex; align-items: center; gap: 8px; color: #cbd5e1;">🎀 <span id="txtGrandes" style="color: #f59e0b; font-weight: bold; text-shadow: 0 0 10px rgba(245,158,11,0.5);">0</span></span>
+            <span style="display: flex; align-items: center; gap: 8px; color: #cbd5e1;">🪔 <span id="txtSouhaits" style="color: #a855f7; font-weight: bold; text-shadow: 0 0 10px rgba(168,85,247,0.5);">0</span></span>
+        </div>
+    </div>
+
+    <!-- DASHBOARD RÉCOMPENSES ACTIVES -->
+    <div id="rewardsDashboard" class="dashboard glow-track" style="display:none; flex-direction:column; padding: 20px; gap: 15px; --glow-color: 168, 85, 247; margin-bottom: 20px;">
+        <h4 style="color:#cbd5e1; margin:0; font-size:0.9em; text-transform:uppercase; letter-spacing:1px; text-align:center;">💬 En Cours</h4>
+        <div id="propositionsList" style="display:flex; flex-direction:column; gap:5px;"></div>
+        <div id="timersList" style="display:flex; flex-direction:column; gap:5px;"></div>
+    </div>
+
+    <!-- MODAL PSEUDO -->
+    <div id="modalPseudo" class="modal-overlay" style="z-index:99999; display:flex; align-items:center; justify-content:center;">
+        <div class="modal-content glow-track" style="--glow-color: 236, 72, 153;">
+            <h3 style="color:#ec4899; margin-bottom: 20px; font-size:1.8em;">💘 Connexion</h3>
+            <p style="margin-bottom:20px; color:#cbd5e1; font-size:1.1em;">Quel surnom choisis-tu aujourd'hui mon amour ?</p>
+            <input type="text" id="inputPseudo" autocomplete="new-password" placeholder="Ton surnom..." style="width:80%; max-width:300px; box-sizing:border-box; padding:15px; border-radius:10px; border:1px solid rgba(236, 72, 153, 0.5); background:rgba(0,0,0,0.5); color:white; font-size:1.2em; text-align:center; margin:0 auto 25px auto; display:block; outline:none;">
+            <button id="btnValiderPseudo" class="glow-track" style="width:100%; --glow-color: 16, 185, 129; padding:15px; border-color:rgba(16, 185, 129, 0.5); color:#10b981; font-size:1.1em;">Entrer dans la session</button>
+        </div>
+    </div>
+
+    <!-- INVENTAIRE -->
+    <div id="modalInventaire" class="modal-overlay">
+        <div class="modal-content glow-track" style="--glow-color: 168, 85, 247;">
+            <h3 style="color:#a855f7; margin-bottom: 20px; letter-spacing: 2px;">🧰 INVENTAIRE</h3>
+            
+            <div class="inv-row" id="rowPetite">
+                <div class="inv-icon">🎁</div>
+                <div class="inv-details">
+                    <div class="inv-stats"><span style="color:#10b981; font-weight:bold;">Stock: <span id="invP_stock">0</span></span> <span>Consommées: <span id="invP_cons">0</span></span></div>
+                    <input type="text" id="defPetite" autocomplete="new-password" placeholder="Ex: Regarder 1 épisode de série">
+                    <button class="btn-consume glow-track" id="btnConsommerPetite" style="--glow-color: 16, 185, 129; border-color:#10b981; color:#10b981;">▶ Proposer</button>
+                </div>
+            </div>
+
+            <div class="inv-row" id="rowGrande">
+                <div class="inv-icon">🎀</div>
+                <div class="inv-details">
+                    <div class="inv-stats"><span style="color:#f59e0b; font-weight:bold;">Stock: <span id="invG_stock">0</span></span> <span>Consommées: <span id="invG_cons">0</span></span></div>
+                    <input type="text" id="defGrande" autocomplete="new-password" placeholder="Ex: Sortie resto ce soir">
+                    <button class="btn-consume glow-track" id="btnConsommerGrande" style="--glow-color: 245, 158, 11; border-color:#f59e0b; color:#f59e0b;">▶ Proposer</button>
+                </div>
+            </div>
+
+            <div class="inv-row" id="rowSouhait">
+                <div class="inv-icon" style="filter: drop-shadow(0 0 5px #a855f7);">🪔</div>
+                <div class="inv-details">
+                    <div class="inv-stats"><span style="color:#a855f7; font-weight:bold;">Stock: <span id="invS_stock">0</span></span> <span>Consommés: <span id="invS_cons">0</span></span></div>
+                    <input type="text" id="defSouhait" autocomplete="new-password" placeholder="Ex: Achat du jeu vidéo">
+                    <button class="btn-consume souhait-btn glow-track" id="btnConsommerSouhait" style="--glow-color: 168, 85, 247;">▶ Consommer</button>
+                </div>
+            </div>
+
+            <button onclick="document.getElementById('modalInventaire').style.display='none'" class="glow-track" style="width:100%; --glow-color: 239, 68, 68; color: #ef4444; border-color: rgba(239,68,68,0.4); padding:15px; margin-top:10px;">Fermer l'inventaire</button>
+        </div>
+    </div>
+
+    <!-- MODAL CONTRE-PROPOSITION -->
+    <div id="modalNego" class="modal-overlay" style="z-index:1001; align-items:center; justify-content:center;">
+        <div class="modal-content glow-track" style="--glow-color: 59, 130, 246;">
+            <h3 style="color:#3b82f6; margin-bottom: 20px;">⚖️ Contre-Proposition</h3>
+            <p style="margin-bottom:15px; color:#cbd5e1; font-size:0.9em;">Propose une autre idée à ton partenaire :</p>
+            <input type="text" id="inputNego" autocomplete="new-password" style="width:100%; box-sizing:border-box; padding:12px; border-radius:10px; border:1px solid rgba(59, 130, 246, 0.5); background:rgba(0,0,0,0.5); color:white; font-size:1em; margin-bottom:20px; outline:none;">
+            <div style="display:flex; gap:10px;">
+                <button onclick="document.getElementById('modalNego').style.display='none'" class="glow-track" style="--glow-color: 239, 68, 68; color: #ef4444; border-color:rgba(239,68,68,0.4);">Annuler</button>
+                <button id="btnValiderNego" class="glow-track" style="--glow-color: 59, 130, 246; border-color:rgba(59, 130, 246, 0.4); color:#3b82f6;">Envoyer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- GAME OVER -->
+    <div id="modalGameOver" class="modal-overlay">
+        <div id="goContent" class="modal-content glow-track pulse-red-loop">
+            <div class="game-over-title" style="font-size:2.2em; font-weight:bold; margin-bottom:20px;">ARRÊT CARDIAQUE</div>
+            <p id="goDesc" style="color:#cbd5e1; margin-bottom:30px; font-size:1.1em;">Le cœur a trop divagué, concentration corrompue.</p>
+            <button id="btnRestartGO" class="glow-track" style="width:100%; padding:20px; --glow-color: 16, 185, 129; border-color: rgba(16, 185, 129, 0.4); color:#10b981; font-weight:bold; background:rgba(0,0,0,0) !important;">UTILISER LE DÉFIBRILLATEUR</button>
+        </div>
+    </div>
+
+    <!-- MODAL CHOIX PAUSE -->
     <div id="modalChoixPause" class="modal-overlay">
-        <div class="modal-content choix-pause glass-panel glow-track">
-            <h3 style="color: #ec4899;">⏸️ Menu Pause</h3>
-            <p>Choisis le type de pause que tu souhaites prendre :</p>
-            <button id="btnChoixCafe" class="menu-btn glow-track">🪙 Pause<br><small style="font-weight: normal;">(Coûte 30 pièces/minute)</small></button>
-            <button id="btnChoixRepas" class="menu-btn glow-track">🍔 Pause Repas<br><small style="font-weight: normal;">(Gratuit : 30 min)</small></button>
-            <button onclick="fermerModal('modalChoixPause')" class="menu-btn btn-modal-annuler glow-track" style="margin-top:20px;">Annuler</button>
+        <div class="modal-content glow-track" style="--glow-color: 236, 72, 153;">
+            <h3 style="color:#ec4899; margin-bottom: 20px;">⏸️ MENU PAUSE</h3>
+            <button id="optCafe" class="glow-track" style="width:100%; margin-bottom:12px; padding:15px;">🪙 Pause (-30/min)</button>
+            <button id="optRepas" class="glow-track" style="width:100%; margin-bottom:12px; padding:15px;">🍔 Pause Repas (30 min)</button>
+            <button onclick="document.getElementById('modalChoixPause').style.display='none'" class="glow-track" style="width:100%; margin-top:15px; --glow-color: 239, 68, 68; color:#ef4444; border-color: rgba(239,68,68,0.4);">Annuler</button>
         </div>
     </div>
 
+    <!-- BOUTIQUE -->
     <div id="modalBoutique" class="modal-overlay">
-        <div class="modal-content boutique glass-panel glow-track">
-            <h3 style="color: #ec4899;">🛒 Boutique Pro</h3>
-            <p>Choisis ton moyen de paiement :</p>
-            
-            <div style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 8px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.05);">
-                <span style="color: #fbbf24; font-weight: bold;">💛 Cœurs dispos : <span id="coeursJaunesDispos">0</span></span><br>
-                <span style="color: #fbbf24; font-weight: bold;">🪙 Pièces dispos : <span id="piecesBoutiqueDispos">0</span></span>
+        <div class="modal-content glow-track" style="--glow-color: 236, 72, 153;">
+            <h3 style="color:#ec4899; margin-bottom: 20px;">🛒 BOUTIQUE FOCUS</h3>
+            <p style="font-size:0.8em; text-align:left; color:#64748b;">🎁 Petite Surprise</p>
+            <div style="display:flex; gap:8px; margin-bottom:15px;">
+                <button id="buy1S" class="glow-track btn-star">2 ✦</button>
+                <button id="buy1P" class="glow-track btn-piece">300 🪙</button>
             </div>
-
-            <h4 style="margin: 10px 0 5px 0; color: #cbd5e1; text-align: left;">🎁 Petite Surprise</h4>
-            <div style="display: flex; gap: 8px;">
-                <button id="btnAchatPetiteCoeur" class="menu-btn glow-track" style="margin-top:0; padding: 10px;">2 💛</button>
-                <button id="btnAchatPetitePiece" class="menu-btn glow-track" style="margin-top:0; padding: 10px;">300 🪙</button>
+            <p style="font-size:0.8em; text-align:left; color:#64748b;">🎀 Grande Surprise</p>
+            <div style="display:flex; gap:8px; margin-bottom:15px;">
+                <button id="buy2S" class="glow-track btn-star">3 ✦</button>
+                <button id="buy2P" class="glow-track btn-piece">600 🪙</button>
             </div>
-
-            <h4 style="margin: 15px 0 5px 0; color: #cbd5e1; text-align: left;">🎀 Grande Surprise</h4>
-            <div style="display: flex; gap: 8px;">
-                <button id="btnAchatGrandeCoeur" class="menu-btn glow-track" style="margin-top:0; padding: 10px;">3 💛</button>
-                <button id="btnAchatGrandePiece" class="menu-btn glow-track" style="margin-top:0; padding: 10px;">600 🪙</button>
-            </div>
-            
-            <button onclick="fermerModal('modalBoutique')" class="menu-btn btn-modal-annuler glow-track" style="margin-top:20px;">Fermer</button>
+            <button onclick="document.getElementById('modalBoutique').style.display='none'" class="glow-track" style="width:100%; margin-top:15px; --glow-color: 239, 68, 68; color:#ef4444; border-color: rgba(239,68,68,0.4);">Fermer</button>
         </div>
     </div>
-
-    <div id="modalAlerte" class="modal-overlay">
-        <div class="modal-content alerte glass-panel glow-track">
-            <h3 id="titreAlerte" style="color: #fbbf24;">Alerte</h3>
-            <p id="texteAlerte">Message</p>
-            <button onclick="fermerModal('modalAlerte')" class="menu-btn btn-modal-ok glow-track">OK</button> 
-        </div>
-    </div>
-
-    <script>
-        // Ce petit script capture la position X et Y de la souris
-        // et l'injecte dans le CSS de l'élément pour déplacer le halo intense
-        document.querySelectorAll('.glow-track').forEach(element => {
-            element.addEventListener('mousemove', e => {
-                const rect = element.getBoundingClientRect();
-                const x = e.clientX - rect.left;
-                const y = e.clientY - rect.top;
-                element.style.setProperty('--mouse-x', `${x}px`);
-                element.style.setProperty('--mouse-y', `${y}px`);
-            });
-        });
-    </script>
-
-    <script>
-        const canvas = document.getElementById('bgCanvas');
-        const ctx = canvas.getContext('2d');
-        let width, height;
-        let mouseX = window.innerWidth / 2;
-        let mouseY = window.innerHeight / 2;
-
-        function resize() {
-            width = canvas.width = window.innerWidth;
-            height = canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resize);
-        resize();
-
-        window.addEventListener('mousemove', (e) => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-        });
-
-        // --- PARAMÈTRES (Mosaïque réduite et lueur plus resserrée) ---
-        const gridSize = 45; 
-        const glowIntensity = 2; 
-        const glowRadius = 320; // Portée réduite
-        const gridRadius = 220; // Zone où la mosaïque s'active
-
-        function drawBackground() {
-            ctx.clearRect(0, 0, width, height);
-
-            // 1. Dessiner la lueur monochrome rose
-            let gradient = ctx.createRadialGradient(mouseX, mouseY, 0, mouseX, mouseY, glowRadius);
-            gradient.addColorStop(0, `rgba(236, 72, 153, ${0.12 * glowIntensity})`); 
-            gradient.addColorStop(1, 'rgba(236, 72, 153, 0)');
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, width, height);
-
-            // 2. Dessiner le quadrillage mosaïque aléatoire
-            ctx.lineWidth = 1;
-            const startCol = Math.floor((mouseX - gridRadius) / gridSize);
-            const endCol = Math.ceil((mouseX + gridRadius) / gridSize);
-            const startRow = Math.floor((mouseY - gridRadius) / gridSize);
-            const endRow = Math.ceil((mouseY + gridRadius) / gridSize);
-
-            // Le temps pour animer le scintillement
-            const time = Date.now() / 250; 
-
-            for (let x = startCol; x <= endCol; x++) {
-                for (let y = startRow; y <= endRow; y++) {
-                    const rectX = x * gridSize;
-                    const rectY = y * gridSize;
-                    const centerX = rectX + gridSize / 2;
-                    const centerY = rectY + gridSize / 2;
-                    const dist = Math.hypot(mouseX - centerX, mouseY - centerY);
-
-                    if (dist < gridRadius) {
-                        // RANDOMIZER : Scintillement homogène et indépendant pour chaque case
-                        const seed = Math.sin(x * 12.9898 + y * 78.233) * 43758.5453;
-                        const pulse = Math.sin(time + seed);
-
-                        // Seules les cases avec un pulse positif s'éclairent
-                        if (pulse > 0.2) {
-                            // On diminue l'opacité vers les bords du cercle
-                            let alpha = (1 - dist / gridRadius) * 0.5 * pulse; 
-                            
-                            // Contour du carré
-                            ctx.strokeStyle = `rgba(236, 72, 153, ${alpha})`;
-                            ctx.strokeRect(rectX, rectY, gridSize, gridSize);
-                            
-                            // Remplissage léger
-                            if (pulse > 0.7) {
-                                ctx.fillStyle = `rgba(236, 72, 153, ${alpha * 0.15})`;
-                                ctx.fillRect(rectX, rectY, gridSize, gridSize);
-                            }
-                        }
-                    }
-                }
-            }
-            requestAnimationFrame(drawBackground);
-        }
-        drawBackground();
-    </script>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getDatabase, ref, set, onValue, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+
+        // Pseudo Multijoueur - Vraiment vidé de force
+        let playerName = "";
+        window.addEventListener('DOMContentLoaded', () => {
+            const pInput = document.getElementById('inputPseudo');
+            pInput.value = "";
+            setTimeout(() => { pInput.value = ""; }, 50);
+            setTimeout(() => { pInput.value = ""; }, 200);
+        });
+
+        document.getElementById('btnValiderPseudo').onclick = () => {
+            let val = document.getElementById('inputPseudo').value.trim();
+            if (val) {
+                playerName = val;
+                document.getElementById('modalPseudo').style.display = 'none';
+            }
+        };
 
         const firebaseConfig = {
             apiKey: "AIzaSyDaHguuxN1Jq8c4YZuk0XEzm1E-tHTBzAY",
@@ -500,248 +389,655 @@
         const gameRef = ref(db, 'sessionPartagee');
         const offsetRef = ref(db, ".info/serverTimeOffset");
 
-        let serverTimeOffset = 0;
-        let gameState = {
-            pvActuels: 5,
-            piecesBase: 0,
-            repasRestants: 2,
-            nbPetitesSurprises: 0,
-            nbGrandesSurprises: 0,
-            modeJeu: 'attente',
-            timestampMode: null,
-            tempsTravailCumule: 0 
+        let state = { pvActuels: 5, modeJeu: 'attente', piecesBase: 0, tempsTravailCumule: 0, repasRestants: 2, propositions: [], timers: [] };
+        let sOff = 0; let localPieces = 0; let isFirstLoad = true; 
+        let lastAnimId = 0; let lastToastId = 0;
+        let currentNegoId = null;
+        
+        window.currentPv = 5;
+        window.fxState = 'normal';
+        window.isDead = false;
+
+        onValue(offsetRef, s => sOff = s.val() || 0);
+
+        function format(s) {
+            if(s < 0) s = 0;
+            let h = Math.floor(s/3600), m = Math.floor((s%3600)/60), sec = s%60;
+            return `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+        }
+
+        window.showNotification = function(title, text, colorCode, icon) {
+            const toast = document.createElement('div');
+            toast.className = 'glow-track';
+            toast.style.setProperty('--glow-color', colorCode);
+            toast.style.background = 'rgba(10, 10, 14, 0.9)';
+            toast.style.border = `1px solid rgba(${colorCode}, 0.5)`;
+            toast.style.padding = '15px 20px';
+            toast.style.borderRadius = '15px';
+            toast.style.color = 'white';
+            toast.style.display = 'flex';
+            toast.style.alignItems = 'center';
+            toast.style.gap = '15px';
+            toast.style.boxShadow = `0 0 20px rgba(${colorCode}, 0.4)`;
+            toast.style.transition = 'all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55)'; 
+            toast.style.transform = 'translateX(150%)'; 
+            toast.style.opacity = '0';
+            
+            toast.innerHTML = `
+                <div style="font-size:2.2em; filter: drop-shadow(0 0 8px rgba(${colorCode},0.8));">${icon}</div>
+                <div style="text-align: left;">
+                    <strong style="display:block; font-size:1.1em; color:rgb(${colorCode}); margin-bottom:2px; text-transform:uppercase; letter-spacing:1px;">${title}</strong>
+                    <span style="font-size:0.9em; color:#cbd5e1;">${text}</span>
+                </div>
+            `;
+            
+            document.getElementById('toastContainer').appendChild(toast);
+            void toast.offsetWidth;
+            toast.style.transform = 'translateX(0)';
+            toast.style.opacity = '1';
+            
+            setTimeout(() => {
+                toast.style.transform = 'translateX(150%)';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 500);
+            }, 4500);
         };
 
-        let localPieces = 0; 
-        let isTransitioning = false; 
-
-        onValue(offsetRef, (snap) => {
-            serverTimeOffset = snap.val() || 0;
-        });
-
-        const imageElement = document.getElementById("trackerImage");
-        const burgerLoader = document.getElementById("burgerLoader");
-        const chronoAffichage = document.getElementById("chrono");
-        const decomptePause = document.getElementById("decomptePause");
-        const piecesDisplay = document.getElementById("piecesDisplay");
-        const repasDisplay = document.getElementById("repasDisplay");
-        const panelPause = document.getElementById("panelPause");
-        const titrePanelPause = document.getElementById("titrePanelPause");
-        const btnStart = document.getElementById("btnStart");
-        const btnPause = document.getElementById("btnPause");
-        const btnStop = document.getElementById("btnStop");
-        const btnMinus = document.getElementById("btnMinus");
-        const btnBoutique = document.getElementById("btnBoutique");
-        const btnPlus = document.getElementById("btnPlus");
-        const messageFin = document.getElementById("messageFin");
-        const coeursJaunesDispos = document.getElementById("coeursJaunesDispos");
-        const piecesBoutiqueDispos = document.getElementById("piecesBoutiqueDispos");
-
-        window.ouvrirModal = function(id) { document.getElementById(id).style.display = "flex"; }
-        window.fermerModal = function(id) { document.getElementById(id).style.display = "none"; }
-        window.afficherAlerte = function(titre, texte) {
-            document.getElementById("titreAlerte").innerText = titre;
-            document.getElementById("texteAlerte").innerText = texte;
-            window.ouvrirModal("modalAlerte");
+        function triggerSharedAnim(cssClass, colorName) {
+            let animEvent = { id: Date.now(), className: cssClass, color: colorName };
+            set(gameRef, { ...state, lastAnimation: animEvent });
         }
 
-        function formaterTemps(secondes) {
-            if(secondes < 0) secondes = 0;
-            let h = Math.floor(secondes / 3600);
-            let m = Math.floor((secondes % 3600) / 60);
-            let s = secondes % 60;
-            return String(h).padStart(2, "0") + ":" + String(m).padStart(2, "0") + ":" + String(s).padStart(2, "0");
+        window.showRewardAnim = function(type) {
+            const el = document.createElement('div');
+            el.className = 'reward-anim' + (type === 'grande' ? ' grande-anim' : (type === 'souhait' ? ' souhait-anim' : ''));
+            let icon = '🎁'; let text = 'Petite Surprise';
+            if(type === 'grande') { icon = '🎀'; text = 'Grande Surprise'; }
+            if(type === 'souhait') { icon = '🪔'; text = 'Souhait'; }
+            el.innerHTML = `<span class="reward-icon">${icon}</span>${text} Débloqué${type==='souhait'?'':'e'} !`;
+            document.body.appendChild(el);
+            setTimeout(() => el.remove(), 2500);
         }
 
-        function sendUpdate(patch) {
-            const newState = { ...gameState, ...patch };
-            set(gameRef, newState);
+        window.triggerDashAnim = function(className, colorName) {
+            const dash = document.getElementById('mainDashboard');
+            dash.classList.remove('anim-shake', 'anim-flash-green', 'anim-flash-yellow', 'anim-shake-red');
+            void dash.offsetWidth; 
+            dash.classList.add(className);
+            if(window.spawnWave) window.spawnWave(colorName, 'radial');
         }
 
-        onValue(gameRef, (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                gameState = data;
-                mettreAJourInterface();
+        document.getElementById('tacheInput').addEventListener('keydown', (e) => {
+            if(e.key === 'Enter' && e.target.value.trim() !== "") {
+                let txt = e.target.value.trim();
+                let toast = { id: Date.now(), title: "Nouvelle Cible", text: `${playerName} a défini : ${txt}`, colorCode: "236, 72, 153", icon: "🎯" };
+                set(gameRef, { ...state, tacheActuelle: txt, tacheEnCours: true, lastToast: toast });
             }
         });
 
-        function triggerAnimation(className) {
-            imageElement.classList.add(className);
-            setTimeout(() => {
-                imageElement.classList.remove(className);
-            }, 800); 
-        }
+        document.getElementById('btnTerminerTache').onclick = () => {
+            let toast = { id: Date.now(), title: "Cible Atteinte", text: `${playerName} a terminé : ${state.tacheActuelle}`, colorCode: "16, 185, 129", icon: "✅" };
+            set(gameRef, { ...state, tacheActuelle: "", tacheEnCours: false, lastToast: toast });
+        };
 
-        function mettreAJourInterface() {
-            imageElement.src = gameState.pvActuels + ".jpg"; 
-            let basePetite = (gameState.pvActuels >= 5) ? 1 : 0;
-            let baseGrande = (gameState.pvActuels >= 7) ? 1 : 0;
+        function updateCibleUI() {
+            const input = document.getElementById('tacheInput');
+            const display = document.getElementById('tacheDisplay');
+            const btnTerminer = document.getElementById('btnTerminerTache');
             
-            document.getElementById("txtPetites").innerText = gameState.nbPetitesSurprises + basePetite;
-            document.getElementById("txtGrandes").innerText = gameState.nbGrandesSurprises + baseGrande;
-            repasDisplay.innerText = "🍔 Repas : " + gameState.repasRestants; 
-            
-            coeursJaunesDispos.innerText = Math.max(0, gameState.pvActuels - 5);
-            piecesBoutiqueDispos.innerText = localPieces;
-
-            if (gameState.modeJeu === 'attente') {
-                btnStart.disabled = false;
-                btnPause.disabled = true; btnStop.disabled = true; btnMinus.disabled = true; btnBoutique.disabled = true; btnPlus.disabled = true;
-                panelPause.style.display = "none"; imageElement.classList.remove("en-pause"); burgerLoader.style.display = "none";
-                piecesDisplay.innerText = "🪙 Pièces : 0"; chronoAffichage.innerText = "00:00:00"; messageFin.style.display = "block";
+            if (state.tacheEnCours) {
+                input.style.display = 'none';
+                display.style.display = 'inline';
+                display.innerText = state.tacheActuelle;
+                btnTerminer.style.display = 'inline-block';
             } else {
-                messageFin.style.display = "none";
-                btnStart.disabled = true; btnStop.disabled = false;
-                if (gameState.modeJeu === 'travail') {
-                    btnPause.disabled = false; btnMinus.disabled = false; btnBoutique.disabled = false; btnPlus.disabled = false;
-                    panelPause.style.display = "none"; imageElement.classList.remove("en-pause"); burgerLoader.style.display = "none";
-                } else {
-                    btnPause.disabled = true; btnMinus.disabled = true; btnBoutique.disabled = true; btnPlus.disabled = true;
-                    panelPause.style.display = "block"; imageElement.classList.add("en-pause");
-                    if (gameState.modeJeu === 'pause_cafe') {
-                        titrePanelPause.innerText = "🪙 EN PAUSE"; titrePanelPause.style.color = "#ec4899"; burgerLoader.style.display = "none";
-                    } else {
-                        titrePanelPause.innerText = "🍔 BON APPÉTIT"; titrePanelPause.style.color = "#f97316"; burgerLoader.style.display = "block";
-                    }
-                }
+                input.style.display = 'inline';
+                if(document.activeElement !== input) input.value = state.tacheActuelle || "";
+                display.style.display = 'none';
+                btnTerminer.style.display = 'none';
             }
         }
 
-        function tickLocal() {
-            if (gameState.modeJeu === 'attente' || !gameState.timestampMode) {
-                if (gameState.modeJeu !== 'attente') chronoAffichage.innerText = "Synchro...";
-                return;
-            }
-
-            let nowCorrected = Date.now() + serverTimeOffset;
-            let elapsedSeconds = Math.floor((nowCorrected - gameState.timestampMode) / 1000);
-
-            if (gameState.modeJeu === 'travail') {
-                let gainedPieces = Math.floor(elapsedSeconds / 60) * 5;
-                localPieces = gameState.piecesBase + gainedPieces;
-                
-                let totalSeconds = (gameState.tempsTravailCumule || 0) + elapsedSeconds;
-                chronoAffichage.innerText = formaterTemps(totalSeconds);
-                piecesDisplay.innerText = "🪙 Pièces : " + localPieces;
-                piecesBoutiqueDispos.innerText = localPieces;
-            } 
-            else if (gameState.modeJeu === 'pause_cafe') {
-                let spentPieces = Math.floor(elapsedSeconds / 2); 
-                localPieces = gameState.piecesBase - spentPieces;
-                let tempsRestant = (gameState.piecesBase * 2) - elapsedSeconds;
-                
-                if (tempsRestant <= 0 && !isTransitioning) {
-                    isTransitioning = true; sortirDePause(0);
-                    setTimeout(() => isTransitioning = false, 2000);
-                } else {
-                    decomptePause.innerText = formaterTemps(tempsRestant);
-                    piecesDisplay.innerText = "🪙 Pièces : " + localPieces;
-                    chronoAffichage.innerText = formaterTemps(gameState.tempsTravailCumule);
-                }
-            }
-            else if (gameState.modeJeu === 'pause_repas') {
-                localPieces = gameState.piecesBase;
-                let tempsRestant = 1800 - elapsedSeconds; 
-                
-                if (tempsRestant <= 0 && !isTransitioning) {
-                    isTransitioning = true; sortirDePause(gameState.piecesBase);
-                    setTimeout(() => isTransitioning = false, 2000);
-                } else {
-                    decomptePause.innerText = formaterTemps(tempsRestant);
-                    chronoAffichage.innerText = formaterTemps(gameState.tempsTravailCumule);
-                }
-            }
-        }
-
-        setInterval(tickLocal, 500);
-
-        btnStart.addEventListener("click", () => {
-            sendUpdate({
-                pvActuels: 5, piecesBase: 0, repasRestants: 2, nbPetitesSurprises: 0, nbGrandesSurprises: 0, 
-                modeJeu: 'travail', timestampMode: serverTimestamp(), tempsTravailCumule: 0 
+        ['defPetite', 'defGrande', 'defSouhait'].forEach(id => {
+            document.getElementById(id).addEventListener('change', (e) => {
+                let patch = {}; patch[id] = e.target.value;
+                set(gameRef, { ...state, ...patch });
             });
         });
 
-        btnStop.addEventListener("click", () => sendUpdate({ modeJeu: 'attente', timestampMode: null }));
-
-        function commitTravail() {
-            let nowCorrected = Date.now() + serverTimeOffset;
-            let elapsedSeconds = Math.floor((nowCorrected - gameState.timestampMode) / 1000);
-            return {
-                tempsTravailCumule: (gameState.tempsTravailCumule || 0) + elapsedSeconds,
-                piecesBase: localPieces,
-                timestampMode: serverTimestamp()
-            };
+        function checkRewardsVisibility() {
+            const hasProps = state.propositions && state.propositions.length > 0;
+            const now = Date.now() + sOff;
+            const hasTimers = state.timers && state.timers.some(t => t.end > now);
+            document.getElementById('rewardsDashboard').style.display = (hasProps || hasTimers) ? 'flex' : 'none';
         }
 
-        document.getElementById("btnChoixCafe").addEventListener("click", () => {
-            if (localPieces < 1) return;
-            window.fermerModal("modalChoixPause");
-            let update = commitTravail();
-            update.modeJeu = 'pause_cafe';
-            sendUpdate(update);
-        });
+        function updateButtonsState() {
+            const modeJeuSafe = state.modeJeu || 'attente';
+            const isTr = modeJeuSafe === 'travail';
+            const dead = (state.pvActuels || 0) <= 0;
 
-        document.getElementById("btnChoixRepas").addEventListener("click", () => {
-            if (gameState.repasRestants <= 0) return;
-            window.fermerModal("modalChoixPause");
-            let update = commitTravail();
-            update.modeJeu = 'pause_repas';
-            update.repasRestants = gameState.repasRestants - 1;
-            sendUpdate(update);
-        });
+            document.getElementById('btnStart').disabled = modeJeuSafe !== 'attente' || dead;
+            document.getElementById('btnStop').disabled = modeJeuSafe === 'attente';
+            document.getElementById('btnPause').disabled = !isTr || dead;
+            document.getElementById('btnMinus').disabled = !isTr || dead;
+            document.getElementById('btnPlus').disabled = !isTr || dead;
+            document.getElementById('btnBoutique').disabled = !isTr || dead;
+            
+            document.getElementById('buy1S').disabled = (state.pvActuels || 0) < 7;
+            document.getElementById('buy1P').disabled = localPieces < 300;
+            document.getElementById('buy2S').disabled = (state.pvActuels || 0) < 8;
+            document.getElementById('buy2P').disabled = localPieces < 600;
+            document.getElementById('optCafe').disabled = localPieces < 1;
+            document.getElementById('optRepas').disabled = (state.repasRestants || 0) <= 0;
 
-        function sortirDePause(piecesRestantes) { 
-            sendUpdate({ modeJeu: 'travail', piecesBase: piecesRestantes, timestampMode: serverTimestamp() }); 
+            document.getElementById('btnConsommerPetite').disabled = (state.nbPetitesSurprises || 0) <= 0;
+            document.getElementById('btnConsommerGrande').disabled = (state.nbGrandesSurprises || 0) <= 0;
+            document.getElementById('btnConsommerSouhait').disabled = (state.nbSouhaits || 0) <= 0;
         }
+
+        onValue(gameRef, snap => {
+            const data = snap.val(); if(!data) return; 
+
+            if (data.lastToast && data.lastToast.id !== lastToastId) {
+                lastToastId = data.lastToast.id;
+                if (Date.now() - data.lastToast.id < 5000) {
+                    showNotification(data.lastToast.title, data.lastToast.text, data.lastToast.colorCode, data.lastToast.icon);
+                }
+            }
+
+            if (data.lastAnimation && data.lastAnimation.id !== lastAnimId) {
+                lastAnimId = data.lastAnimation.id;
+                if (Date.now() - data.lastAnimation.id < 5000) {
+                    window.triggerDashAnim(data.lastAnimation.className, data.lastAnimation.color);
+                }
+            }
+            
+            state = data;
+            isFirstLoad = false;
+            window.currentPv = state.pvActuels || 0; 
+            
+            updateCibleUI();
+
+            if (document.activeElement !== document.getElementById('defPetite')) document.getElementById('defPetite').value = state.defPetite || "";
+            if (document.activeElement !== document.getElementById('defGrande')) document.getElementById('defGrande').value = state.defGrande || "";
+            if (document.activeElement !== document.getElementById('defSouhait')) document.getElementById('defSouhait').value = state.defSouhait || "";
+            
+            document.querySelectorAll('.heart-vital').forEach((h, i) => i < state.pvActuels ? h.classList.add('active') : h.classList.remove('active'));
+            document.querySelectorAll('.heart-bonus').forEach((h, i) => i + 5 < state.pvActuels ? h.classList.add('active') : h.classList.remove('active'));
+            
+            document.getElementById('invP_stock').innerText = state.nbPetitesSurprises || 0;
+            document.getElementById('invG_stock').innerText = state.nbGrandesSurprises || 0;
+            document.getElementById('invS_stock').innerText = state.nbSouhaits || 0;
+
+            document.getElementById('invP_cons').innerText = state.consommePetites || 0;
+            document.getElementById('invG_cons').innerText = state.consommeGrandes || 0;
+            document.getElementById('invS_cons').innerText = state.consommeSouhaits || 0;
+            
+            if(document.getElementById('txtPetites')) document.getElementById('txtPetites').innerText = state.sessionPetites || 0;
+            if(document.getElementById('txtGrandes')) document.getElementById('txtGrandes').innerText = state.sessionGrandes || 0;
+            if(document.getElementById('txtSouhaits')) document.getElementById('txtSouhaits').innerText = state.sessionSouhaits || 0;
+
+            document.getElementById('repasDisplay').innerText = "🍔 Repas : " + (state.repasRestants || 0);
+
+            document.getElementById('rowPetite').classList.toggle('disabled-row', (state.nbPetitesSurprises || 0) <= 0);
+            document.getElementById('rowGrande').classList.toggle('disabled-row', (state.nbGrandesSurprises || 0) <= 0);
+            document.getElementById('rowSouhait').classList.toggle('disabled-row', (state.nbSouhaits || 0) <= 0);
+            
+            updateTimersUI();
+            updatePropositionsUI();
+            checkRewardsVisibility();
+            updateButtonsState();
+
+            const modeJeuSafe = state.modeJeu || 'attente';
+            const isPa = modeJeuSafe.includes('pause');
+            const dead = (state.pvActuels || 0) <= 0;
+
+            if(isPa) {
+                document.body.classList.add('paused-mode');
+                const panel = document.getElementById('panelPause');
+                if(modeJeuSafe === 'pause_repas') {
+                    panel.style.setProperty('--glow-color', '249, 115, 22');
+                    document.getElementById('titrePause').style.color = '#f97316';
+                    document.getElementById('titrePause').innerText = "🍔 PAUSE REPAS";
+                    document.getElementById('burgerLoading').style.display = 'inline-block';
+                } else {
+                    panel.style.setProperty('--glow-color', '236, 72, 153');
+                    document.getElementById('titrePause').style.color = '#ec4899';
+                    document.getElementById('titrePause').innerText = "🪙 PAUSE";
+                    document.getElementById('burgerLoading').style.display = 'none';
+                }
+                panel.style.display = 'block';
+            } else {
+                document.body.classList.remove('paused-mode');
+                document.getElementById('panelPause').style.display = 'none';
+            }
+
+            if (dead && !window.isDead) {
+                window.isDead = true;
+                window.fxState = 'failing';
+                
+                document.body.classList.add('failing-theme');
+                
+                const goModal = document.getElementById('modalGameOver');
+                const goContent = document.getElementById('goContent');
+                
+                goModal.style.display = 'flex';
+                goContent.className = 'modal-content glow-track anim-shake pulse-red-loop';
+
+                window.flatlineTimeout = setTimeout(() => {
+                    if(!window.isDead) return;
+                    window.fxState = 'flatline';
+                    document.body.classList.remove('failing-theme');
+                    document.body.classList.add('flatline-theme');
+                    goContent.className = 'modal-content glow-track pulse-white-loop';
+                }, 3500);
+
+            } else if (!dead && window.isDead) {
+                window.isDead = false;
+                window.fxState = 'normal';
+                clearTimeout(window.flatlineTimeout);
+                document.body.classList.remove('failing-theme');
+                document.body.classList.remove('flatline-theme');
+                document.getElementById('modalGameOver').style.display = 'none';
+            }
+        });
+
+        const launch = () => {
+            let toast = { id: Date.now(), title: "Session Démarrée", text: `${playerName} a lancé le chrono !`, colorCode: "16, 185, 129", icon: "🚀" };
+            set(gameRef, { 
+                ...state, 
+                pvActuels: 5, piecesBase: 0, repasRestants: 2, 
+                recompense5Obtenue: false, recompense7Obtenue: false, recompense10Obtenue: false,
+                sessionPetites: 0, sessionGrandes: 0, sessionSouhaits: 0,
+                modeJeu: 'travail', timestampMode: serverTimestamp(), tempsTravailCumule: 0,
+                lastToast: toast
+            });
+        };
+
+        const applyPvChange = (newPv, extraPatch = {}, customToast = null) => {
+            let current = state.pvActuels || 0;
+            let patch = { pvActuels: newPv, ...extraPatch };
+            
+            let pS = extraPatch.nbPetitesSurprises !== undefined ? extraPatch.nbPetitesSurprises : (state.nbPetitesSurprises || 0);
+            let gS = extraPatch.nbGrandesSurprises !== undefined ? extraPatch.nbGrandesSurprises : (state.nbGrandesSurprises || 0);
+            let sH = extraPatch.nbSouhaits !== undefined ? extraPatch.nbSouhaits : (state.nbSouhaits || 0);
+
+            let sesP = extraPatch.sessionPetites !== undefined ? extraPatch.sessionPetites : (state.sessionPetites || 0);
+            let sesG = extraPatch.sessionGrandes !== undefined ? extraPatch.sessionGrandes : (state.sessionGrandes || 0);
+            let sesS = extraPatch.sessionSouhaits !== undefined ? extraPatch.sessionSouhaits : (state.sessionSouhaits || 0);
+
+            let unlockToast = null;
+            if (newPv >= 5 && !state.recompense5Obtenue) { pS += 1; sesP += 1; patch.recompense5Obtenue = true; unlockToast = {title: "Focus Atteint", text: `${playerName} a débloqué : Petite Surprise !`, colorCode: "16, 185, 129", icon: "🎁"}; showRewardAnim('petite'); }
+            if (newPv >= 7 && !state.recompense7Obtenue) { gS += 1; sesG += 1; patch.recompense7Obtenue = true; unlockToast = {title: "Focus Atteint", text: `${playerName} a débloqué : Grande Surprise !`, colorCode: "245, 158, 11", icon: "🎀"}; showRewardAnim('grande'); }
+            if (newPv >= 10 && !state.recompense10Obtenue) { sH += 1; sesS += 1; patch.recompense10Obtenue = true; unlockToast = {title: "Focus Maximal", text: `${playerName} a débloqué : Souhait !`, colorCode: "168, 85, 247", icon: "🪔"}; showRewardAnim('souhait'); }
+
+            if (current >= 10 && newPv < 10 && state.recompense10Obtenue) { sH = Math.max(0, sH - 1); sesS = Math.max(0, sesS - 1); patch.recompense10Obtenue = false; }
+            if (current >= 7 && newPv < 7 && state.recompense7Obtenue) { gS = Math.max(0, gS - 1); sesG = Math.max(0, sesG - 1); patch.recompense7Obtenue = false; }
+            if (current >= 5 && newPv < 5 && state.recompense5Obtenue) { pS = Math.max(0, pS - 1); sesP = Math.max(0, sesP - 1); patch.recompense5Obtenue = false; }
+
+            patch.nbPetitesSurprises = pS; patch.nbGrandesSurprises = gS; patch.nbSouhaits = sH;
+            patch.sessionPetites = sesP; patch.sessionGrandes = sesG; patch.sessionSouhaits = sesS;
+            
+            if(unlockToast) {
+                patch.lastToast = { id: Date.now(), ...unlockToast };
+            } else if (customToast) {
+                patch.lastToast = { id: Date.now(), ...customToast };
+            }
+            
+            set(gameRef, { ...state, ...patch });
+        };
+
+        document.getElementById('btnRestartGO').onclick = () => {
+            document.body.classList.remove('flatline-theme');
+            const flash = document.createElement('div');
+            flash.className = 'flash-overlay';
+            document.body.appendChild(flash);
+            setTimeout(() => flash.remove(), 1200);
+            
+            triggerSharedAnim('anim-flash-green', 'green');
+            
+            let toast = { id: Date.now(), title: "Réanimation", text: `${playerName} a utilisé le défibrillateur !`, colorCode: "16, 185, 129", icon: "⚡" };
+            set(gameRef, { 
+                ...state, 
+                pvActuels: 5, piecesBase: 0, repasRestants: 2, 
+                recompense5Obtenue: false, recompense7Obtenue: false, recompense10Obtenue: false,
+                sessionPetites: 0, sessionGrandes: 0, sessionSouhaits: 0,
+                modeJeu: 'travail', timestampMode: serverTimestamp(), tempsTravailCumule: 0,
+                lastToast: toast
+            });
+        };
+
+        document.getElementById('btnStart').onclick = launch;
+        document.getElementById('btnStop').onclick = () => {
+            let toast = { id: Date.now(), title: "Session Stoppée", text: `${playerName} a arrêté le chrono.`, colorCode: "239, 68, 68", icon: "🛑" };
+            set(gameRef, { ...state, modeJeu: 'attente', lastToast: toast });
+        };
+        document.getElementById('btnInventaire').onclick = () => document.getElementById('modalInventaire').style.display='flex';
         
-        document.getElementById("btnStopperPause").addEventListener("click", () => sortirDePause(localPieces));
-        btnPause.addEventListener("click", () => window.ouvrirModal("modalChoixPause"));
+        document.getElementById('btnMinus').onclick = () => {
+            let current = state.pvActuels || 0;
+            triggerSharedAnim('anim-shake-red', 'red');
+            let toast = { title: "Alerte Distraction", text: `${playerName} a perdu le focus (-1 PV).`, colorCode: "239, 68, 68", icon: "💔" };
+            applyPvChange(current > 5 ? 5 : Math.max(0, current - 1), {}, toast);
+        };
+        
+        document.getElementById('btnPlus').onclick = () => {
+            let current = state.pvActuels || 0; let newPv = Math.min(10, current + 2);
+            let customToast = null;
+            if(newPv === 10 && current < 10) {
+                triggerSharedAnim('anim-flash-yellow', 'yellow');
+                customToast = { title: "FOCUS MAXIMAL", text: `${playerName} a atteint 10/10 ! 🔥`, colorCode: "251, 191, 36", icon: "👑" };
+            } else if (newPv < 10) {
+                triggerSharedAnim('anim-flash-green', 'green');
+                customToast = { title: "Focus Maintenu", text: `${playerName} a regagné de la vie (+2 PV).`, colorCode: "16, 185, 129", icon: "💚" };
+            }
+            applyPvChange(newPv, {}, customToast);
+        };
+        
+        document.getElementById('btnPause').onclick = () => document.getElementById('modalChoixPause').style.display='flex';
+        document.getElementById('btnBoutique').onclick = () => document.getElementById('modalBoutique').style.display='flex';
 
-        btnMinus.addEventListener("click", () => {
-            if (gameState.modeJeu !== 'travail') return;
-            triggerAnimation('shake');
-            if (gameState.pvActuels > 5) sendUpdate({ pvActuels: 5 });
-            else if (gameState.pvActuels > 1) sendUpdate({ pvActuels: gameState.pvActuels - 1 });
+        document.getElementById('optCafe').onclick = () => {
+            const elap = Math.floor((Date.now() + sOff - state.timestampMode)/1000);
+            let toast = { id: Date.now(), title: "Pause", text: `${playerName} prend un café ☕`, colorCode: "251, 191, 36", icon: "☕" };
+            set(gameRef, { ...state, modeJeu: 'pause_cafe', timestampMode: serverTimestamp(), piecesBase: localPieces, tempsTravailCumule: (state.tempsTravailCumule || 0) + elap, lastToast: toast });
+            document.getElementById('modalChoixPause').style.display='none';
+        };
+        document.getElementById('optRepas').onclick = () => {
+            if((state.repasRestants || 0) <= 0) return;
+            const elap = Math.floor((Date.now() + sOff - state.timestampMode)/1000);
+            let toast = { id: Date.now(), title: "Pause", text: `${playerName} part manger 🍔`, colorCode: "249, 115, 22", icon: "🍔" };
+            set(gameRef, { ...state, modeJeu: 'pause_repas', repasRestants: state.repasRestants - 1, timestampMode: serverTimestamp(), piecesBase: localPieces, tempsTravailCumule: (state.tempsTravailCumule || 0) + elap, lastToast: toast });
+            document.getElementById('modalChoixPause').style.display='none';
+        };
+        document.getElementById('btnStopperPause').onclick = () => {
+            let toast = { id: Date.now(), title: "Reprise", text: `${playerName} est de retour au travail !`, colorCode: "16, 185, 129", icon: "▶️" };
+            set(gameRef, { ...state, modeJeu: 'travail', timestampMode: serverTimestamp(), piecesBase: localPieces, lastToast: toast });
+        };
+
+        const handleShopPurchase = (action, logText, animType) => { 
+            if(action()) {
+                showRewardAnim(animType);
+                document.getElementById('modalBoutique').style.display = 'none'; 
+            }
+        };
+        
+        document.getElementById('buy1P').onclick = () => handleShopPurchase(() => {
+            if(localPieces >= 300) {
+                let toast = { id: Date.now(), title: "Achat Boutique", text: `${playerName} a obtenu : Petite Surprise !`, colorCode: "236, 72, 153", icon: "🛒" };
+                set(gameRef, {...state, piecesBase: state.piecesBase - 300, nbPetitesSurprises: (state.nbPetitesSurprises || 0) + 1, sessionPetites: (state.sessionPetites || 0) + 1, lastToast: toast});
+                return true;
+            } return false;
+        }, "Petite Surprise", "petite");
+        document.getElementById('buy2P').onclick = () => handleShopPurchase(() => {
+            if(localPieces >= 600) {
+                let toast = { id: Date.now(), title: "Achat Boutique", text: `${playerName} a obtenu : Grande Surprise !`, colorCode: "236, 72, 153", icon: "🛒" };
+                set(gameRef, {...state, piecesBase: state.piecesBase - 600, nbGrandesSurprises: (state.nbGrandesSurprises || 0) + 1, sessionGrandes: (state.sessionGrandes || 0) + 1, lastToast: toast});
+                return true;
+            } return false;
+        }, "Grande Surprise", "grande");
+
+        document.getElementById('buy1S').onclick = () => handleShopPurchase(() => {
+            if(state.pvActuels >= 7) {
+                let toast = { title: "Achat Boutique", text: `${playerName} a obtenu : Petite Surprise !`, colorCode: "236, 72, 153", icon: "🛒" };
+                applyPvChange(state.pvActuels - 2, { nbPetitesSurprises: (state.nbPetitesSurprises || 0) + 1, sessionPetites: (state.sessionPetites || 0) + 1 }, toast);
+                return true;
+            } return false;
+        }, "Petite Surprise", "petite");
+        document.getElementById('buy2S').onclick = () => handleShopPurchase(() => {
+            if(state.pvActuels >= 8) {
+                let toast = { title: "Achat Boutique", text: `${playerName} a obtenu : Grande Surprise !`, colorCode: "236, 72, 153", icon: "🛒" };
+                applyPvChange(state.pvActuels - 3, { nbGrandesSurprises: (state.nbGrandesSurprises || 0) + 1, sessionGrandes: (state.sessionGrandes || 0) + 1 }, toast);
+                return true;
+            } return false;
+        }, "Grande Surprise", "grande");
+
+        function proposerItem(typeKey, nameField) {
+            let currentNb = state[typeKey] || 0;
+            if (currentNb <= 0) return;
+            let val = document.getElementById(nameField).value.trim();
+            if(!val) val = "Récompense Mystère";
+            
+            let props = state.propositions || [];
+            props.push({ id: Date.now(), type: typeKey, text: val, author: playerName });
+            
+            let toast = { id: Date.now(), title: "Nouvelle Proposition", text: `${playerName} propose : ${val}`, colorCode: "59, 130, 246", icon: "💬" };
+            let patch = { propositions: props, lastToast: toast };
+            patch[typeKey] = currentNb - 1; 
+            patch[nameField] = ""; 
+            
+            set(gameRef, { ...state, ...patch });
+            document.getElementById(nameField).value = ""; 
+        }
+
+        window.accepterNego = function(pId) {
+            let props = state.propositions || [];
+            let p = props.find(x => x.id === pId);
+            if(!p) return;
+            
+            let patch = {};
+            if(p.type==='nbPetitesSurprises') patch.consommePetites = (state.consommePetites||0)+1;
+            else patch.consommeGrandes = (state.consommeGrandes||0)+1;
+
+            let timers = state.timers || [];
+            timers.push({ id: Date.now(), name: p.text, end: Date.now() + sOff + 86400000, color: p.type==='nbPetitesSurprises'?'#10b981':'#f59e0b' });
+            patch.timers = timers;
+            patch.propositions = props.filter(x => x.id !== pId);
+            
+            let toast = { id: Date.now(), title: "Accord Validé", text: `"${p.text}" accepté ! 24h pour le faire !`, colorCode: "16, 185, 129", icon: "🤝" };
+            set(gameRef, { ...state, ...patch, lastToast: toast });
+        };
+
+        window.ouvrirContrePropo = function(pId, oldText) {
+            currentNegoId = pId;
+            document.getElementById('inputNego').value = oldText;
+            document.getElementById('modalNego').style.display = 'flex';
+        };
+
+        document.getElementById('btnValiderNego').onclick = () => {
+            let val = document.getElementById('inputNego').value.trim();
+            let props = state.propositions || [];
+            let idx = props.findIndex(x => x.id === currentNegoId);
+            if(idx !== -1 && val) {
+                props[idx].text = val;
+                props[idx].author = playerName;
+                let toast = { id: Date.now(), title: "Contre-Proposition", text: `${playerName} propose : ${val}`, colorCode: "236, 72, 153", icon: "⚖️" };
+                set(gameRef, { ...state, propositions: props, lastToast: toast });
+            }
+            document.getElementById('modalNego').style.display = 'none';
+        };
+
+        function updatePropositionsUI() {
+            const container = document.getElementById('propositionsList');
+            container.innerHTML = "";
+            (state.propositions || []).forEach(p => {
+                let color = p.type === 'nbPetitesSurprises' ? '#10b981' : '#f59e0b';
+                let div = document.createElement('div');
+                div.className = "nego-block";
+                div.innerHTML = `
+                    <div style="font-size:0.9em; margin-bottom:5px;"><strong style="color:${color};">${p.author}</strong> propose :</div>
+                    <div style="font-size:1.1em; color:white; font-style:italic;">"${p.text}"</div>
+                    <div class="nego-actions">
+                        <button class="glow-track btn-nego-acc" style="--glow-color: 16, 185, 129;" onclick="window.accepterNego(${p.id})">✅ Accepter</button>
+                        <button class="glow-track btn-nego-ct" style="--glow-color: 236, 72, 153;" onclick="window.ouvrirContrePropo(${p.id}, '${p.text.replace(/'/g, "\\'")}')">✍️ Contre-proposer</button>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        document.getElementById('btnConsommerSouhait').onclick = () => {
+            let currentNb = state.nbSouhaits || 0;
+            if (currentNb <= 0) return;
+            let val = document.getElementById('defSouhait').value.trim() || "Souhait Mystère";
+            
+            let timers = state.timers || [];
+            timers.push({ id: Date.now(), name: val, end: Date.now() + sOff + 86400000, color: '#a855f7' });
+            
+            let toast = { id: Date.now(), title: "Souhait Utilisé", text: `"${val}" lancé ! 24h pour réaliser !`, colorCode: "168, 85, 247", icon: "🪔" };
+            set(gameRef, { 
+                ...state, timers: timers, nbSouhaits: currentNb - 1, consommeSouhaits: (state.consommeSouhaits||0) + 1,
+                defSouhait: "", lastToast: toast
+            });
+            document.getElementById('defSouhait').value = "";
+        };
+
+        document.getElementById('btnConsommerPetite').onclick = () => proposerItem('nbPetitesSurprises', 'defPetite');
+        document.getElementById('btnConsommerGrande').onclick = () => proposerItem('nbGrandesSurprises', 'defGrande');
+
+        window.terminerTimer = function(tId) {
+            let timers = state.timers || [];
+            let completed = timers.find(t => t.id === tId);
+            timers = timers.filter(t => t.id !== tId);
+            let toast = { id: Date.now(), title: "Récompense Effectuée !", text: `"${completed ? completed.name : 'Tâche'}" a été validée !`, colorCode: "16, 185, 129", icon: "🎉" };
+            set(gameRef, { ...state, timers: timers, lastToast: toast });
+        };
+
+        function updateTimersUI() {
+            const container = document.getElementById('timersList');
+            const now = Date.now() + sOff;
+            let activeTimers = (state.timers || []).filter(t => t.end > now);
+            
+            if(state.timers && activeTimers.length !== state.timers.length) {
+                set(gameRef, { ...state, timers: activeTimers });
+            }
+
+            container.innerHTML = "";
+            activeTimers.forEach(t => {
+                let leftSec = Math.floor((t.end - now) / 1000);
+                let pct = Math.max(0, Math.min(100, (leftSec / 86400) * 100)); 
+                let h = Math.floor(leftSec/3600), m = Math.floor((leftSec%3600)/60);
+                let timeStr = `${h}h ${m}m rest.`;
+
+                let div = document.createElement('div');
+                div.className = "active-timer";
+                div.style.borderLeftColor = t.color;
+                div.innerHTML = `
+                    <div class="timer-header">
+                        <strong>${t.name}</strong>
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <span style="color:${t.color}">${timeStr}</span>
+                            <button class="glow-track" onclick="window.terminerTimer(${t.id})" style="--glow-color: 16, 185, 129; padding: 4px 8px; font-size: 0.8em; background: rgba(16, 185, 129, 0.1) !important; border: 1px solid rgba(16, 185, 129, 0.5); color: #10b981; border-radius: 5px; flex: 0; white-space:nowrap;">✔ Fait</button>
+                        </div>
+                    </div>
+                    <div class="timer-gauge-bg">
+                        <div class="timer-gauge-fill" style="width: ${pct}%; background: ${t.color};"></div>
+                    </div>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        setInterval(() => {
+            updateTimersUI();
+            checkRewardsVisibility();
+            updateButtonsState();
+            const modeJeuSafe = state.modeJeu || 'attente';
+            if(modeJeuSafe === 'attente' || !state.timestampMode) return;
+            const now = Date.now() + sOff; const elap = Math.floor((now - state.timestampMode)/1000);
+            if(modeJeuSafe === 'travail') {
+                localPieces = (state.piecesBase || 0) + Math.floor(elap / 60) * 5;
+                document.getElementById('chrono').innerText = format((state.tempsTravailCumule || 0) + elap);
+                document.getElementById('piecesDisplay').innerText = "🪙 Pièces : " + localPieces;
+            } else if(modeJeuSafe === 'pause_cafe') {
+                localPieces = Math.max(0, (state.piecesBase || 0) - Math.floor(elap * 0.5));
+                let tRem = Math.floor((state.piecesBase || 0) / 0.5) - elap;
+                document.getElementById('decomptePause').innerText = format(tRem);
+                document.getElementById('piecesDisplay').innerText = "🪙 Pièces : " + localPieces;
+                if(tRem <= 0) document.getElementById('btnStopperPause').click();
+            } else if(modeJeuSafe === 'pause_repas') {
+                let tRem = 1800 - elap; document.getElementById('decomptePause').innerText = format(tRem);
+                if(tRem <= 0) document.getElementById('btnStopperPause').click();
+            }
+        }, 500);
+    </script>
+
+    <script>
+        let waves = [];
+        window.spawnWave = function(color, type = 'radial') {
+            const dash = document.getElementById('mainDashboard'); if(!dash) return;
+            const rect = dash.getBoundingClientRect();
+            let startX = (type === 'horizontal') ? window.innerWidth / 2 : rect.left + rect.width / 2;
+            let startY = (type === 'horizontal') ? window.innerHeight / 2 : rect.top + rect.height / 2;
+            waves.push({ x: startX, y: startY, radius: 0, color: color, alpha: 1, type: type });
+        };
+
+        setInterval(() => {
+            if (window.fxState === 'failing') window.spawnWave('red', 'radial');
+            else if (window.fxState === 'flatline') window.spawnWave('white', 'horizontal');
+        }, window.fxState === 'flatline' ? 1200 : 700); 
+
+        document.querySelectorAll('.glow-track').forEach(el => {
+            el.addEventListener('mousemove', e => {
+                const r = el.getBoundingClientRect(); el.style.setProperty('--mouse-x', `${e.clientX - r.left}px`); el.style.setProperty('--mouse-y', `${e.clientY - r.top}px`);
+            });
         });
+        
+        const canvas = document.getElementById('bgCanvas'); const ctx = canvas.getContext('2d');
+        let w, h, mx=0, my=0;
+        function res() { w=canvas.width=window.innerWidth; h=canvas.height=window.innerHeight; }
+        window.onresize=res; res(); window.onmousemove=e=>{mx=e.clientX; my=e.clientY;};
+        
+        function draw() {
+            ctx.clearRect(0,0,w,h);
+            
+            let isMax = window.currentPv >= 10;
+            let baseR = isMax ? 251 : 236; let baseG = isMax ? 191 : 72; let baseB = isMax ? 36 : 153;
+            
+            if (document.body.classList.contains('paused-mode')) { baseR = 255; baseG = 255; baseB = 255; }
+            if (window.fxState === 'failing') { baseR = 239; baseG = 68; baseB = 68; }
+            if (window.fxState === 'flatline') { baseR = 200; baseG = 200; baseB = 200; }
+            
+            let gGrad = ctx.createRadialGradient(mx,my,0,mx,my,350);
+            gGrad.addColorStop(0, `rgba(${baseR}, ${baseG}, ${baseB}, 0.12)`);
+            gGrad.addColorStop(1, 'transparent');
+            ctx.fillStyle = gGrad; ctx.fillRect(0,0,w,h);
+            
+            const gs = 45, rad = 250, time = Date.now()/250;
+            
+            for (let i = waves.length - 1; i >= 0; i--) {
+                if (waves[i].type === 'horizontal') { waves[i].radius += 35; waves[i].alpha -= 0.008; }
+                else { waves[i].radius += 20; waves[i].alpha -= 0.015; }
+                if (waves[i].alpha <= 0 || waves[i].radius > Math.max(w, h)) waves.splice(i, 1);
+            }
 
-        btnPlus.addEventListener("click", () => {
-            if (gameState.modeJeu !== 'travail') return;
-            triggerAnimation('glow');
-            sendUpdate({ pvActuels: Math.min(10, gameState.pvActuels + 2) });
-        });
+            for(let x=0; x<=Math.ceil(w/gs); x++) {
+                for(let y=0; y<=Math.ceil(h/gs); y++) {
+                    const cx = x*gs+gs/2; const cy = y*gs+gs/2;
+                    const dMouse = Math.hypot(mx-cx, my-cy);
+                    
+                    let p = (window.fxState === 'flatline') ? 0 : Math.sin(time+Math.sin(x*13+y*77)*43758);
+                    let baseA = (p > 0.2 && dMouse < rad) ? (1 - dMouse/rad) * 0.4 * p : 0;
+                    
+                    let finalR = baseR, finalG = baseG, finalB = baseB, finalA = baseA;
 
-        btnBoutique.addEventListener("click", () => { window.ouvrirModal("modalBoutique"); });
-
-        document.getElementById("btnAchatPetiteCoeur").addEventListener("click", () => {
-            if (gameState.pvActuels - 5 >= 2) {
-                sendUpdate({ pvActuels: gameState.pvActuels - 2, nbPetitesSurprises: gameState.nbPetitesSurprises + 1 });
-                window.afficherAlerte("🎁 Succès", "Petite surprise achetée avec 2 cœurs !");
-            } else window.afficherAlerte("❌ Erreur", "Tu n'as pas assez de cœurs jaunes !");
-        });
-
-        document.getElementById("btnAchatPetitePiece").addEventListener("click", () => {
-            if (localPieces >= 300) {
-                sendUpdate({ piecesBase: gameState.piecesBase - 300, nbPetitesSurprises: gameState.nbPetitesSurprises + 1 });
-                window.afficherAlerte("🎁 Succès", "Petite surprise achetée avec 300 pièces !");
-            } else window.afficherAlerte("❌ Erreur", "Tu n'as pas assez de pièces !");
-        });
-
-        document.getElementById("btnAchatGrandeCoeur").addEventListener("click", () => {
-            if (gameState.pvActuels - 5 >= 3) {
-                sendUpdate({ pvActuels: gameState.pvActuels - 3, nbGrandesSurprises: gameState.nbGrandesSurprises + 1 });
-                window.afficherAlerte("🎀 Succès", "Grande surprise achetée avec 3 cœurs !");
-            } else window.afficherAlerte("❌ Erreur", "Tu n'as pas assez de cœurs jaunes !");
-        });
-
-        document.getElementById("btnAchatGrandePiece").addEventListener("click", () => {
-            if (localPieces >= 600) {
-                sendUpdate({ piecesBase: gameState.piecesBase - 600, nbGrandesSurprises: gameState.nbGrandesSurprises + 1 });
-                window.afficherAlerte("🎀 Succès", "Grande surprise achetée avec 600 pièces !");
-            } else window.afficherAlerte("❌ Erreur", "Tu n'as pas assez de pièces !");
-        });
-
+                    for (let wv of waves) {
+                        let dWave;
+                        if (wv.type === 'horizontal') {
+                            let dX = Math.abs(Math.abs(cx - wv.x) - wv.radius);
+                            let dY = Math.abs(cy - wv.y) * 3.0; dWave = Math.hypot(dX, dY);
+                        } else {
+                            dWave = Math.abs(Math.hypot(wv.x - cx, wv.y - cy) - wv.radius);
+                        }
+                        
+                        if (dWave < 150) { 
+                            let wIntensity = (1 - dWave / 150) * wv.alpha * (wv.type === 'horizontal' ? 2.5 : 0.8);
+                            if (wIntensity > finalA) {
+                                finalA = wIntensity;
+                                if(wv.color === 'red') { finalR = 239; finalG = 68; finalB = 68; }
+                                if(wv.color === 'green') { finalR = 16; finalG = 185; finalB = 129; }
+                                if(wv.color === 'yellow') { finalR = 251; finalG = 191; finalB = 36; }
+                                if(wv.color === 'white') { finalR = 255; finalG = 255; finalB = 255; }
+                            }
+                        }
+                    }
+                    if (finalA > 0.02) { ctx.strokeStyle = `rgba(${finalR}, ${finalG}, ${finalB}, ${finalA})`; ctx.strokeRect(x*gs, y*gs, gs, gs); }
+                }
+            }
+            requestAnimationFrame(draw);
+        }
+        draw();
     </script>
 </body>
 </html>
