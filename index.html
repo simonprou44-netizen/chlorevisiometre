@@ -56,13 +56,12 @@
         body.viewing-partner #partnerIndicator { display: block; animation: pulseBlue 1.5s infinite; }
         @keyframes pulseBlue { 0% { opacity: 0.7; } 50% { opacity: 1; text-shadow: 0 0 20px rgba(59, 130, 246, 1); } 100% { opacity: 0.7; } }
 
-        /* --- TOUS LES BOUTONS TRANSPARENTS --- */
+        /* --- BOUTONS --- */
         button { 
             padding: 14px 10px; font-size: 1.05em; font-weight: bold; border-radius: 10px; cursor: pointer; transition: all 0.2s ease; flex: 1; color: white; 
             background: rgba(0, 0, 0, 0) !important; border: 1px solid transparent; 
         }
         button:active:not(:disabled) { transform: scale(0.96); }
-        
         button:disabled.glow-track, button:disabled {
             background: rgba(0, 0, 0, 0) !important; color: rgba(255, 255, 255, 0.2) !important; border-color: rgba(255, 255, 255, 0.05) !important;
             --glow-color: 200, 200, 200 !important; cursor: not-allowed !important; transform: none !important; opacity: 0.5 !important;
@@ -79,7 +78,6 @@
         #btnConsommerGrande { --glow-color: 245, 158, 11; border-color: rgba(245, 158, 11, 0.4); color: #f59e0b; }
         #btnConsommerSouhait { --glow-color: 168, 85, 247; border-color: rgba(168, 85, 247, 0.4); color: #a855f7; }
 
-        /* --- BOUTONS ACTIONS EN BAS --- */
         #btnMinus { --glow-color: 245, 158, 11; border-color: rgba(245, 158, 11, 0.6); box-shadow: 0 0 15px rgba(245, 158, 11, 0.3); background: rgba(245, 158, 11, 0.05) !important; }
         #btnBoutique { --glow-color: 236, 72, 153; border-color: rgba(236, 72, 153, 0.6); box-shadow: 0 0 15px rgba(236, 72, 153, 0.3); background: rgba(236, 72, 153, 0.05) !important; }
         #btnPlus { --glow-color: 16, 185, 129; border-color: rgba(16, 185, 129, 0.6); box-shadow: 0 0 15px rgba(16, 185, 129, 0.3); background: rgba(16, 185, 129, 0.05) !important; }
@@ -94,7 +92,7 @@
 
         #btnSwitchView { position: fixed; top: 20px; left: 20px; z-index: 9998; height: 55px; border-radius: 15px; display: flex; justify-content: center; align-items: center; font-size: 0.9em; padding: 0 15px; flex: none; background: rgba(0,0,0,0.4) !important; --glow-color: 59, 130, 246; border-color: rgba(59, 130, 246, 0.5); color: #3b82f6; cursor: pointer; max-width: 140px; }
 
-        /* --- HISTORIQUE NOTIFS LISTE --- */
+        /* --- LISTES ET MESSAGERIE --- */
         .notif-item { background: rgba(255,255,255,0.03); border-left: 4px solid var(--n-color); border-radius: 8px; margin-bottom: 8px; transition: background 0.3s ease; display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0; }
         .notif-main { padding: 12px; display: flex; gap: 12px; align-items: center; cursor: pointer; transition: background 0.2s; }
         .notif-main:hover { background: rgba(255,255,255,0.05); }
@@ -110,7 +108,11 @@
         .notif-sub-item:last-child { border-bottom: none; }
         .notif-sub-item:hover { background: rgba(239, 68, 68, 0.2); }
 
-        /* --- MODE PAUSE / FLATLINE / FAILING --- */
+        .msg-bubble { padding:8px 12px; border-radius:15px; margin-bottom:8px; max-width:85%; word-wrap:break-word; text-align:left; font-size:0.95em; }
+        .msg-mine { background:rgba(236, 72, 153, 0.2); border: 1px solid #ec4899; align-self:flex-end; border-bottom-right-radius:0; color:white; }
+        .msg-theirs { background:rgba(59, 130, 246, 0.2); border: 1px solid #3b82f6; align-self:flex-start; border-bottom-left-radius:0; color:white; }
+
+        /* --- THEMES --- */
         body.paused-mode .header, body.paused-mode .status-bar, body.paused-mode .dashboard, body.paused-mode .controls, body.paused-mode #rewardsDashboard { filter: grayscale(1) opacity(0.25); pointer-events: none; transition: all 0.5s ease; }
         body.flatline-theme #bgCanvas { filter: grayscale(1); }
         body.flatline-theme .header, body.flatline-theme .status-bar, body.flatline-theme .dashboard, body.flatline-theme .controls, body.flatline-theme #rewardsDashboard,
@@ -138,11 +140,11 @@
         .heart-vital.active { filter: grayscale(0) opacity(1); color: #10b981; text-shadow: 0 0 15px #10b981; }
         .heart-bonus.active { filter: grayscale(0) opacity(1); color: #f59e0b; text-shadow: 0 0 20px #f59e0b; transform: rotate(10deg); }
 
-        .cible-container { margin-top: 10px; display: flex; justify-content: center; align-items: center; gap: 10px; background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); }
+        .cible-container { margin-top: 10px; display: flex; justify-content: center; align-items: center; gap: 10px; background: rgba(0,0,0,0.3); padding: 8px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); position:relative;}
         .cible-prefix { color: #f472b6; font-weight: bold; font-family: monospace; font-size: 1.1em; }
         body.viewing-partner .cible-prefix { color: #3b82f6; }
-        #tacheInput, #msgInput { flex: 1; background: transparent; border: none; outline: none; color: white; font-family: monospace; font-size: 1.1em; text-align: left; }
-        #tacheInput::placeholder, #msgInput::placeholder { color: rgba(255,255,255,0.3); }
+        #tacheInput, #msgInputQuick { flex: 1; background: transparent; border: none; outline: none; color: white; font-family: monospace; font-size: 1.1em; text-align: left; }
+        #tacheInput::placeholder, #msgInputQuick::placeholder { color: rgba(255,255,255,0.3); }
         #tacheDisplay { display: none; flex: 1; color: white; font-family: monospace; font-size: 1.1em; text-align: left; word-break: break-word; }
         #btnTerminerTache { display: none; padding: 6px 12px; font-size: 0.85em; background: rgba(16, 185, 129, 0.2) !important; border: 1px solid #10b981; color: #10b981; flex: 0; white-space: nowrap; }
 
@@ -153,7 +155,7 @@
         /* --- MODALES --- */
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); display: none; align-items: center; justify-content: center; z-index: 100; backdrop-filter: blur(3px); }
         #modalGameOver.modal-overlay { background: transparent; backdrop-filter: none; }
-        .modal-content { padding: 35px; width: 85%; max-width: 480px; color: white; text-align: center; border-radius: 20px; background: rgba(0, 0, 0, 0) !important; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); max-height: 90vh; overflow-y: auto; }
+        .modal-content { padding: 35px; width: 85%; max-width: 480px; color: white; text-align: center; border-radius: 20px; background: rgba(0, 0, 0, 0) !important; backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.15); max-height: 90vh; overflow-y: auto; position:relative; }
         
         /* --- INVENTAIRE --- */
         .inv-row { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; background: rgba(255,255,255,0.03); padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: left; transition: all 0.3s ease;}
@@ -266,21 +268,28 @@
             <input type="text" id="tacheInput" placeholder="Saisir puis taper Entrée..." autocomplete="new-password" spellcheck="false">
             <span id="tacheDisplay"></span>
             <button id="btnTerminerTache" class="glow-track" style="--glow-color: 16, 185, 129;">✅ Terminer</button>
+            <button id="btnHistoTaches" class="glow-track" style="--glow-color: 168, 85, 247; padding: 6px; margin-left:5px; flex:none; position:relative;">
+                📋
+                <span id="tachesBadge" style="position:absolute; top:-5px; right:-5px; background:#ef4444; color:white; font-size:0.7em; font-family:sans-serif; font-weight:bold; padding:3px 6px; border-radius:10px; display:none; box-shadow: 0 0 10px rgba(239,68,68,0.8);"></span>
+            </button>
         </div>
         
-        <!-- SYSTEME MESSAGERIE -->
+        <!-- SYSTEME MESSAGERIE RAPIDE TERMINAL -->
         <div class="cible-container" style="margin-top:10px; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.3);">
             <span class="cible-prefix" style="color: #3b82f6;">> MSG:</span>
-            <input type="text" id="msgInput" placeholder="Envoyer un message..." autocomplete="new-password" spellcheck="false">
-            <button id="btnSendMsg" class="glow-track" style="--glow-color: 59, 130, 246; display:none; padding:6px 12px; font-size:0.85em; flex:0; white-space:nowrap; border-color:#3b82f6; color:#3b82f6;">💬 Envoyer</button>
+            <input type="text" id="msgInputQuick" placeholder="Saisir puis taper Entrée..." autocomplete="off" spellcheck="false">
+            <button id="btnOpenChat" class="glow-track" style="--glow-color: 59, 130, 246; padding: 6px; margin-left:5px; flex:none; position:relative;" onclick="document.getElementById('modalMessagerie').style.display='flex'; window.updateChatUI();">
+                💬
+                <span id="chatBadge" style="position:absolute; top:-5px; right:-5px; background:#ef4444; color:white; font-size:0.7em; font-family:sans-serif; font-weight:bold; padding:3px 6px; border-radius:10px; display:none; box-shadow: 0 0 10px rgba(239,68,68,0.8);"></span>
+            </button>
         </div>
     </div>
 
     <div class="controls glow-track">
         <div class="action-buttons">
-            <button id="btnMinus" class="action-btn glow-track" disabled><span>👎 Distraction</span><small>-1 PV</small></button>
+            <button id="btnMinus" class="action-btn glow-track" disabled><span>⭐ Distraction</span><small>Reset Bonus</small></button>
             <button id="btnBoutique" class="action-btn glow-track" disabled><span>🛒 Boutique</span><small>Échanger</small></button>
-            <button id="btnPlus" class="action-btn glow-track" disabled><span>👍 Focus</span><small>+2 PV</small></button>
+            <button id="btnPlus" class="action-btn glow-track" disabled><span>👍 Focus</span><small>+1 PV</small></button>
         </div>
         
         <!-- HUD COMPTEUR INVENTAIRE -->
@@ -322,15 +331,37 @@
         </div>
     </div>
 
-    <!-- MODAL REPONDRE MESSAGE -->
-    <div id="modalReply" class="modal-overlay" style="z-index:100001; align-items:center; justify-content:center;">
-        <div class="modal-content glow-track" style="--glow-color: 59, 130, 246;">
-            <h3 style="color:#3b82f6; margin-bottom: 15px;">Répondre à <span id="replyTarget"></span></h3>
-            <input type="text" id="inputReply" placeholder="Votre réponse..." autocomplete="off" style="width:100%; box-sizing:border-box; padding:12px; border-radius:10px; border:1px solid rgba(59, 130, 246, 0.5); background:rgba(0,0,0,0.5); color:white; font-size:1em; margin-bottom:20px; outline:none;">
-            <div style="display:flex; gap:10px;">
-                <button onclick="document.getElementById('modalReply').style.display='none'" class="glow-track" style="--glow-color: 239, 68, 68; color: #ef4444; border-color:rgba(239,68,68,0.4);">Annuler</button>
-                <button id="btnSendReply" class="glow-track" style="--glow-color: 59, 130, 246; border-color:rgba(59, 130, 246, 0.4); color:#3b82f6;">Envoyer</button>
+    <!-- MODAL MESSAGERIE GLOBALE -->
+    <div id="modalMessagerie" class="modal-overlay" style="z-index:100001; align-items:center; justify-content:center;">
+        <div class="modal-content glow-track" style="--glow-color: 59, 130, 246; width:95%; max-width:500px; padding:20px; display:flex; flex-direction:column; height:80vh;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+                <h3 style="color:#3b82f6; margin:0;">💬 Messagerie</h3>
+                <button onclick="document.getElementById('modalMessagerie').style.display='none'" class="glow-track" style="--glow-color: 239, 68, 68; color: #ef4444; border-color:rgba(239,68,68,0.4); padding:8px 12px; flex:none;">Fermer</button>
             </div>
+            
+            <div id="chatHistory" style="flex:1; overflow-y:auto; display:flex; flex-direction:column; gap:8px; padding-right:5px; margin-bottom:15px; border-top:1px solid rgba(255,255,255,0.1); border-bottom:1px solid rgba(255,255,255,0.1); padding-top:10px; padding-bottom:10px;">
+                <!-- MSG ici -->
+            </div>
+            
+            <div style="display:flex; align-items:center; gap:8px; background: rgba(0,0,0,0.5); padding:8px 12px; border-radius:10px; border:1px solid rgba(59, 130, 246, 0.5); position:relative;">
+                <input type="text" id="chatInputModal" placeholder="Votre message..." autocomplete="off" spellcheck="false" style="flex:1; background:transparent; border:none; outline:none; color:white; font-size:1em;">
+                <span id="chatEmojiToggleModal" style="cursor:pointer; font-size:1.5em; flex:none;">😀</span>
+                <button id="btnSendChatMsgModal" class="glow-track" style="--glow-color: 59, 130, 246; padding:8px 15px; flex:none; border-color:#3b82f6; color:#3b82f6;">Envoyer</button>
+                
+                <!-- PANEL EMOJIS MODAL GEANT -->
+                <div id="emojiPanelModal" style="display:none; position:absolute; bottom:55px; right:0; background:rgba(0,0,0,0.95); border:1px solid rgba(59,130,246,0.5); border-radius:10px; padding:10px; gap:8px; flex-wrap:wrap; width:280px; max-height:220px; overflow-y:auto; z-index:100; box-shadow:0 0 15px rgba(59,130,246,0.4);">
+                    <!-- EMOJIS INJECTES VIA JS -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL HISTORIQUE TACHES -->
+    <div id="modalTaches" class="modal-overlay" style="z-index:10000;">
+        <div class="modal-content glow-track" style="--glow-color: 168, 85, 247; width:90%; max-width:420px; padding:25px;">
+            <h3 style="color:#a855f7; margin-top:0; margin-bottom:15px;">📋 Tâches Terminées</h3>
+            <div id="tachesList" style="display:flex; flex-direction:column; gap:8px; max-height:50vh; overflow-y:auto; margin-bottom:15px; text-align:left;"></div>
+            <button onclick="document.getElementById('modalTaches').style.display='none'" class="glow-track" style="--glow-color: 239, 68, 68; color:#ef4444; border-color:rgba(239,68,68,0.4); padding:12px; width:100%;">Fermer</button>
         </div>
     </div>
 
@@ -345,6 +376,23 @@
                 <button id="btnClearAllNotifs" class="glow-track" style="--glow-color: 239, 68, 68; color: #ef4444; border-color: rgba(239,68,68,0.4); padding:12px;">Vider</button>
                 <button onclick="document.getElementById('modalNotifs').style.display='none'" class="glow-track" style="flex:1.5; --glow-color: 255, 255, 255; color: white; border-color: rgba(255,255,255,0.2); padding:12px;">Fermer</button>
             </div>
+        </div>
+    </div>
+
+    <!-- MODALES REMBOURSEMENT -->
+    <div id="modalGuiltyExpired" class="modal-overlay" style="z-index:100005;">
+        <div class="modal-content glow-track pulse-red-loop">
+            <h3 style="color:#ef4444; margin-bottom:15px;">Oupss ! 🙈</h3>
+            <p id="guiltyExpiredText" style="color:#cbd5e1; margin-bottom:20px; font-size:1.1em;"></p>
+            <button id="btnGuiltyAck" class="glow-track" style="width:100%; --glow-color: 239, 68, 68; padding:15px; border-color:rgba(239,68,68,0.5); color:#ef4444;">C'est noté !</button>
+        </div>
+    </div>
+
+    <div id="modalVictimExpired" class="modal-overlay" style="z-index:100005;">
+        <div class="modal-content glow-track" style="--glow-color: 16, 185, 129;">
+            <h3 style="color:#10b981; margin-bottom:15px;">Surprise Expirée ⏳</h3>
+            <p id="victimExpiredText" style="color:#cbd5e1; margin-bottom:20px; font-size:1.1em;"></p>
+            <button id="btnVictimRecover" class="glow-track" style="width:100%; --glow-color: 16, 185, 129; padding:15px; border-color:rgba(16,185,129,0.5); color:#10b981;">Récupérer ma surprise</button>
         </div>
     </div>
 
@@ -375,7 +423,7 @@
                 <div class="inv-icon" style="filter: drop-shadow(0 0 5px #a855f7);">🪔</div>
                 <div class="inv-details">
                     <div class="inv-stats"><span style="color:#a855f7; font-weight:bold;">Stock: <span id="invS_stock">0</span></span> <span>Consommés: <span id="invS_cons">0</span></span></div>
-                    <input type="text" id="defSouhait" autocomplete="new-password" placeholder="Ex: Achat du jeu vidéo">
+                    <input type="text" id="defSouhait" autocomplete="new-password" placeholder="Ex: Faire un massage 1h à ta copine">
                     <button class="btn-consume souhait-btn glow-track" id="btnConsommerSouhait" style="--glow-color: 168, 85, 247;">▶ Consommer</button>
                 </div>
             </div>
@@ -423,12 +471,12 @@
             <p style="font-size:0.8em; text-align:left; color:#64748b;">🎁 Petite Surprise</p>
             <div style="display:flex; gap:8px; margin-bottom:15px;">
                 <button id="buy1S" class="glow-track btn-star">2 ✦</button>
-                <button id="buy1P" class="glow-track btn-piece">300 🪙</button>
+                <button id="buy1P" class="glow-track btn-piece">600 🪙</button>
             </div>
             <p style="font-size:0.8em; text-align:left; color:#64748b;">🎀 Grande Surprise</p>
             <div style="display:flex; gap:8px; margin-bottom:15px;">
                 <button id="buy2S" class="glow-track btn-star">3 ✦</button>
-                <button id="buy2P" class="glow-track btn-piece">600 🪙</button>
+                <button id="buy2P" class="glow-track btn-piece">1 200 🪙</button>
             </div>
             <button onclick="document.getElementById('modalBoutique').style.display='none'" class="glow-track" style="width:100%; margin-top:15px; --glow-color: 239, 68, 68; color:#ef4444; border-color: rgba(239,68,68,0.4);">Fermer</button>
         </div>
@@ -442,13 +490,21 @@
         let viewedPlayerName = "";
         let savedPseudo = localStorage.getItem('lastPseudo');
         
+        let myDeviceId = localStorage.getItem('myDeviceId');
+        if (!myDeviceId) {
+            myDeviceId = 'dev_' + Math.random().toString(36).substr(2, 9);
+            localStorage.setItem('myDeviceId', myDeviceId);
+        }
+        
+        // Emojis Setup
+        const EMOJIS = ['😀','😃','😄','😁','😆','😅','😂','🤣','🥲','🥹','☺️','😊','😇','🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚','😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🥸','🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️','😣','😖','😫','😩','🥺','😢','😭','😮‍💨','😤','😠','😡','🤬','🤯','😳','🥵','🥶','😱','😨','😰','😥','😓','🫣','🤗','🫡','🤔','🫢','🤭','🤫','🤥','😶','😶‍🌫️','😐','😑','😬','🫨','🫠','🙄','😯','😦','😧','🥱','😴','🤤','😪','😵','😵‍💫','🤐','🥴','🤢','🤮','🤧','😷','🤒','🤕','🤑','🤠','😈','👿','👹','👺','🤡','💩','👻','💀','☠️','👽','👾','🤖','🎃','😺','😸','😹','😻','😼','😽','🙀','😿','😾','🙈','🙉','🙊','💋','💌','💘','💝','💖','💗','💓','💞','💕','💟','❣️','💔','❤️‍🔥','❤️‍🩹','❤️','🩷','🧡','💛','💚','💙','🩵','💜','🖤','🩶','🤍','🤎','💯','💢','💥','💫','💦','💨','🕳️','💣','💬','👁️‍🗨️','🗨️','🗯️','💭','💤','👋','🤚','🖐️','✋','🖖','🫱','🫲','🫳','🫴','👌','🤌','🤏','✌️','🤞','🫰','🤟','🤘','🤙','👈','👉','👆','🖕','👇','☝️','👍','👎','✊','👊','🤛','🤜','👏','🙌','🫶','👐','🤲','🤝','🙏','✍️','💅','🤳','💪','🦾','🦿','🦵','🦶','👂','🦻','👃','🫀','🫁','🧠','🦷','🦴','👀','👁️','👅','👄','🫦','👶','👧','🧒','👦','👩','🧑','👨','👩‍🦱','🧑‍🦱','👨‍🦱','👩‍🦰','🧑‍🦰','👨‍🦰','👱‍♀️','👱','👱‍♂️','👩‍🦳','🧑‍🦳','👨‍🦳','👩‍🦲','🧑‍🦲','👨‍🦲','🧔‍♀️','🧔','🧔‍♂️','👵','🧓','👴','👲','👳‍♀️','👳','👳‍♂️','🧕','👮‍♀️','👮','👮‍♂️','👰‍♀️','👰','👰‍♂️','🤰','🤱','👼','🎅','🤶','🦸‍♀️','🦸','🦸‍♂️','🦹‍♀️','🦹','🦹‍♂️','🧙‍♀️','🧙','🧙‍♂️','🧚‍♀️','🧚','🧚‍♂️','🧛‍♀️','🧛','🧛‍♂️','🧜‍♀️','🧜','🧜‍♂️','🧝‍♀️','🧝','🧝‍♂️','🧞‍♀️','🧞','🧞‍♂️','🧟‍♀️','🧟','🧟‍♂️','🚶‍♀️','🚶','🚶‍♂️','🏃‍♀️','🏃','🏃‍♂️','💃','🕺','🕴️','👯‍♀️','👯','👯‍♂️','🧖‍♀️','🧖','🧖‍♂️','🧗‍♀️','🧗','🧗‍♂️','🧘‍♀️','🧘','🧘‍♂️','🛀','🛌','🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐻‍❄️','🐨','🐯','🦁','🐮','🐷','🐽','🐸','🐵','🐒','🦍','🦧','🐔','🐧','🐦','🐤','🐣','🐥','🦆','🦅','🦉','🦇','🐺','🐗','🐴','🦄','🐝','🪱','🐛','🦋','🐌','🐞','🐜','🪰','🪲','🪳','🦟','🦗','🕷️','🕸️','🦂','🐢','🐍','🦎','🐙','🦑','🦖','🐊','🦕','🐅','🐆','🦓','🦍','🦧','🦣','🐘','🦛','🦏','🐪','🐫','🦒','🦘','🐃','🐂','🐄','🐎','🐖','🐏','🐑','🦙','🐐','🦌','🐕','🐩','🦮','🐕‍🦺','🐈','🐈‍⬛','🪶','🐓','🦃','🦤','🦚','🦜','🦢','🦩','🕊️','🐇','🦝','🦨','🦡','🦫','🦦','🦥','🐁','🐀','🐿️','🦔','🐾','🐉','🐲','🌵','🎄','🌲','🌳','🌴','🪵','🌱','🌿','☘️','🍀','🎍','🪴','🎋','🍃','🍂','🍁','🍄','🌾','💐','🌷','🌹','🥀','🪷','🌺','🌸','🌼','🌻','🍏','🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐','🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑','🥦','🥬','🥒','🌶️','🫑','🌽','🥕','🫒','🧄','🧅','🥔','🍠','🥐','🥯','🍞','🥖','🥨','🧀','🥚','🍳','🧈','🥞','🧇','🥓','🥩','🍗','🍖','🌭','🍔','🍟','🍕','🫓','🥪','🥙','🧆','🌮','🌯','🫔','🥗','🥘','🫕','🥫','🍝','🍜','🍲','🍛','🍣','🍱','🥟','🦪','🍤','🍙','🍚','🍘','🍥','🥠','🥮','🍢','🍡','🍧','🍨','🍦','🥧','🧁','🍰','🎂','🍮','🍭','🍬','🍫','🍿','🍩','🍪','🌰','🥜','🍯','🥛','🍼','🫖','☕','🍵','🧃','🥤','🧋','🍶','🍺','🍻','🥂','🍷','🥃','🍸','🍹','🧉','🍾','🧊','🥄','🍴','🍽️','🥣','🥡','🥢','🧂'];
+        
         window.addEventListener('DOMContentLoaded', () => {
             const pInput = document.getElementById('inputPseudo');
             const btnResume = document.getElementById('btnResumeSession');
             
             pInput.value = "";
             setTimeout(() => { pInput.value = ""; }, 50);
-            setTimeout(() => { pInput.value = ""; }, 200);
 
             if(savedPseudo) {
                 btnResume.style.display = 'block';
@@ -458,7 +514,39 @@
                     document.getElementById('btnValiderPseudo').click();
                 };
             }
+
+            const panel = document.getElementById('emojiPanelModal');
+            EMOJIS.forEach(em => {
+                let span = document.createElement('span');
+                span.innerText = em;
+                span.style.fontSize = '1.6em';
+                span.style.cursor = 'pointer';
+                span.onclick = () => window.insertEmojiModal(em);
+                panel.appendChild(span);
+            });
+
+            // ATTACHE DES BOUTONS (Garantit que la logique fonctionne au clic)
+            document.getElementById('btnConsommerPetite').onclick = () => proposerItem('nbPetitesSurprises', 'defPetite');
+            document.getElementById('btnConsommerGrande').onclick = () => proposerItem('nbGrandesSurprises', 'defGrande');
         });
+
+        // --- GESTION DES EMOJIS MESSAGERIE MODAL ---
+        document.getElementById('chatEmojiToggleModal').onclick = (e) => {
+            let panel = document.getElementById('emojiPanelModal');
+            panel.style.display = panel.style.display === 'none' ? 'flex' : 'none';
+            e.stopPropagation();
+        };
+        document.addEventListener('click', () => { 
+            let p = document.getElementById('emojiPanelModal');
+            if(p) p.style.display = 'none'; 
+        });
+        document.getElementById('emojiPanelModal').addEventListener('click', e => e.stopPropagation());
+
+        window.insertEmojiModal = function(emoji) {
+            let input = document.getElementById('chatInputModal');
+            input.value += emoji;
+            input.focus();
+        };
 
         const firebaseConfig = {
             apiKey: "AIzaSyDaHguuxN1Jq8c4YZuk0XEzm1E-tHTBzAY",
@@ -473,22 +561,22 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
         const gameRef = ref(db, 'sessionPartageeDuo');
-        const offsetRef = ref(db, ".info/serverTimeOffset");
 
-        let state = { players: {}, propositions: [], timers: [] };
+        let state = { players: {}, propositions: [], timers: [], messagerie: [], tachesAccomplies: [], pendingCompensations: [] };
         let localPieces = 0; let isFirstLoad = true; 
         let lastAnimId = 0; let lastToastId = 0;
         let currentNegoId = null;
-        let sOff = 0;
         
         let localLastReadTime = parseInt(localStorage.getItem('lastReadTime')) || 0;
+        let localLastReadChatTime = parseInt(localStorage.getItem('lastReadChatTime')) || 0;
+        let localLastReadTachesTime = parseInt(localStorage.getItem('lastReadTachesTime')) || 0;
         window.expandedNotifs = new Set();
+        window.currentCompContext = null;
+        window.rewardTrackers = {}; 
         
         window.currentPv = 5;
         window.fxState = 'normal';
         window.isDead = false;
-
-        onValue(offsetRef, s => sOff = s.val() || 0);
 
         function format(s) {
             if(isNaN(s) || s < 0) s = 0;
@@ -504,7 +592,11 @@
             return JSON.parse(localStorage.getItem('deviceInv')) || {p:0, g:0, s:0};
         }
 
-        // --- GESTION DES NOTIFICATIONS INDIVIDUELLES ---
+        function cleanObj(obj) {
+            return JSON.parse(JSON.stringify(obj));
+        }
+
+        // --- GESTION DES NOTIFICATIONS ---
         function appendNotif(pState, title, text, colorCode, icon, type='normal', sender=myPlayerName) {
             if(!pState) return;
             let id = Date.now() + Math.floor(Math.random() * 1000);
@@ -517,19 +609,28 @@
             pState.lastToast = notif;
         }
 
+        function notifyOther(playersObj, title, text, colorCode, icon, type='normal') {
+            Object.keys(playersObj).forEach(k => {
+                if (k !== myPlayerName) {
+                    appendNotif(playersObj[k], title, text, colorCode, icon, type, myPlayerName);
+                }
+            });
+        }
+
         // --- ECRASER SESSION ---
         window.overwriteSlot = function(oldName, newName) {
             let players = Object.assign({}, state.players || {});
-            delete players[oldName];
+            delete players[oldName]; 
             
             let inv = loadDeviceInventory();
             players[newName] = { 
+                deviceId: myDeviceId,
                 pvActuels: 5, modeJeu: 'attente', piecesBase: 0, tempsTravailCumule: 0, repasRestants: 2,
                 nbPetitesSurprises: inv.p, nbGrandesSurprises: inv.g, nbSouhaits: inv.s,
                 notifsHistory: []
             };
             
-            set(gameRef, { ...state, players });
+            set(gameRef, cleanObj({ ...state, players }));
             myPlayerName = newName;
             viewedPlayerName = newName;
             localStorage.setItem('lastPseudo', myPlayerName);
@@ -540,9 +641,8 @@
 
         document.getElementById('btnValiderPseudo').onclick = () => {
             let val = document.getElementById('inputPseudo').value.trim();
-            
             if (val.toUpperCase() === "RESET") {
-                set(gameRef, { players: {}, propositions: [], timers: [] });
+                set(gameRef, cleanObj({ players: {}, propositions: [], timers: [], messagerie: [], tachesAccomplies: [], pendingCompensations: [] }));
                 localStorage.removeItem('lastPseudo');
                 localStorage.removeItem('deviceInv');
                 document.getElementById('btnResumeSession').style.display = 'none';
@@ -550,7 +650,6 @@
                 document.getElementById('inputPseudo').value = "";
                 return;
             }
-
             if (val) {
                 let players = state.players || {};
                 let registeredPlayers = Object.keys(players);
@@ -575,12 +674,15 @@
                     let updatedPlayers = Object.assign({}, state.players || {});
                     let inv = loadDeviceInventory();
                     updatedPlayers[myPlayerName] = { 
+                        deviceId: myDeviceId,
                         pvActuels: 5, modeJeu: 'attente', piecesBase: 0, tempsTravailCumule: 0, repasRestants: 2,
                         nbPetitesSurprises: inv.p, nbGrandesSurprises: inv.g, nbSouhaits: inv.s,
                         notifsHistory: []
                     };
-                    set(gameRef, { ...state, players: updatedPlayers });
+                    set(gameRef, cleanObj({ ...state, players: updatedPlayers }));
                 } else {
+                    players[myPlayerName].deviceId = myDeviceId;
+                    set(gameRef, cleanObj({ ...state, players }));
                     try { updateViewUI(); } catch(e) {}
                 }
             }
@@ -603,7 +705,7 @@
             let players = Object.assign({}, state.players || {});
             if(players[myPlayerName]) {
                 players[myPlayerName].notifsHistory = (players[myPlayerName].notifsHistory || []).filter(x => x.id !== id);
-                set(gameRef, { ...state, players });
+                set(gameRef, cleanObj({ ...state, players }));
             }
         };
 
@@ -615,7 +717,7 @@
                     players[myPlayerName].notifsHistory = (players[myPlayerName].notifsHistory || []).filter(x => x.title !== title);
                 }
                 window.expandedNotifs.delete(groupKey);
-                set(gameRef, { ...state, players });
+                set(gameRef, cleanObj({ ...state, players }));
             } else {
                 window.expandedNotifs.add(groupKey);
                 renderNotifs((state.players[myPlayerName]?.notifsHistory || []).filter(x => x != null));
@@ -626,8 +728,9 @@
             let players = Object.assign({}, state.players || {});
             if(players[myPlayerName]) {
                 players[myPlayerName].notifsHistory = [];
-                set(gameRef, { ...state, players });
+                set(gameRef, cleanObj({ ...state, players }));
             }
+            document.getElementById('modalNotifs').style.display = 'none'; 
         };
 
         function renderNotifs(rawHistory) {
@@ -668,12 +771,17 @@
                 if (isStacked) {
                     subHtml = `<div class="notif-sublist">`;
                     group.subItems.forEach(sub => {
-                        let repBtn = (sub.type === 'message' && sub.sender !== myPlayerName) ? `<button onclick="window.replyToMessage(event, '${sub.sender}')" class="glow-track" style="--glow-color:59,130,246; background:rgba(59,130,246,0.1)!important; border-color:rgba(59,130,246,0.4); color:#3b82f6; padding:2px 6px; font-size:0.8em; margin-right:10px; flex:none;">Répondre</button>` : '';
+                        let itemClick = '';
+                        if (sub.type === 'message' && sub.sender !== myPlayerName) {
+                            itemClick = `onclick="window.replyToMessage(event, '${sub.sender}'); window.deleteNotif(event, ${sub.id});"`;
+                        } else {
+                            itemClick = `onclick="window.deleteNotif(event, ${sub.id})"`;
+                        }
+                        
                         subHtml += `
-                            <div class="notif-sub-item" onclick="window.deleteNotif(event, ${sub.id})">
+                            <div class="notif-sub-item" ${itemClick}>
                                 <span style="color:#cbd5e1; font-size:0.85em; flex:1;">${sub.text}</span>
                                 <span style="display:flex; align-items:center;">
-                                    ${repBtn}
                                     <span style="color:#64748b; font-size:0.8em;">${sub.timeStr} <span style="color:#ef4444; opacity:0.8; margin-left:5px;">❌</span></span>
                                 </span>
                             </div>
@@ -682,18 +790,24 @@
                     subHtml += `</div>`;
                 }
 
-                let mainClick = isStacked ? `onclick="window.handleGroupClick(event, '${group.title}', '${groupKey}')"` : `onclick="window.deleteNotif(event, ${group.id})"`;
+                let mainClick = '';
+                if (isStacked) {
+                    mainClick = `onclick="window.handleGroupClick(event, '${group.title}', '${groupKey}')"`;
+                } else if (group.type === 'message') {
+                    mainClick = `onclick="window.replyToMessage(event, '${group.sender}'); window.deleteNotif(event, ${group.id});"`;
+                } else {
+                    mainClick = `onclick="window.deleteNotif(event, ${group.id})"`;
+                }
+                
                 let expandIcon = isStacked ? (window.expandedNotifs.has(groupKey) ? `<span style="color:#ef4444; opacity:0.8;">❌</span>` : `▼`) : `<span style="color:#ef4444; opacity:0.8;">❌</span>`;
                 
-                let repBtnMain = (!isStacked && group.type === 'message' && group.sender !== myPlayerName) ? `<button onclick="window.replyToMessage(event, '${group.sender}')" class="glow-track" style="--glow-color:59,130,246; background:rgba(59,130,246,0.1)!important; border-color:rgba(59,130,246,0.4); color:#3b82f6; padding:2px 8px; font-size:0.8em; margin-right:10px; flex:none;">Répondre</button>` : '';
-
                 div.innerHTML = `
                     <div class="notif-main" ${mainClick}>
                         <div class="notif-item-icon">${group.icon}</div>
                         <div class="notif-item-content">
                             <div class="notif-item-title">
                                 <span><span style="color:rgb(${group.colorCode})">${group.title}</span>${badgeHtml}</span>
-                                <span style="display:flex; align-items:center;">${repBtnMain}<span class="notif-item-time">${group.timeStr} <span style="font-size:0.8em; margin-left:5px;">${expandIcon}</span></span></span>
+                                <span style="display:flex; align-items:center;"><span class="notif-item-time">${group.timeStr} <span style="font-size:0.8em; margin-left:5px;">${expandIcon}</span></span></span>
                             </div>
                             <div class="notif-item-text">${group.text}</div>
                         </div>
@@ -704,7 +818,7 @@
             });
         }
 
-        window.showNotification = function(title, text, colorCode, icon) {
+        window.showNotification = function(title, text, colorCode, icon, type='normal', sender='') {
             const container = document.getElementById('toastContainer');
             let existingToast = null;
             for (let i = 0; i < container.children.length; i++) {
@@ -714,15 +828,19 @@
                 }
             }
 
+            let extraBtn = (type === 'message' && sender && sender !== myPlayerName) ? `<button onclick="window.replyToMessage(event, '${sender}'); this.parentElement.parentElement.remove();" style="background:#3b82f6!important; padding:6px 10px; font-size:0.8em; font-weight:bold; margin-top:8px; border:none; border-radius:8px; color:white; cursor:pointer; flex:none;">💬 Répondre</button>` : '';
+
             if (existingToast) {
                 let countEl = existingToast.querySelector('.toast-count');
                 let newCount = parseInt(countEl.innerText || "1") + 1;
                 countEl.innerText = newCount;
                 countEl.style.display = 'inline-block';
                 existingToast.querySelector('.toast-text').innerText = text;
+                
                 clearTimeout(existingToast.hideTimeout);
                 existingToast.style.transform = 'scale(1.05)';
                 setTimeout(() => existingToast.style.transform = 'translateX(0) scale(1)', 150);
+                
                 existingToast.hideTimeout = setTimeout(() => {
                     existingToast.style.transform = 'translateX(150%)';
                     existingToast.style.opacity = '0';
@@ -755,7 +873,8 @@
                     <strong style="display:flex; align-items:center; font-size:1.1em; color:rgb(${colorCode}); margin-bottom:2px; text-transform:uppercase; letter-spacing:1px;">
                         ${title} <span class="toast-count" style="background:#ef4444; color:white; font-size:0.7em; padding:2px 6px; border-radius:10px; margin-left:8px; display:none;">1</span>
                     </strong>
-                    <span class="toast-text" style="font-size:0.9em; color:#cbd5e1;">${text}</span>
+                    <div class="toast-text" style="font-size:0.9em; color:#cbd5e1;">${text}</div>
+                    ${extraBtn ? '<div>'+extraBtn+'</div>' : ''}
                 </div>
             `;
             
@@ -764,7 +883,16 @@
             toast.style.transform = 'translateX(0)';
             toast.style.opacity = '1';
             
-            toast.onclick = () => {
+            toast.onclick = (e) => {
+                if(e.target.tagName === 'BUTTON') return;
+                if(type === 'message') {
+                    window.replyToMessage(e, sender);
+                    clearTimeout(toast.hideTimeout);
+                    toast.style.transform = 'translateX(150%)';
+                    toast.style.opacity = '0';
+                    setTimeout(() => toast.remove(), 500);
+                    return;
+                }
                 clearTimeout(toast.hideTimeout);
                 toast.style.transform = 'translateX(150%)';
                 toast.style.opacity = '0';
@@ -789,13 +917,36 @@
             }
         };
 
-        // --- SYSTÈME MESSAGERIE ---
-        document.getElementById('msgInput').addEventListener('input', (e) => {
-            document.getElementById('btnSendMsg').style.display = e.target.value.trim() ? 'inline-block' : 'none';
+        // --- SYSTÈME MESSAGERIE RAPIDE ---
+        document.getElementById('msgInputQuick').addEventListener('keydown', (e) => {
+            if(e.key === 'Enter' && e.target.value.trim() !== "") {
+                let txt = e.target.value.trim();
+                let players = Object.assign({}, state.players || {});
+                
+                let target = viewedPlayerName !== myPlayerName ? viewedPlayerName : Object.keys(players).find(k => k !== myPlayerName);
+                if(!target) target = myPlayerName; 
+
+                if(!players[myPlayerName]) players[myPlayerName] = {};
+                if(!players[target]) players[target] = {};
+
+                let msgs = state.messagerie || [];
+                msgs.push({ id: Date.now(), sender: myPlayerName, text: txt, timeStr: new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}) });
+
+                if (target !== myPlayerName) {
+                    appendNotif(players[target], "Nouveau Message", txt, "59, 130, 246", "💬", "message", myPlayerName);
+                }
+                
+                set(gameRef, cleanObj({ ...state, messagerie: msgs, players }));
+                e.target.value = "";
+            }
         });
 
-        document.getElementById('btnSendMsg').onclick = () => {
-            let txt = document.getElementById('msgInput').value.trim();
+        document.getElementById('chatInputModal').addEventListener('keydown', (e) => {
+            if(e.key === 'Enter') { document.getElementById('btnSendChatMsgModal').click(); }
+        });
+
+        document.getElementById('btnSendChatMsgModal').onclick = () => {
+            let txt = document.getElementById('chatInputModal').value.trim();
             if(!txt) return;
             let players = Object.assign({}, state.players || {});
             
@@ -805,42 +956,53 @@
             if(!players[myPlayerName]) players[myPlayerName] = {};
             if(!players[target]) players[target] = {};
 
-            appendNotif(players[target], "Nouveau Message", txt, "59, 130, 246", "💬", "message", myPlayerName);
-            if(target !== myPlayerName) {
-                appendNotif(players[myPlayerName], "Message Envoyé", `À ${target} : ${txt}`, "16, 185, 129", "✉️", "normal", myPlayerName);
+            let msgs = state.messagerie || [];
+            msgs.push({ id: Date.now(), sender: myPlayerName, text: txt, timeStr: new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}) });
+
+            if (target !== myPlayerName) {
+                appendNotif(players[target], "Nouveau Message", txt, "59, 130, 246", "💬", "message", myPlayerName);
             }
             
-            set(gameRef, { ...state, players });
-            document.getElementById('msgInput').value = "";
-            document.getElementById('btnSendMsg').style.display = 'none';
+            set(gameRef, cleanObj({ ...state, messagerie: msgs, players }));
+            document.getElementById('chatInputModal').value = "";
+            window.updateChatUI();
         };
 
         window.replyToMessage = function(e, senderName) {
             if(e) e.stopPropagation();
-            document.getElementById('modalReply').style.display = 'flex';
-            document.getElementById('replyTarget').innerText = senderName;
-            document.getElementById('modalNotifs').style.display = 'none'; // ferme l'historique
+            document.getElementById('modalMessagerie').style.display = 'flex';
+            document.getElementById('modalNotifs').style.display = 'none'; 
+            window.updateChatUI();
         };
 
-        document.getElementById('btnSendReply').onclick = () => {
-            let txt = document.getElementById('inputReply').value.trim();
-            let target = document.getElementById('replyTarget').innerText;
-            if(txt && target) {
-                let players = Object.assign({}, state.players || {});
-                if(!players[myPlayerName]) players[myPlayerName] = {};
-                if(!players[target]) players[target] = {};
-                
-                appendNotif(players[target], "Nouveau Message", txt, "59, 130, 246", "💬", "message", myPlayerName);
-                if(players[myPlayerName]) appendNotif(players[myPlayerName], "Message Envoyé", `À ${target} : ${txt}`, "16, 185, 129", "✉️", "normal", myPlayerName);
-                set(gameRef, { ...state, players });
+        window.updateChatUI = function() {
+            localLastReadChatTime = Date.now();
+            localStorage.setItem('lastReadChatTime', localLastReadChatTime);
+            
+            let chatBadge = document.getElementById('chatBadge');
+            if(chatBadge) chatBadge.style.display = 'none';
+            
+            const history = document.getElementById('chatHistory');
+            history.innerHTML = "";
+            let msgs = state.messagerie || [];
+            
+            if(msgs.length === 0) {
+                history.innerHTML = "<div style='color:#64748b; text-align:center; margin-top:20px; font-style:italic;'>Aucun message.</div>";
+                return;
             }
-            document.getElementById('inputReply').value = "";
-            document.getElementById('modalReply').style.display = 'none';
-        };
+
+            msgs.forEach(m => {
+                let div = document.createElement('div');
+                div.className = "msg-bubble " + (m.sender === myPlayerName ? "msg-mine" : "msg-theirs");
+                div.innerHTML = `<div style="font-size:0.75em; opacity:0.7; margin-bottom:3px;">${m.sender} - ${m.timeStr}</div><div>${m.text}</div>`;
+                history.appendChild(div);
+            });
+            setTimeout(() => { history.scrollTop = history.scrollHeight; }, 50);
+        }
 
         function triggerSharedAnim(cssClass, colorName) {
             let animEvent = { id: Date.now(), className: cssClass, color: colorName, target: viewedPlayerName };
-            set(gameRef, { ...state, lastAnimation: animEvent });
+            set(gameRef, cleanObj({ ...state, lastAnimation: animEvent }));
         }
 
         window.showRewardAnim = function(type) {
@@ -862,36 +1024,74 @@
             if(window.spawnWave) window.spawnWave(colorName, 'radial');
         }
 
+        // --- CIBLE & HISTORIQUE TACHES PARTAGE ---
         document.getElementById('tacheInput').addEventListener('keydown', (e) => {
             if(e.key === 'Enter' && e.target.value.trim() !== "") {
                 let txt = e.target.value.trim();
                 let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} a défini : ${txt}` : `${myPlayerName} a défini la cible de ${viewedPlayerName}`;
-                updateViewedPlayer({ tacheActuelle: txt, tacheEnCours: true }, ["Nouvelle Cible", textLog, "236, 72, 153", "🎯"]);
+                
+                let players = Object.assign({}, state.players || {});
+                players[viewedPlayerName] = { ...(players[viewedPlayerName]||{}), tacheActuelle: txt, tacheEnCours: true };
+                notifyOther(players, "Nouvelle Cible", textLog, "236, 72, 153", "🎯");
+                set(gameRef, cleanObj({ ...state, players }));
             }
         });
 
         document.getElementById('btnTerminerTache').onclick = () => {
             let vState = (state.players || {})[viewedPlayerName] || {};
             let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} a terminé : ${vState.tacheActuelle}` : `${myPlayerName} a terminé la cible de ${viewedPlayerName}`;
-            updateViewedPlayer({ tacheActuelle: "", tacheEnCours: false }, ["Cible Atteinte", textLog, "16, 185, 129", "✅"]);
+            
+            let taches = state.tachesAccomplies || [];
+            taches.unshift({ text: vState.tacheActuelle, time: Date.now(), author: myPlayerName });
+            taches = taches.slice(0, 100);
+
+            let players = Object.assign({}, state.players || {});
+            players[viewedPlayerName] = { ...vState, tacheActuelle: "", tacheEnCours: false };
+            notifyOther(players, "Cible Atteinte", textLog, "16, 185, 129", "✅");
+            set(gameRef, cleanObj({ ...state, players, tachesAccomplies: taches }));
         };
 
-        ['defPetite', 'defGrande', 'defSouhait'].forEach(id => {
-            document.getElementById(id).addEventListener('change', (e) => {
-                let patch = {}; patch[id] = e.target.value;
-                updateViewedPlayer(patch);
-            });
-        });
+        document.getElementById('btnHistoTaches').onclick = () => {
+            localLastReadTachesTime = Date.now();
+            localStorage.setItem('lastReadTachesTime', localLastReadTachesTime);
+            document.getElementById('tachesBadge').style.display = 'none';
 
+            let taches = state.tachesAccomplies || [];
+            let list = document.getElementById('tachesList');
+            list.innerHTML = "";
+
+            let today = new Date().toLocaleDateString('fr-FR');
+            let todayTaches = taches.filter(t => new Date(t.time).toLocaleDateString('fr-FR') === today);
+
+            if(todayTaches.length === 0) {
+                list.innerHTML = "<p style='color:#cbd5e1; font-style:italic;'>Aucune tâche terminée aujourd'hui.</p>";
+            } else {
+                todayTaches.forEach(t => {
+                    let timeStr = new Date(t.time).toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'});
+                    let color = t.author === myPlayerName ? '#ec4899' : '#3b82f6';
+                    list.innerHTML += `<div style="background:rgba(255,255,255,0.05); padding:10px; border-radius:8px; border-left:3px solid ${color};">
+                        <div style="color:#cbd5e1; font-size:0.8em; margin-bottom:3px; display:flex; justify-content:space-between;">
+                            <span>${timeStr}</span> <span style="color:${color}; font-weight:bold;">${t.author || 'Inconnu'}</span>
+                        </div>
+                        <div style="color:white; font-size:1em;">${t.text}</div>
+                    </div>`;
+                });
+            }
+            document.getElementById('modalTaches').style.display = 'flex';
+        };
+
+        // --- UPDATES UI ---
         function updateViewUI() {
             if(!myPlayerName) return;
             let players = state.players || {};
             let partnerName = Object.keys(players).find(k => k !== myPlayerName);
             let btnSwitch = document.getElementById('btnSwitchView');
 
+            let isMe = (viewedPlayerName === myPlayerName);
+
             if (partnerName) {
                 btnSwitch.disabled = false;
-                if (viewedPlayerName === myPlayerName) {
+                if (isMe) {
                     btnSwitch.innerHTML = `👁️ Voir ${partnerName}`;
                     document.body.classList.remove('viewing-partner');
                 } else {
@@ -903,6 +1103,7 @@
                 btnSwitch.disabled = true;
                 btnSwitch.innerHTML = `⏳ En attente...`;
                 viewedPlayerName = myPlayerName;
+                isMe = true;
                 document.body.classList.remove('viewing-partner');
             }
 
@@ -924,14 +1125,12 @@
                 display.style.display = 'none';
                 btnTerminer.style.display = 'none';
             }
-
-            if (document.activeElement !== document.getElementById('defPetite')) document.getElementById('defPetite').value = vState.defPetite || "";
-            if (document.activeElement !== document.getElementById('defGrande')) document.getElementById('defGrande').value = vState.defGrande || "";
-            if (document.activeElement !== document.getElementById('defSouhait')) document.getElementById('defSouhait').value = vState.defSouhait || "";
             
             document.querySelectorAll('.heart-vital').forEach((h, i) => i < window.currentPv ? h.classList.add('active') : h.classList.remove('active'));
             document.querySelectorAll('.heart-bonus').forEach((h, i) => i + 5 < window.currentPv ? h.classList.add('active') : h.classList.remove('active'));
             
+            let myState = players[myPlayerName] || {};
+
             document.getElementById('invP_stock').innerText = Number(vState.nbPetitesSurprises) || 0;
             document.getElementById('invG_stock').innerText = Number(vState.nbGrandesSurprises) || 0;
             document.getElementById('invS_stock').innerText = Number(vState.nbSouhaits) || 0;
@@ -939,6 +1138,10 @@
             document.getElementById('invP_cons').innerText = Number(vState.consommePetites) || 0;
             document.getElementById('invG_cons').innerText = Number(vState.consommeGrandes) || 0;
             document.getElementById('invS_cons').innerText = Number(vState.consommeSouhaits) || 0;
+
+            document.getElementById('defPetite').disabled = !isMe;
+            document.getElementById('defGrande').disabled = !isMe;
+            document.getElementById('defSouhait').disabled = !isMe;
             
             if(document.getElementById('txtPetites')) document.getElementById('txtPetites').innerText = Number(vState.sessionPetites) || 0;
             if(document.getElementById('txtGrandes')) document.getElementById('txtGrandes').innerText = Number(vState.sessionGrandes) || 0;
@@ -946,15 +1149,20 @@
 
             document.getElementById('repasDisplay').innerText = "🍔 Repas : " + (Number(vState.repasRestants) || 0);
 
-            document.getElementById('rowPetite').classList.toggle('disabled-row', (Number(vState.nbPetitesSurprises) || 0) <= 0);
-            document.getElementById('rowGrande').classList.toggle('disabled-row', (Number(vState.nbGrandesSurprises) || 0) <= 0);
-            document.getElementById('rowSouhait').classList.toggle('disabled-row', (Number(vState.nbSouhaits) || 0) <= 0);
+            document.getElementById('rowPetite').classList.toggle('disabled-row', !isMe || (Number(vState.nbPetitesSurprises) || 0) <= 0);
+            document.getElementById('rowGrande').classList.toggle('disabled-row', !isMe || (Number(vState.nbGrandesSurprises) || 0) <= 0);
+            document.getElementById('rowSouhait').classList.toggle('disabled-row', !isMe || (Number(vState.nbSouhaits) || 0) <= 0);
             
+            document.getElementById('btnConsommerPetite').disabled = !isMe || (Number(myState.nbPetitesSurprises) || 0) <= 0;
+            document.getElementById('btnConsommerGrande').disabled = !isMe || (Number(myState.nbGrandesSurprises) || 0) <= 0;
+            document.getElementById('btnConsommerSouhait').disabled = !isMe || (Number(myState.nbSouhaits) || 0) <= 0;
+
             let props = Object.values(state.propositions || {}).filter(x => x != null);
             let timers = Object.values(state.timers || {}).filter(x => x != null);
-            const now = Date.now() + sOff;
+            const now = Date.now();
             const hasTimers = timers.some(t => t.end > now);
-            document.getElementById('rewardsDashboard').style.display = (props.length > 0 || hasTimers) ? 'flex' : 'none';
+            let rewardsDash = document.getElementById('rewardsDashboard');
+            if (rewardsDash) rewardsDash.style.display = (props.length > 0 || hasTimers) ? 'flex' : 'none';
 
             const modeJeuSafe = vState.modeJeu || 'attente';
             const isTr = modeJeuSafe === 'travail';
@@ -968,16 +1176,19 @@
             document.getElementById('btnPlus').disabled = !isTr || dead;
             document.getElementById('btnBoutique').disabled = !isTr || dead;
             
+            const btnMinus = document.getElementById('btnMinus');
+            if (window.currentPv > 5) {
+                btnMinus.innerHTML = `<span>⭐ Distraction</span><small>Reset Bonus</small>`;
+            } else {
+                btnMinus.innerHTML = `<span>👎 Distraction</span><small>-1 PV</small>`;
+            }
+            
             document.getElementById('buy1S').disabled = window.currentPv < 7;
-            document.getElementById('buy1P').disabled = localPieces < 300;
+            document.getElementById('buy1P').disabled = localPieces < 600; 
             document.getElementById('buy2S').disabled = window.currentPv < 8;
-            document.getElementById('buy2P').disabled = localPieces < 600;
+            document.getElementById('buy2P').disabled = localPieces < 1200; 
             document.getElementById('optCafe').disabled = localPieces < 1;
             document.getElementById('optRepas').disabled = (Number(vState.repasRestants) || 0) <= 0;
-
-            document.getElementById('btnConsommerPetite').disabled = (Number(vState.nbPetitesSurprises) || 0) <= 0;
-            document.getElementById('btnConsommerGrande').disabled = (Number(vState.nbGrandesSurprises) || 0) <= 0;
-            document.getElementById('btnConsommerSouhait').disabled = (Number(vState.nbSouhaits) || 0) <= 0;
 
             if(isPa) {
                 document.body.classList.add('paused-mode');
@@ -1011,8 +1222,8 @@
                 goContent.className = 'modal-content glow-track anim-shake pulse-red-loop';
 
                 let players = Object.assign({}, state.players || {});
-                appendNotif(players[myPlayerName], "ARRÊT CARDIAQUE", `${myPlayerName} a perdu le focus.`, "239, 68, 68", "💀");
-                set(gameRef, { ...state, players });
+                notifyOther(players, "ARRÊT CARDIAQUE", `${myPlayerName} a perdu le focus.`, "239, 68, 68", "💀");
+                set(gameRef, cleanObj({ ...state, players }));
 
                 window.flatlineTimeout = setTimeout(() => {
                     if(!window.isDead) return;
@@ -1030,6 +1241,10 @@
                 document.body.classList.remove('flatline-theme');
                 document.getElementById('modalGameOver').style.display = 'none';
             }
+            
+            if(document.getElementById('modalMessagerie').style.display === 'flex') {
+                window.updateChatUI();
+            }
         }
 
         onValue(gameRef, snap => {
@@ -1042,8 +1257,7 @@
                 }
             }
             
-            // --- NOTIFS INDIVIDUELLES ET TOASTS ---
-            if(myPlayerName && data.players[myPlayerName]) {
+            if(myPlayerName && data.players && data.players[myPlayerName]) {
                 const rawHistory = Object.values(data.players[myPlayerName].notifsHistory || {}).filter(n => n != null);
                 let unreadCount = 0;
                 rawHistory.forEach(n => { if(n.id > localLastReadTime) unreadCount++; });
@@ -1062,25 +1276,64 @@
                 if (lToast && lToast.id !== lastToastId) {
                     lastToastId = lToast.id;
                     if (Date.now() - lToast.id < 5000) {
-                        window.showNotification(lToast.title, lToast.text, lToast.colorCode, lToast.icon);
+                        if (!(lToast.type === 'message' && lToast.sender === myPlayerName)) {
+                            window.showNotification(lToast.title, lToast.text, lToast.colorCode, lToast.icon, lToast.type, lToast.sender);
+                        }
                     }
                 }
                 
-                // Sauvegarde Inventaire Local en fond
                 let me = data.players[myPlayerName];
                 saveDeviceInventory(me.nbPetitesSurprises || 0, me.nbGrandesSurprises || 0, me.nbSouhaits || 0);
             }
             
+            // --- BADGE MESSAGERIE ---
+            let msgs = data.messagerie || [];
+            let unreadCountChat = msgs.filter(m => m.id > localLastReadChatTime && m.sender !== myPlayerName).length;
+            let chatBadge = document.getElementById('chatBadge');
+            if (chatBadge) {
+                if (unreadCountChat > 0) {
+                    chatBadge.style.display = 'block';
+                    chatBadge.innerText = unreadCountChat > 99 ? '99+' : unreadCountChat;
+                } else {
+                    chatBadge.style.display = 'none';
+                }
+            }
+
+            // --- BADGE TACHES ---
+            let taches = data.tachesAccomplies || [];
+            let unreadTachesCount = taches.filter(t => t.time > localLastReadTachesTime && t.author !== myPlayerName).length;
+            let tachesBadge = document.getElementById('tachesBadge');
+            if (tachesBadge) {
+                if (unreadTachesCount > 0) {
+                    tachesBadge.style.display = 'block';
+                    tachesBadge.innerText = unreadTachesCount > 99 ? '99+' : unreadTachesCount;
+                } else {
+                    tachesBadge.style.display = 'none';
+                }
+            }
+            
             state = data;
             
-            if (!isFirstLoad && viewedPlayerName) {
+            // ANIMATION DES RECOMPENSES SEULEMENT QUAND ON LES GAGNE
+            if (myPlayerName && viewedPlayerName) {
                 let vState = state.players[viewedPlayerName] || {};
-                if (vState.recompense5Obtenue && !window.r5) { window.r5 = true; showRewardAnim('petite'); }
-                if (vState.recompense7Obtenue && !window.r7) { window.r7 = true; showRewardAnim('grande'); }
-                if (vState.recompense10Obtenue && !window.r10) { window.r10 = true; showRewardAnim('souhait'); }
-                if (!vState.recompense5Obtenue) window.r5 = false;
-                if (!vState.recompense7Obtenue) window.r7 = false;
-                if (!vState.recompense10Obtenue) window.r10 = false;
+                
+                if (!window.rewardTrackers) window.rewardTrackers = {};
+                if (!window.rewardTrackers[viewedPlayerName]) {
+                    window.rewardTrackers[viewedPlayerName] = {
+                        r5: vState.recompense5Obtenue || false,
+                        r7: vState.recompense7Obtenue || false,
+                        r10: vState.recompense10Obtenue || false
+                    };
+                } else if (!isFirstLoad) {
+                    if (vState.recompense5Obtenue && !window.rewardTrackers[viewedPlayerName].r5) showRewardAnim('petite');
+                    if (vState.recompense7Obtenue && !window.rewardTrackers[viewedPlayerName].r7) showRewardAnim('grande');
+                    if (vState.recompense10Obtenue && !window.rewardTrackers[viewedPlayerName].r10) showRewardAnim('souhait');
+                    
+                    window.rewardTrackers[viewedPlayerName].r5 = vState.recompense5Obtenue || false;
+                    window.rewardTrackers[viewedPlayerName].r7 = vState.recompense7Obtenue || false;
+                    window.rewardTrackers[viewedPlayerName].r10 = vState.recompense10Obtenue || false;
+                }
             }
 
             try { updateTimersUI(); } catch(e) {}
@@ -1089,35 +1342,29 @@
             isFirstLoad = false;
         });
 
-        function updateViewedPlayer(patchObj, notifParams = null) {
-            if(!viewedPlayerName) return;
-            let players = Object.assign({}, state.players || {}); 
-            let targetState = players[viewedPlayerName] || {};
-            players[viewedPlayerName] = { ...targetState, ...patchObj };
-            
-            if (notifParams) {
-                appendNotif(players[viewedPlayerName], ...notifParams);
-                if(viewedPlayerName !== myPlayerName && players[myPlayerName]) {
-                    appendNotif(players[myPlayerName], ...notifParams);
-                }
-            }
-            set(gameRef, { ...state, players });
-        }
-
         const launch = () => {
-            let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} a lancé le chrono !` : `${myPlayerName} a lancé le chrono de ${viewedPlayerName} !`;
             document.getElementById('toastContainer').innerHTML = ""; 
             
-            updateViewedPlayer({ 
+            let players = Object.assign({}, state.players || {});
+            let vState = players[viewedPlayerName] || {};
+
+            players[viewedPlayerName] = {
+                ...vState,
                 pvActuels: 5, piecesBase: 0, repasRestants: 2, 
                 recompense5Obtenue: false, recompense7Obtenue: false, recompense10Obtenue: false,
                 sessionPetites: 0, sessionGrandes: 0, sessionSouhaits: 0,
-                modeJeu: 'travail', timestampMode: Date.now() + sOff, tempsTravailCumule: 0
-            }, ["Session Démarrée", textLog, "16, 185, 129", "🚀"]);
+                modeJeu: 'travail', timestampMode: Date.now(), tempsTravailCumule: 0
+            };
+            
+            let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} a lancé le chrono !` : `${myPlayerName} a lancé le chrono de ${viewedPlayerName} !`;
+            notifyOther(players, "Session Démarrée", textLog, "16, 185, 129", "🚀");
+            
+            set(gameRef, cleanObj({ ...state, players }));
         };
 
         const applyPvChange = (newPv, extraPatch = {}, notifParams = null) => {
-            let vState = (state.players || {})[viewedPlayerName] || {};
+            let players = Object.assign({}, state.players || {});
+            let vState = players[viewedPlayerName] || {};
             let current = vState.pvActuels || 0;
             let patch = { pvActuels: newPv, ...extraPatch };
             
@@ -1130,18 +1377,24 @@
             let sesS = extraPatch.sessionSouhaits !== undefined ? extraPatch.sessionSouhaits : (vState.sessionSouhaits || 0);
 
             let unlockParams = null;
-            if (newPv >= 5 && !vState.recompense5Obtenue) { pS += 1; sesP += 1; patch.recompense5Obtenue = true; unlockParams = ["Focus Atteint", `${viewedPlayerName} a débloqué : Petite Surprise !`, "16, 185, 129", "🎁"]; }
-            if (newPv >= 7 && !vState.recompense7Obtenue) { gS += 1; sesG += 1; patch.recompense7Obtenue = true; unlockParams = ["Focus Atteint", `${viewedPlayerName} a débloqué : Grande Surprise !`, "245, 158, 11", "🎀"]; }
-            if (newPv >= 10 && !vState.recompense10Obtenue) { sH += 1; sesS += 1; patch.recompense10Obtenue = true; unlockParams = ["Focus Maximal", `${viewedPlayerName} a débloqué : Souhait !`, "168, 85, 247", "🪔"]; }
+            if (newPv >= 5 && current < 5) { pS += 1; sesP += 1; patch.recompense5Obtenue = true; unlockParams = ["Focus Atteint", `${viewedPlayerName} a débloqué : Petite Surprise !`, "16, 185, 129", "🎁"]; }
+            if (newPv >= 7 && current < 7) { gS += 1; sesG += 1; patch.recompense7Obtenue = true; unlockParams = ["Focus Atteint", `${viewedPlayerName} a débloqué : Grande Surprise !`, "245, 158, 11", "🎀"]; }
+            if (newPv >= 10 && current < 10) { sH += 1; sesS += 1; patch.recompense10Obtenue = true; unlockParams = ["Focus Maximal", `${viewedPlayerName} a débloqué : Souhait !`, "168, 85, 247", "🪔"]; }
 
-            if (current >= 10 && newPv < 10 && vState.recompense10Obtenue) { sH = Math.max(0, sH - 1); sesS = Math.max(0, sesS - 1); patch.recompense10Obtenue = false; }
-            if (current >= 7 && newPv < 7 && vState.recompense7Obtenue) { gS = Math.max(0, gS - 1); sesG = Math.max(0, sesG - 1); patch.recompense7Obtenue = false; }
-            if (current >= 5 && newPv < 5 && vState.recompense5Obtenue) { pS = Math.max(0, pS - 1); sesP = Math.max(0, sesP - 1); patch.recompense5Obtenue = false; }
+            // PERTE CADEAUX SI ON DESCEND SOUS LE PALIER
+            if (newPv < 10 && current >= 10) { sH = Math.max(0, sH - 1); sesS = Math.max(0, sesS - 1); patch.recompense10Obtenue = false; }
+            if (newPv < 7 && current >= 7) { gS = Math.max(0, gS - 1); sesG = Math.max(0, sesG - 1); patch.recompense7Obtenue = false; }
+            if (newPv < 5 && current >= 5) { pS = Math.max(0, pS - 1); sesP = Math.max(0, sesP - 1); patch.recompense5Obtenue = false; }
 
             patch.nbPetitesSurprises = pS; patch.nbGrandesSurprises = gS; patch.nbSouhaits = sH;
             patch.sessionPetites = sesP; patch.sessionGrandes = sesG; patch.sessionSouhaits = sesS;
             
-            updateViewedPlayer(patch, unlockParams || notifParams);
+            players[viewedPlayerName] = { ...vState, ...patch };
+            
+            let finalNotif = unlockParams || notifParams;
+            if(finalNotif) notifyOther(players, ...finalNotif);
+            
+            set(gameRef, cleanObj({ ...state, players }));
         };
 
         document.getElementById('btnRestartGO').onclick = () => {
@@ -1154,18 +1407,32 @@
             triggerSharedAnim('anim-flash-green', 'green');
             document.getElementById('toastContainer').innerHTML = ""; 
             
-            updateViewedPlayer({ 
+            let players = Object.assign({}, state.players || {});
+            
+            players[viewedPlayerName] = { 
+                ...(players[viewedPlayerName]||{}),
                 pvActuels: 5, piecesBase: 0, repasRestants: 2, 
                 recompense5Obtenue: false, recompense7Obtenue: false, recompense10Obtenue: false,
                 sessionPetites: 0, sessionGrandes: 0, sessionSouhaits: 0,
-                modeJeu: 'travail', timestampMode: Date.now() + sOff, tempsTravailCumule: 0
-            }, ["Réanimation", `${viewedPlayerName} a été réanimé !`, "16, 185, 129", "⚡"]);
+                modeJeu: 'travail', timestampMode: Date.now(), tempsTravailCumule: 0
+            };
+            
+            notifyOther(players, "Réanimation", `${viewedPlayerName} a été réanimé !`, "16, 185, 129", "⚡");
+            set(gameRef, cleanObj({ ...state, players }));
         };
 
         document.getElementById('btnStart').onclick = launch;
         document.getElementById('btnStop').onclick = () => {
             let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} a arrêté le chrono.` : `${myPlayerName} a arrêté le chrono de ${viewedPlayerName}.`;
-            updateViewedPlayer({ modeJeu: 'attente' }, ["Session Stoppée", textLog, "239, 68, 68", "🛑"]);
+            let players = Object.assign({}, state.players || {});
+            
+            players[viewedPlayerName].modeJeu = 'attente';
+            players[viewedPlayerName].tacheActuelle = "";
+            players[viewedPlayerName].tacheEnCours = false;
+            
+            // On supprime TOUTES les tâches de l'historique quand on stop
+            notifyOther(players, "Session Stoppée", textLog, "239, 68, 68", "🛑");
+            set(gameRef, cleanObj({ ...state, players, tachesAccomplies: [] }));
         };
         
         document.getElementById('btnInventaire').onclick = () => document.getElementById('modalInventaire').style.display='flex';
@@ -1174,21 +1441,25 @@
             let vState = (state.players || {})[viewedPlayerName] || {};
             let current = vState.pvActuels || 0;
             triggerSharedAnim('anim-shake-red', 'red');
-            let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} a perdu le focus (-1 PV).` : `${myPlayerName} a retiré 1 PV à ${viewedPlayerName}.`;
+            let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} a perdu son focus.` : `${myPlayerName} a brisé le focus de ${viewedPlayerName}.`;
             let notifParams = ["Alerte Distraction", textLog, "239, 68, 68", "💔"];
-            applyPvChange(current > 5 ? 5 : Math.max(0, current - 1), {}, notifParams);
+            
+            let newPv = current > 5 ? 5 : Math.max(0, current - 1);
+            applyPvChange(newPv, {}, notifParams);
         };
         
         document.getElementById('btnPlus').onclick = () => {
             let vState = (state.players || {})[viewedPlayerName] || {};
-            let current = vState.pvActuels || 0; let newPv = Math.min(10, current + 2);
+            let current = vState.pvActuels || 0; 
+            
+            let newPv = Math.min(10, current + 1);
             let notifParams = null;
             if(newPv === 10 && current < 10) {
                 triggerSharedAnim('anim-flash-yellow', 'yellow');
                 notifParams = ["FOCUS MAXIMAL", `${viewedPlayerName} a atteint 10/10 ! 🔥`, "251, 191, 36", "👑"];
             } else if (newPv < 10) {
                 triggerSharedAnim('anim-flash-green', 'green');
-                let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} a regagné de la vie (+2 PV).` : `${myPlayerName} a donné du focus à ${viewedPlayerName} (+2 PV).`;
+                let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} a regagné de la vie (+1 PV).` : `${myPlayerName} a donné du focus à ${viewedPlayerName} (+1 PV).`;
                 notifParams = ["Focus Maintenu", textLog, "16, 185, 129", "💚"];
             }
             applyPvChange(newPv, {}, notifParams);
@@ -1198,39 +1469,45 @@
         document.getElementById('btnBoutique').onclick = () => document.getElementById('modalBoutique').style.display='flex';
 
         document.getElementById('optCafe').onclick = () => {
-            let vState = (state.players || {})[viewedPlayerName] || {};
-            
+            let players = Object.assign({}, state.players || {});
+            let vState = players[viewedPlayerName] || {};
             let tMode = Number(vState.timestampMode);
-            if (isNaN(tMode) || tMode <= 0) tMode = Date.now() + sOff;
+            if (isNaN(tMode) || tMode <= 0) tMode = Date.now();
 
-            const elap = Math.max(0, Math.floor((Date.now() + sOff - tMode)/1000));
+            const elap = Math.max(0, Math.floor((Date.now() - tMode)/1000));
             let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} prend un café ☕` : `${myPlayerName} a mis ${viewedPlayerName} en pause café ☕`;
             
-            updateViewedPlayer({ 
-                modeJeu: 'pause_cafe', timestampMode: Date.now() + sOff, piecesBase: localPieces, tempsTravailCumule: (vState.tempsTravailCumule || 0) + elap
-            }, ["Pause", textLog, "251, 191, 36", "☕"]);
+            players[viewedPlayerName] = { ...vState, modeJeu: 'pause_cafe', timestampMode: Date.now(), piecesBase: localPieces, tempsTravailCumule: (vState.tempsTravailCumule || 0) + elap };
+            notifyOther(players, "Pause", textLog, "251, 191, 36", "☕");
             document.getElementById('modalChoixPause').style.display='none';
+            set(gameRef, cleanObj({ ...state, players }));
         };
         
         document.getElementById('optRepas').onclick = () => {
-            let vState = (state.players || {})[viewedPlayerName] || {};
+            let players = Object.assign({}, state.players || {});
+            let vState = players[viewedPlayerName] || {};
             if((vState.repasRestants || 0) <= 0) return;
             
             let tMode = Number(vState.timestampMode);
-            if (isNaN(tMode) || tMode <= 0) tMode = Date.now() + sOff;
+            if (isNaN(tMode) || tMode <= 0) tMode = Date.now();
 
-            const elap = Math.max(0, Math.floor((Date.now() + sOff - tMode)/1000));
+            const elap = Math.max(0, Math.floor((Date.now() - tMode)/1000));
             let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} part manger 🍔` : `${myPlayerName} a mis ${viewedPlayerName} en pause repas 🍔`;
             
-            updateViewedPlayer({ 
-                modeJeu: 'pause_repas', repasRestants: vState.repasRestants - 1, timestampMode: Date.now() + sOff, piecesBase: localPieces, tempsTravailCumule: (vState.tempsTravailCumule || 0) + elap
-            }, ["Pause", textLog, "249, 115, 22", "🍔"]);
+            players[viewedPlayerName] = { ...vState, modeJeu: 'pause_repas', repasRestants: vState.repasRestants - 1, timestampMode: Date.now(), piecesBase: localPieces, tempsTravailCumule: (vState.tempsTravailCumule || 0) + elap };
+            notifyOther(players, "Pause", textLog, "249, 115, 22", "🍔");
             document.getElementById('modalChoixPause').style.display='none';
+            set(gameRef, cleanObj({ ...state, players }));
         };
         
         document.getElementById('btnStopperPause').onclick = () => {
             let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} est de retour au travail !` : `${myPlayerName} a relancé le HUD de ${viewedPlayerName}.`;
-            updateViewedPlayer({ modeJeu: 'travail', timestampMode: Date.now() + sOff, piecesBase: localPieces }, ["Reprise", textLog, "16, 185, 129", "▶️"]);
+            let players = Object.assign({}, state.players || {});
+            players[viewedPlayerName].modeJeu = 'travail';
+            players[viewedPlayerName].timestampMode = Date.now();
+            players[viewedPlayerName].piecesBase = localPieces;
+            notifyOther(players, "Reprise", textLog, "16, 185, 129", "▶️");
+            set(gameRef, cleanObj({ ...state, players }));
         };
 
         const handleShopPurchase = (action, animType) => { 
@@ -1241,23 +1518,27 @@
         };
         
         document.getElementById('buy1P').onclick = () => handleShopPurchase(() => {
-            if(localPieces >= 300) {
+            if(localPieces >= 600) {
                 let vState = (state.players || {})[viewedPlayerName] || {};
                 let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} a acheté : Petite Surprise !` : `${myPlayerName} a offert une Petite Surprise à ${viewedPlayerName} !`;
-                updateViewedPlayer({
-                    piecesBase: vState.piecesBase - 300, nbPetitesSurprises: (vState.nbPetitesSurprises || 0) + 1, sessionPetites: (vState.sessionPetites || 0) + 1
-                }, ["Achat Boutique", textLog, "236, 72, 153", "🛒"]);
+                
+                let players = Object.assign({}, state.players || {});
+                players[viewedPlayerName] = { ...vState, piecesBase: vState.piecesBase - 600, nbPetitesSurprises: (vState.nbPetitesSurprises || 0) + 1, sessionPetites: (vState.sessionPetites || 0) + 1 };
+                notifyOther(players, "Achat Boutique", textLog, "236, 72, 153", "🛒");
+                set(gameRef, cleanObj({ ...state, players }));
                 return true;
             } return false;
         }, "petite");
 
         document.getElementById('buy2P').onclick = () => handleShopPurchase(() => {
-            if(localPieces >= 600) {
+            if(localPieces >= 1200) {
                 let vState = (state.players || {})[viewedPlayerName] || {};
                 let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} a acheté : Grande Surprise !` : `${myPlayerName} a offert une Grande Surprise à ${viewedPlayerName} !`;
-                updateViewedPlayer({
-                    piecesBase: vState.piecesBase - 600, nbGrandesSurprises: (vState.nbGrandesSurprises || 0) + 1, sessionGrandes: (vState.sessionGrandes || 0) + 1
-                }, ["Achat Boutique", textLog, "236, 72, 153", "🛒"]);
+                
+                let players = Object.assign({}, state.players || {});
+                players[viewedPlayerName] = { ...vState, piecesBase: vState.piecesBase - 1200, nbGrandesSurprises: (vState.nbGrandesSurprises || 0) + 1, sessionGrandes: (vState.sessionGrandes || 0) + 1 };
+                notifyOther(players, "Achat Boutique", textLog, "236, 72, 153", "🛒");
+                set(gameRef, cleanObj({ ...state, players }));
                 return true;
             } return false;
         }, "grande");
@@ -1281,27 +1562,38 @@
         }, "grande");
 
         function proposerItem(typeKey, nameField) {
-            let vState = (state.players || {})[viewedPlayerName] || {};
-            let currentNb = vState[typeKey] || 0;
-            if (currentNb <= 0) return;
+            let myState = (state.players || {})[myPlayerName] || {};
+            let currentNb = Number(myState[typeKey]) || 0;
+            if (currentNb <= 0) { alert("Stock insuffisant !"); return; }
+            
             let val = document.getElementById(nameField).value.trim();
-            if(!val) val = "Récompense Mystère";
+            if(!val) { alert("Veuillez saisir une description pour la récompense."); return; }
             
+            let partnerName = Object.keys(state.players||{}).find(k => k !== myPlayerName) || myPlayerName;
+            let partnerDevice = state.players[partnerName]?.deviceId || myDeviceId;
+
             let props = Object.values(state.propositions || {}).filter(x => x != null);
-            props.push({ id: Date.now(), type: typeKey, text: val, author: myPlayerName, target: viewedPlayerName });
+            props.push({ 
+                id: Date.now(), 
+                type: typeKey, 
+                text: val, 
+                author: myPlayerName, 
+                authorDevice: myDeviceId,
+                target: partnerName,
+                targetDevice: partnerDevice 
+            });
             
-            let patch = {}; patch[typeKey] = currentNb - 1; patch[nameField] = ""; 
+            let patch = {}; patch[typeKey] = currentNb - 1; 
             
             let players = Object.assign({}, state.players || {});
-            players[viewedPlayerName] = { ...vState, ...patch };
+            players[myPlayerName] = { ...myState, ...patch };
             
-            let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} propose : ${val}` : `${myPlayerName} utilise le stock de ${viewedPlayerName} pour proposer : ${val}`;
+            let textLog = `${myPlayerName} a fait une proposition : ${val}`;
             
-            appendNotif(players[viewedPlayerName], "Nouvelle Proposition", textLog, "59, 130, 246", "💬");
-            if(viewedPlayerName !== myPlayerName && players[myPlayerName]) appendNotif(players[myPlayerName], "Nouvelle Proposition", textLog, "59, 130, 246", "💬");
-            
-            set(gameRef, { ...state, players, propositions: props });
+            notifyOther(players, "Nouvelle Proposition", textLog, "168, 85, 247", "💡");
+            set(gameRef, cleanObj({ ...state, players, propositions: props }));
             document.getElementById(nameField).value = ""; 
+            document.getElementById('modalInventaire').style.display = 'none';
         }
 
         window.accepterNego = function(pId) {
@@ -1309,23 +1601,28 @@
             let p = props.find(x => x.id === pId);
             if(!p) return;
             
-            let vState = (state.players || {})[p.target] || {}; 
+            let actualTargetPseudo = Object.keys(state.players || {}).find(k => state.players[k].deviceId === p.targetDevice) || p.target;
+            let vState = (state.players || {})[actualTargetPseudo] || {}; 
             let patch = {};
             if(p.type==='nbPetitesSurprises') patch.consommePetites = (vState.consommePetites||0)+1;
             else patch.consommeGrandes = (vState.consommeGrandes||0)+1;
 
             let timers = Object.values(state.timers || {}).filter(x => x != null);
-            timers.push({ id: Date.now(), name: p.text, end: Date.now() + sOff + 86400000, color: p.type==='nbPetitesSurprises'?'#10b981':'#f59e0b' });
+            timers.push({ 
+                id: Date.now(), name: p.text, end: Date.now() + 86400000, 
+                color: p.type==='nbPetitesSurprises'?'#10b981':'#f59e0b', 
+                author: p.author, authorDevice: p.authorDevice,
+                target: actualTargetPseudo, targetDevice: p.targetDevice, 
+                type: p.type 
+            });
             
             let players = Object.assign({}, state.players || {});
-            players[p.target] = { ...vState, ...patch };
+            players[actualTargetPseudo] = { ...vState, ...patch };
 
-            let textLog = myPlayerName === p.target ? `L'accord de ${myPlayerName} sur "${p.text}" est validé !` : `${myPlayerName} a accepté l'idée : "${p.text}" !`;
+            let textLog = myPlayerName === actualTargetPseudo ? `L'accord de ${myPlayerName} sur "${p.text}" est validé !` : `${myPlayerName} a accepté l'idée : "${p.text}" !`;
             
-            appendNotif(players[p.target], "Accord Validé", textLog, "16, 185, 129", "🤝");
-            if (p.target !== myPlayerName && players[myPlayerName]) appendNotif(players[myPlayerName], "Accord Validé", textLog, "16, 185, 129", "🤝");
-            
-            set(gameRef, { ...state, players, timers, propositions: props.filter(x => x.id !== pId) });
+            notifyOther(players, "Accord Validé", textLog, "16, 185, 129", "🤝");
+            set(gameRef, cleanObj({ ...state, players, timers, propositions: props.filter(x => x.id !== pId) }));
         };
 
         window.ouvrirContrePropo = function(pId, oldText) {
@@ -1341,14 +1638,12 @@
             if(idx !== -1 && val) {
                 props[idx].text = val;
                 props[idx].author = myPlayerName;
+                props[idx].authorDevice = myDeviceId;
                 
                 let players = Object.assign({}, state.players || {});
-                appendNotif(players[myPlayerName], "Contre-Proposition", `${myPlayerName} propose : ${val}`, "236, 72, 153", "⚖️");
-                if (props[idx].target !== myPlayerName && players[props[idx].target]) {
-                    appendNotif(players[props[idx].target], "Contre-Proposition", `${myPlayerName} propose : ${val}`, "236, 72, 153", "⚖️");
-                }
+                notifyOther(players, "Contre-Proposition", `${myPlayerName} propose : ${val}`, "236, 72, 153", "⚖️");
 
-                set(gameRef, { ...state, players, propositions: props });
+                set(gameRef, cleanObj({ ...state, players, propositions: props }));
             }
             document.getElementById('modalNego').style.display = 'none';
         };
@@ -1359,42 +1654,128 @@
             
             let props = Object.values(state.propositions || {}).filter(x => x != null);
             props.forEach(p => {
-                let color = p.type === 'nbPetitesSurprises' ? '#10b981' : '#f59e0b';
+                let actualTargetPseudo = Object.keys(state.players || {}).find(k => state.players[k].deviceId === p.targetDevice) || p.target;
+                let actualAuthorPseudo = Object.keys(state.players || {}).find(k => state.players[k].deviceId === p.authorDevice) || p.author;
+                
+                let authorColor = p.authorDevice === myDeviceId ? '#ec4899' : '#3b82f6';
+                let targetColor = p.targetDevice === myDeviceId ? '#ec4899' : '#3b82f6';
+                
+                let actionsHtml = '';
+                if (p.targetDevice === myDeviceId || Object.keys(state.players || {}).length < 2) {
+                    actionsHtml = `
+                        <div class="nego-actions">
+                            <button class="glow-track btn-nego-acc" style="--glow-color: 16, 185, 129;" onclick="window.accepterNego(${p.id})">✅ Accepter</button>
+                            <button class="glow-track btn-nego-ct" style="--glow-color: 236, 72, 153;" onclick="window.ouvrirContrePropo(${p.id}, '${p.text.replace(/'/g, "\\'")}')">✍️ Contre-proposer</button>
+                        </div>
+                    `;
+                } else {
+                    actionsHtml = `<div style="font-size:0.85em; color:#94a3b8; margin-top:8px; font-style:italic;">⏳ En attente d'une réponse de <span style="color:${targetColor}">${actualTargetPseudo}</span>...</div>`;
+                }
+
                 let div = document.createElement('div');
                 div.className = "nego-block";
                 div.innerHTML = `
-                    <div style="font-size:0.9em; margin-bottom:5px;"><strong style="color:${color};">${p.author}</strong> propose :</div>
+                    <div style="font-size:0.9em; margin-bottom:5px;">De <strong style="color:${authorColor};">${actualAuthorPseudo}</strong> pour <strong style="color:${targetColor};">${actualTargetPseudo}</strong> :</div>
                     <div style="font-size:1.1em; color:white; font-style:italic;">"${p.text}"</div>
-                    <div class="nego-actions">
-                        <button class="glow-track btn-nego-acc" style="--glow-color: 16, 185, 129;" onclick="window.accepterNego(${p.id})">✅ Accepter</button>
-                        <button class="glow-track btn-nego-ct" style="--glow-color: 236, 72, 153;" onclick="window.ouvrirContrePropo(${p.id}, '${p.text.replace(/'/g, "\\'")}')">✍️ Contre-proposer</button>
-                    </div>
+                    ${actionsHtml}
                 `;
                 container.appendChild(div);
             });
         }
 
         document.getElementById('btnConsommerSouhait').onclick = () => {
-            let vState = (state.players || {})[viewedPlayerName] || {};
-            let currentNb = vState.nbSouhaits || 0;
-            if (currentNb <= 0) return;
-            let val = document.getElementById('defSouhait').value.trim() || "Souhait Mystère";
+            let myState = (state.players || {})[myPlayerName] || {};
+            let currentNb = Number(myState.nbSouhaits) || 0;
+            if (currentNb <= 0) { alert("Stock insuffisant !"); return; }
+            
+            let val = document.getElementById('defSouhait').value.trim();
+            if(!val) { alert("Veuillez saisir une description pour la récompense."); return; }
+            
+            let partnerName = Object.keys(state.players||{}).find(k => k !== myPlayerName) || myPlayerName;
+            let partnerDevice = state.players[partnerName]?.deviceId || myDeviceId;
             
             let timers = Object.values(state.timers || {}).filter(x => x != null);
-            timers.push({ id: Date.now(), name: val, end: Date.now() + sOff + 86400000, color: '#a855f7' });
+            timers.push({ 
+                id: Date.now(), name: val, end: Date.now() + 86400000, color: '#a855f7', 
+                author: myPlayerName, authorDevice: myDeviceId, 
+                target: partnerName, targetDevice: partnerDevice, 
+                type: 'nbSouhaits' 
+            });
             
-            let textLog = myPlayerName === viewedPlayerName ? `${myPlayerName} a lancé un Souhait !` : `${myPlayerName} a validé le Souhait de ${viewedPlayerName} !`;
+            let textLog = `${myPlayerName} a lancé le Souhait : ${val} !`;
             
-            updateViewedPlayer({ 
-                nbSouhaits: currentNb - 1, consommeSouhaits: (vState.consommeSouhaits||0) + 1, defSouhait: ""
-            }, ["Souhait Utilisé", textLog, "168, 85, 247", "🪔"]);
+            let players = Object.assign({}, state.players || {});
+            players[myPlayerName] = { ...myState, nbSouhaits: currentNb - 1, consommeSouhaits: (myState.consommeSouhaits||0) + 1 };
             
-            set(gameRef, { ...state, timers }); 
+            notifyOther(players, "Souhait Utilisé", textLog, "168, 85, 247", "🪔");
+            set(gameRef, cleanObj({ ...state, players, timers })); 
             document.getElementById('defSouhait').value = "";
+            document.getElementById('modalInventaire').style.display = 'none';
         };
 
-        document.getElementById('btnConsommerPetite').onclick = () => proposerItem('nbPetitesSurprises', 'defPetite');
-        document.getElementById('btnConsommerGrande').onclick = () => proposerItem('nbGrandesSurprises', 'defGrande');
+        // --- GESTION DU REMBOURSEMENT ---
+        document.getElementById('btnGuiltyAck').onclick = () => {
+            let comps = state.pendingCompensations || [];
+            let idx = comps.findIndex(c => c.id === window.currentCompContext);
+            if (idx !== -1) {
+                comps[idx].guiltySeen = true;
+                if(comps[idx].guiltySeen && comps[idx].victimSeen) comps.splice(idx, 1);
+                set(gameRef, cleanObj({ ...state, pendingCompensations: comps }));
+            }
+            document.getElementById('modalGuiltyExpired').style.display = 'none';
+        };
+
+        document.getElementById('btnVictimRecover').onclick = () => {
+            let comps = state.pendingCompensations || [];
+            let idx = comps.findIndex(c => c.id === window.currentCompContext);
+            if (idx !== -1) {
+                let comp = comps[idx];
+                comps[idx].victimSeen = true;
+                
+                let players = Object.assign({}, state.players || {});
+                
+                // Remboursement direct sans bonus supplémentaire
+                if (players[myPlayerName] && comp.type) {
+                    players[myPlayerName][comp.type] = (players[myPlayerName][comp.type] || 0) + 1;
+                }
+
+                let guiltyKey = Object.keys(players).find(k => players[k].deviceId === comp.guiltyDevice || k === comp.guiltyPseudo);
+                if (guiltyKey && players[guiltyKey] && guiltyKey !== myPlayerName) {
+                    appendNotif(players[guiltyKey], "Remboursement effectué", `${myPlayerName} a récupéré sa surprise "${comp.text}".`, "16, 185, 129", "✅", "normal", myPlayerName);
+                }
+
+                if(comps[idx].guiltySeen && comps[idx].victimSeen) comps.splice(idx, 1);
+                set(gameRef, cleanObj({ ...state, players, pendingCompensations: comps }));
+                
+                let typeStr = comp.type === 'nbPetitesSurprises' ? 'petite' : (comp.type === 'nbGrandesSurprises' ? 'grande' : 'souhait');
+                showRewardAnim(typeStr); 
+            }
+            document.getElementById('modalVictimExpired').style.display = 'none';
+        };
+
+        function checkCompensations() {
+            if (!myPlayerName) return;
+            if (document.getElementById('modalGuiltyExpired').style.display === 'flex') return;
+            if (document.getElementById('modalVictimExpired').style.display === 'flex') return;
+
+            let comps = state.pendingCompensations || [];
+            
+            let myGuilty = comps.find(c => (c.guiltyDevice === myDeviceId || c.guiltyPseudo === myPlayerName) && !c.guiltySeen);
+            if (myGuilty) {
+                window.currentCompContext = myGuilty.id;
+                document.getElementById('guiltyExpiredText').innerText = `Tu as oublié la surprise "${myGuilty.text}" ! Le temps est écoulé et ${myGuilty.victimPseudo} a récupéré son action. 😊`;
+                document.getElementById('modalGuiltyExpired').style.display = 'flex';
+                return;
+            }
+
+            let myVictim = comps.find(c => (c.victimDevice === myDeviceId || c.victimPseudo === myPlayerName) && !c.victimSeen);
+            if (myVictim) {
+                window.currentCompContext = myVictim.id;
+                document.getElementById('victimExpiredText').innerText = `${myVictim.guiltyPseudo} a oublié la surprise "${myVictim.text}". Clique ci-dessous pour la récupérer ! 🎁`;
+                document.getElementById('modalVictimExpired').style.display = 'flex';
+                return;
+            }
+        }
 
         window.terminerTimer = function(tId) {
             let timers = Object.values(state.timers || {}).filter(x => x != null);
@@ -1402,24 +1783,44 @@
             timers = timers.filter(t => t.id !== tId);
             
             let players = Object.assign({}, state.players || {});
-            appendNotif(players[myPlayerName], "Récompense Effectuée !", `"${completed ? completed.name : 'Tâche'}" a été validée par ${myPlayerName} !`, "16, 185, 129", "🎉");
-            let partnerName = Object.keys(players).find(k => k !== myPlayerName);
-            if(partnerName && players[partnerName]) {
-                appendNotif(players[partnerName], "Récompense Effectuée !", `"${completed ? completed.name : 'Tâche'}" a été validée par ${myPlayerName} !`, "16, 185, 129", "🎉");
-            }
+            notifyOther(players, "Récompense Effectuée !", `"${completed ? completed.name : 'Tâche'}" a été validée par ${myPlayerName} !`, "16, 185, 129", "🎉");
 
-            set(gameRef, { ...state, players, timers });
+            set(gameRef, cleanObj({ ...state, players, timers }));
         };
 
         function updateTimersUI() {
             const container = document.getElementById('timersList');
-            const now = Date.now() + sOff;
+            const now = Date.now();
             
             let timers = Object.values(state.timers || {}).filter(x => x != null);
-            let activeTimers = timers.filter(t => t.end > now);
+            let activeTimers = [];
+            let expiredTimers = [];
             
-            if(timers.length !== activeTimers.length) {
-                set(gameRef, { ...state, timers: activeTimers });
+            timers.forEach(t => {
+                if (t.end > now) activeTimers.push(t);
+                else expiredTimers.push(t);
+            });
+            
+            if (expiredTimers.length > 0 && myPlayerName) {
+                let doUpdate = false;
+                let comps = state.pendingCompensations || [];
+                
+                expiredTimers.forEach(t => {
+                    if (t.targetDevice === myDeviceId || t.target === myPlayerName || Object.keys(state.players || {}).length < 2) {
+                        doUpdate = true;
+                        comps.push({ 
+                            id: t.id, text: t.name, type: t.type,
+                            victimDevice: t.targetDevice, victimPseudo: t.target || myPlayerName,
+                            guiltyDevice: t.authorDevice, guiltyPseudo: t.author || 'Inconnu',
+                            victimSeen: false, guiltySeen: false 
+                        });
+                    }
+                });
+                
+                if (doUpdate) {
+                    set(gameRef, cleanObj({ ...state, timers: activeTimers, pendingCompensations: comps }));
+                    return; 
+                }
             }
 
             container.innerHTML = "";
@@ -1429,14 +1830,25 @@
                 let h = Math.floor(leftSec/3600), m = Math.floor((leftSec%3600)/60);
                 let timeStr = `${h}h ${m}m rest.`;
 
+                let actualTargetPseudo = Object.keys(state.players || {}).find(k => state.players[k].deviceId === t.targetDevice) || t.target;
+                let actualAuthorPseudo = Object.keys(state.players || {}).find(k => state.players[k].deviceId === t.authorDevice) || t.author;
+
+                let authorColor = t.authorDevice === myDeviceId ? '#ec4899' : '#3b82f6';
+                let targetColor = t.targetDevice === myDeviceId ? '#ec4899' : '#3b82f6';
+
                 let div = document.createElement('div');
                 div.className = "active-timer";
                 div.style.borderLeftColor = t.color;
                 div.innerHTML = `
-                    <div class="timer-header">
-                        <strong>${t.name}</strong>
-                        <div style="display:flex; align-items:center; gap:10px;">
-                            <span style="color:${t.color}">${timeStr}</span>
+                    <div class="timer-header" style="align-items: flex-start; flex-direction: column; gap: 5px;">
+                        <div style="display:flex; justify-content:space-between; width: 100%;">
+                            <div style="display:flex; flex-direction:column; gap:2px;">
+                                <span style="font-size:0.75em; color:#cbd5e1;">De <strong style="color:${authorColor};">${actualAuthorPseudo}</strong> pour <strong style="color:${targetColor};">${actualTargetPseudo}</strong></span>
+                                <strong style="font-size:1.05em;">${t.name}</strong>
+                            </div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; width: 100%;">
+                            <span style="color:${t.color}; font-size:0.9em; font-weight:bold;">${timeStr}</span>
                             <button class="glow-track" onclick="window.terminerTimer(${t.id})" style="--glow-color: 16, 185, 129; padding: 4px 8px; font-size: 0.8em; background: rgba(16, 185, 129, 0.1) !important; border: 1px solid rgba(16, 185, 129, 0.5); color: #10b981; border-radius: 5px; flex: 0; white-space:nowrap;">✔ Fait</button>
                         </div>
                     </div>
@@ -1448,7 +1860,7 @@
             });
         }
 
-        // --- BOUCLE PRINCIPALE 100% BLINDÉE ---
+        // --- BOUCLE PRINCIPALE ---
         setInterval(() => {
             if(!myPlayerName || !viewedPlayerName) return;
             
@@ -1458,6 +1870,7 @@
             const modeJeuSafe = vState.modeJeu || 'attente';
             
             try { updateTimersUI(); } catch(e) {}
+            try { checkCompensations(); } catch(e) {}
             try { checkRewardsVisibility(); } catch(e) {}
             try { updateViewUI(); } catch(e) {}
             
@@ -1468,10 +1881,9 @@
             }
             
             let tMode = Number(vState.timestampMode);
-            if (isNaN(tMode) || tMode <= 0) tMode = Date.now() + sOff; 
+            if (isNaN(tMode) || tMode <= 0) tMode = Date.now();
             
-            const now = Date.now() + sOff; 
-            const elap = Math.max(0, Math.floor((now - tMode) / 1000));
+            const elap = Math.max(0, Math.floor((Date.now() - tMode) / 1000));
             const cumule = Number(vState.tempsTravailCumule) || 0;
             const baseP = Number(vState.piecesBase) || 0;
 
