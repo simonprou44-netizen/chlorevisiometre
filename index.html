@@ -780,16 +780,33 @@
             toast.style.padding = '15px 20px'; toast.style.borderRadius = '15px'; toast.style.color = 'white'; toast.style.display = 'flex'; toast.style.alignItems = 'center'; toast.style.gap = '15px';
             toast.style.boxShadow = `0 0 20px rgba(${colorCode}, 0.4)`; toast.style.transition = 'all 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55)'; toast.style.transform = 'translateX(150%)'; toast.style.opacity = '0'; toast.style.cursor = 'pointer'; 
             
-            toast.innerHTML = `<div style="font-size:2.2em; filter: drop-shadow(0 0 8px rgba(${colorCode},0.8));">${icon}</div><div style="text-align: left; flex:1;"><strong style="display:flex; align-items:center; font-size:1.1em; color:rgb(${colorCode}); margin-bottom:2px; text-transform:uppercase; letter-spacing:1px;">${title} <span class="toast-count" style="background:#ef4444; color:white; font-size:0.7em; padding:2px 6px; border-radius:10px; margin-left:8px; display:none;">1</span></strong><div class="toast-text" style="font-size:0.9em; color:#cbd5e1;">${text}</div>${extraBtn ? '<div>'+extraBtn+'</div>' : ''}</div>`;
+            toast.innerHTML = `
+                <div style="font-size:2.2em; filter: drop-shadow(0 0 8px rgba(${colorCode},0.8));">${icon}</div>
+                <div style="text-align: left; flex:1;">
+                    <strong style="display:flex; align-items:center; font-size:1.1em; color:rgb(${colorCode}); margin-bottom:2px; text-transform:uppercase; letter-spacing:1px;">
+                        ${title} <span class="toast-count" style="background:#ef4444; color:white; font-size:0.7em; padding:2px 6px; border-radius:10px; margin-left:8px; display:none;">1</span>
+                    </strong>
+                    <div class="toast-text" style="font-size:0.9em; color:#cbd5e1;">${text}</div>
+                    ${extraBtn ? '<div>'+extraBtn+'</div>' : ''}
+                </div>
+            `;
+            
             container.appendChild(toast);
-            void toast.offsetWidth; toast.style.transform = 'translateX(0)'; toast.style.opacity = '1';
+            void toast.offsetWidth;
+            toast.style.transform = 'translateX(0)';
+            toast.style.opacity = '1';
             
             toast.onclick = (e) => {
                 if(e.target.tagName === 'BUTTON') return;
                 if(type === 'message') window.replyToMessage(e, sender);
                 clearTimeout(toast.hideTimeout); toast.style.transform = 'translateX(150%)'; toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500);
             };
-            toast.hideTimeout = setTimeout(() => { toast.style.transform = 'translateX(150%)'; toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 4500);
+            
+            toast.hideTimeout = setTimeout(() => {
+                toast.style.transform = 'translateX(150%)';
+                toast.style.opacity = '0';
+                setTimeout(() => toast.remove(), 500);
+            }, 4500);
         };
 
         document.getElementById('btnNotifBell').onclick = () => {
@@ -810,7 +827,7 @@
                 let players = Object.assign({}, state.players || {});
                 let target = viewedPlayerName !== myPlayerName ? viewedPlayerName : Object.keys(players).find(k => k !== myPlayerName) || myPlayerName;
                 if(!players[myPlayerName]) players[myPlayerName] = {}; if(!players[target]) players[target] = {};
-                let msgs = state.messagerie || []; msgs.push({ id: Date.now(), sender: myPlayerName, text: txt, timeStr: new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}) });
+                let msgs = state.messagerie || []; msgs.push({ id: Date.now(), sender: myPlayerName, text: txt, timeStr: new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}), target: target });
                 if (target !== myPlayerName) appendNotif(players[target], "Nouveau Message", txt, "59, 130, 246", "💬", "message", myPlayerName);
                 set(gameRef, cleanObj({ ...state, messagerie: msgs, players })); e.target.value = "";
             }
@@ -823,7 +840,7 @@
             let players = Object.assign({}, state.players || {});
             let target = viewedPlayerName !== myPlayerName ? viewedPlayerName : Object.keys(players).find(k => k !== myPlayerName) || myPlayerName;
             if(!players[myPlayerName]) players[myPlayerName] = {}; if(!players[target]) players[target] = {};
-            let msgs = state.messagerie || []; msgs.push({ id: Date.now(), sender: myPlayerName, text: txt, timeStr: new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}) });
+            let msgs = state.messagerie || []; msgs.push({ id: Date.now(), sender: myPlayerName, text: txt, timeStr: new Date().toLocaleTimeString('fr-FR', {hour: '2-digit', minute:'2-digit'}), target: target });
             if (target !== myPlayerName) appendNotif(players[target], "Nouveau Message", txt, "59, 130, 246", "💬", "message", myPlayerName);
             set(gameRef, cleanObj({ ...state, messagerie: msgs, players })); document.getElementById('chatInputModal').value = ""; window.updateChatUI();
         };
@@ -925,6 +942,7 @@
                     btnSwitch.innerHTML = `👁️ Voir ${partnerName}`; 
                     document.body.classList.remove('viewing-partner'); 
                     
+                    // Appliquer la couleur grise si l'autre est hors ligne
                     if (!isPartnerOnline) {
                         btnSwitch.style.setProperty('--glow-color', '156, 163, 175');
                         btnSwitch.style.borderColor = 'rgba(156, 163, 175, 0.5)';
@@ -940,6 +958,7 @@
                     document.getElementById('partnerIndicator').innerHTML = `HUD DE ${partnerName}`; 
                     document.body.classList.add('viewing-partner'); 
                     
+                    // Retirer le gris pour notre propre bouton
                     btnSwitch.style.removeProperty('--glow-color');
                     btnSwitch.style.removeProperty('border-color');
                     btnSwitch.style.removeProperty('color');
@@ -956,18 +975,24 @@
                 btnSwitch.style.removeProperty('color');
             }
 
-            // Gestion de l'affichage noir et blanc si partenaire déconnecté
-            if (!isMe && partnerName && !isPartnerOnline) document.body.classList.add('offline-theme');
-            else document.body.classList.remove('offline-theme');
+            if (!isMe && partnerName && !isPartnerOnline) {
+                document.body.classList.add('offline-theme');
+            } else {
+                document.body.classList.remove('offline-theme');
+            }
 
             let vState = players[viewedPlayerName] || {};
             window.currentPv = (vState.pvActuels !== undefined && vState.pvActuels !== null) ? Number(vState.pvActuels) : 5; 
             
+            const input = document.getElementById('tacheInput');
+            const display = document.getElementById('tacheDisplay');
+            const btnTerminer = document.getElementById('btnTerminerTache');
+            
             if (vState.tacheEnCours) {
-                document.getElementById('tacheInput').style.display = 'none'; document.getElementById('tacheDisplay').style.display = 'inline'; document.getElementById('tacheDisplay').innerText = vState.tacheActuelle; document.getElementById('btnTerminerTache').style.display = 'inline-block';
+                input.style.display = 'none'; display.style.display = 'inline'; display.innerText = vState.tacheActuelle; btnTerminer.style.display = 'inline-block';
             } else {
-                document.getElementById('tacheInput').style.display = 'inline'; if(document.activeElement !== document.getElementById('tacheInput')) document.getElementById('tacheInput').value = vState.tacheActuelle || "";
-                document.getElementById('tacheDisplay').style.display = 'none'; document.getElementById('btnTerminerTache').style.display = 'none';
+                input.style.display = 'inline'; if(document.activeElement !== input) input.value = vState.tacheActuelle || "";
+                display.style.display = 'none'; btnTerminer.style.display = 'none';
             }
             
             document.querySelectorAll('.heart-vital').forEach((h, i) => i < window.currentPv ? h.classList.add('active') : h.classList.remove('active'));
@@ -993,15 +1018,17 @@
 
             let props = Object.values(state.propositions || {}).filter(x => x != null);
             let timers = Object.values(state.timers || {}).filter(x => x != null);
-            if (document.getElementById('rewardsDashboard')) document.getElementById('rewardsDashboard').style.display = (props.length > 0 || timers.some(t => t.end > Date.now())) ? 'flex' : 'none';
+            const now = Date.now(); const hasTimers = timers.some(t => t.end > now);
+            let rewardsDash = document.getElementById('rewardsDashboard');
+            if (rewardsDash) rewardsDash.style.display = (props.length > 0 || hasTimers) ? 'flex' : 'none';
 
-            const modeJeuSafe = vState.modeJeu || 'attente'; const isTr = modeJeuSafe === 'travail'; const dead = window.currentPv <= 0;
+            const modeJeuSafe = vState.modeJeu || 'attente'; const isTr = modeJeuSafe === 'travail'; const dead = window.currentPv <= 0; const isPa = modeJeuSafe.includes('pause');
 
             document.getElementById('btnStart').disabled = modeJeuSafe !== 'attente' || dead; document.getElementById('btnStop').disabled = modeJeuSafe === 'attente';
             document.getElementById('btnPause').disabled = !isTr || dead; document.getElementById('btnMinus').disabled = !isTr || dead; document.getElementById('btnPlus').disabled = !isTr || dead; document.getElementById('btnBoutique').disabled = !isTr || dead;
             
-            if (window.currentPv > 5) document.getElementById('btnMinus').innerHTML = `<span>⭐ Distraction</span><small>Reset Bonus</small>`;
-            else document.getElementById('btnMinus').innerHTML = `<span>👎 Distraction</span><small>-1 PV</small>`;
+            const btnMinus = document.getElementById('btnMinus');
+            if (window.currentPv > 5) { btnMinus.innerHTML = `<span>⭐ Distraction</span><small>Reset Bonus</small>`; } else { btnMinus.innerHTML = `<span>👎 Distraction</span><small>-1 PV</small>`; }
             
             document.getElementById('buy1S').disabled = window.currentPv < 7; document.getElementById('buy1P').disabled = localPieces < 600; 
             document.getElementById('buy2S').disabled = window.currentPv < 8; document.getElementById('buy2P').disabled = localPieces < 1200; 
@@ -1009,12 +1036,13 @@
 
             if(isPa) {
                 document.body.classList.add('paused-mode');
+                const panel = document.getElementById('panelPause');
                 if(modeJeuSafe === 'pause_repas') {
-                    document.getElementById('panelPause').style.setProperty('--glow-color', '249, 115, 22'); document.getElementById('titrePause').style.color = '#f97316'; document.getElementById('titrePause').innerText = "🍔 PAUSE REPAS"; document.getElementById('burgerLoading').style.display = 'inline-block';
+                    panel.style.setProperty('--glow-color', '249, 115, 22'); document.getElementById('titrePause').style.color = '#f97316'; document.getElementById('titrePause').innerText = "🍔 PAUSE REPAS"; document.getElementById('burgerLoading').style.display = 'inline-block';
                 } else {
-                    document.getElementById('panelPause').style.setProperty('--glow-color', '236, 72, 153'); document.getElementById('titrePause').style.color = '#ec4899'; document.getElementById('titrePause').innerText = "🪙 PAUSE"; document.getElementById('burgerLoading').style.display = 'none';
+                    panel.style.setProperty('--glow-color', '236, 72, 153'); document.getElementById('titrePause').style.color = '#ec4899'; document.getElementById('titrePause').innerText = "🪙 PAUSE"; document.getElementById('burgerLoading').style.display = 'none';
                 }
-                document.getElementById('panelPause').style.display = 'block';
+                panel.style.display = 'block';
             } else {
                 document.body.classList.remove('paused-mode'); document.getElementById('panelPause').style.display = 'none';
             }
@@ -1058,8 +1086,9 @@
             if (myPlayerName && viewedPlayerName) {
                 let vState = state.players[viewedPlayerName] || {};
                 if (!window.rewardTrackers) window.rewardTrackers = {};
-                if (!window.rewardTrackers[viewedPlayerName]) window.rewardTrackers[viewedPlayerName] = { r5: vState.recompense5Obtenue || false, r7: vState.recompense7Obtenue || false, r10: vState.recompense10Obtenue || false };
-                else if (!isFirstLoad) {
+                if (!window.rewardTrackers[viewedPlayerName]) {
+                    window.rewardTrackers[viewedPlayerName] = { r5: vState.recompense5Obtenue || false, r7: vState.recompense7Obtenue || false, r10: vState.recompense10Obtenue || false };
+                } else if (!isFirstLoad) {
                     if (vState.recompense5Obtenue && !window.rewardTrackers[viewedPlayerName].r5) showRewardAnim('petite');
                     if (vState.recompense7Obtenue && !window.rewardTrackers[viewedPlayerName].r7) showRewardAnim('grande');
                     if (vState.recompense10Obtenue && !window.rewardTrackers[viewedPlayerName].r10) showRewardAnim('souhait');
@@ -1075,15 +1104,10 @@
         const launch = () => {
             document.getElementById('toastContainer').innerHTML = ""; 
             let players = Object.assign({}, state.players || {}); let vState = players[viewedPlayerName] || {};
-
-            players[viewedPlayerName] = {
-                ...vState,
-                pvActuels: 5, piecesBase: 0, repasRestants: 2, 
-                recompense5Obtenue: false, recompense7Obtenue: false, recompense10Obtenue: false,
-                sessionPetites: 0, sessionGrandes: 0, sessionSouhaits: 0,
-                modeJeu: 'travail', timestampMode: Date.now(), tempsTravailCumule: 0
-            };
             
+            if(viewedPlayerName === myPlayerName) { if (!window.rewardTrackers) window.rewardTrackers = {}; if (!window.rewardTrackers[myPlayerName]) window.rewardTrackers[myPlayerName] = {}; window.rewardTrackers[myPlayerName].r5 = true; }
+
+            players[viewedPlayerName] = { ...vState, pvActuels: 5, piecesBase: 0, repasRestants: 2, recompense5Obtenue: true, recompense7Obtenue: false, recompense10Obtenue: false, sessionPetites: (Number(vState.sessionPetites)||0)+1, sessionGrandes: 0, sessionSouhaits: 0, modeJeu: 'travail', timestampMode: Date.now(), tempsTravailCumule: 0 };
             notifyOther(players, "Session Démarrée", `${myPlayerName} a lancé le chrono !`, "16, 185, 129", "🚀");
             set(gameRef, cleanObj({ ...state, players }));
         };
@@ -1114,14 +1138,8 @@
             triggerSharedAnim('anim-flash-green', 'green'); document.getElementById('toastContainer').innerHTML = ""; 
             let players = Object.assign({}, state.players || {});
             
-            players[viewedPlayerName] = { 
-                ...(players[viewedPlayerName]||{}),
-                pvActuels: 5, piecesBase: 0, repasRestants: 2, 
-                recompense5Obtenue: false, recompense7Obtenue: false, recompense10Obtenue: false,
-                sessionPetites: 0, sessionGrandes: 0, sessionSouhaits: 0,
-                modeJeu: 'travail', timestampMode: Date.now(), tempsTravailCumule: 0
-            };
-            
+            if(viewedPlayerName === myPlayerName) { if (!window.rewardTrackers) window.rewardTrackers = {}; if (!window.rewardTrackers[myPlayerName]) window.rewardTrackers[myPlayerName] = {}; window.rewardTrackers[myPlayerName].r5 = true; }
+            players[viewedPlayerName] = { ...(players[viewedPlayerName]||{}), pvActuels: 5, piecesBase: 0, repasRestants: 2, recompense5Obtenue: true, recompense7Obtenue: false, recompense10Obtenue: false, sessionPetites: 1, sessionGrandes: 0, sessionSouhaits: 0, modeJeu: 'travail', timestampMode: Date.now(), tempsTravailCumule: 0 };
             notifyOther(players, "Réanimation", `${viewedPlayerName} a été réanimé !`, "16, 185, 129", "⚡");
             set(gameRef, cleanObj({ ...state, players }));
         };
@@ -1264,8 +1282,10 @@
             let val = document.getElementById('defSouhait').value.trim(); if(!val) { alert("Veuillez saisir une description."); return; }
             
             let partnerName = Object.keys(state.players||{}).find(k => k !== myPlayerName) || myPlayerName;
+            let partnerDevice = state.players[partnerName]?.deviceId || myDeviceId;
+            
             let timers = Object.values(state.timers || {}).filter(x => x != null);
-            timers.push({ id: Date.now(), name: val, end: Date.now() + 86400000, color: '#a855f7', author: myPlayerName, authorDevice: myDeviceId, target: partnerName, targetDevice: state.players[partnerName]?.deviceId || myDeviceId, type: 'nbSouhaits' });
+            timers.push({ id: Date.now(), name: val, end: Date.now() + 86400000, color: '#a855f7', author: myPlayerName, authorDevice: myDeviceId, target: partnerName, targetDevice: partnerDevice, type: 'nbSouhaits' });
             
             let players = Object.assign({}, state.players || {}); players[myPlayerName] = { ...myState, nbSouhaits: currentNb - 1, consommeSouhaits: (myState.consommeSouhaits||0) + 1 };
             notifyOther(players, "Souhait Utilisé", `${myPlayerName} a lancé le Souhait : ${val} !`, "168, 85, 247", "🪔");
@@ -1286,7 +1306,7 @@
                 let comp = comps[idx]; comps[idx].victimSeen = true; let players = Object.assign({}, state.players || {});
                 if (players[myPlayerName] && comp.type) players[myPlayerName][comp.type] = (players[myPlayerName][comp.type] || 0) + 1;
                 let guiltyKey = Object.keys(players).find(k => players[k].deviceId === comp.guiltyDevice || k === comp.guiltyPseudo);
-                if (guiltyKey && players[guiltyKey] && guiltyKey !== myPlayerName) appendNotif(players[guiltyKey], "Remboursement", `${myPlayerName} a récupéré sa surprise.`, "16, 185, 129", "✅", "normal", myPlayerName);
+                if (guiltyKey && players[guiltyKey] && guiltyKey !== myPlayerName) appendNotif(players[guiltyKey], "Remboursement effectué", `${myPlayerName} a récupéré sa surprise "${comp.text}".`, "16, 185, 129", "✅", "normal", myPlayerName);
                 if(comps[idx].guiltySeen && comps[idx].victimSeen) comps.splice(idx, 1);
                 set(gameRef, cleanObj({ ...state, players, pendingCompensations: comps }));
                 showRewardAnim(comp.type === 'nbPetitesSurprises' ? 'petite' : (comp.type === 'nbGrandesSurprises' ? 'grande' : 'souhait')); 
