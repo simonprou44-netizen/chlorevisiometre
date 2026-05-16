@@ -118,10 +118,7 @@
         body.flatline-theme .header, body.flatline-theme .status-bar, body.flatline-theme .dashboard, body.flatline-theme .controls, body.flatline-theme #rewardsDashboard,
         body.failing-theme .header, body.failing-theme .status-bar, body.failing-theme .dashboard, body.failing-theme .controls, body.failing-theme #rewardsDashboard { filter: grayscale(1) opacity(0.15); pointer-events: none; transition: all 1s ease; }
         
-        /* NEW OFFLINE THEME */
-        body.offline-theme .header, body.offline-theme .status-bar, body.offline-theme .dashboard, body.offline-theme .controls, body.offline-theme #rewardsDashboard { filter: grayscale(1) opacity(0.85); transition: all 0.5s ease; }
-        
-        body:not(.paused-mode):not(.flatline-theme):not(.failing-theme):not(.offline-theme) .header, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme):not(.offline-theme) .status-bar, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme):not(.offline-theme) .dashboard, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme):not(.offline-theme) .controls, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme):not(.offline-theme) #rewardsDashboard { transition: all 0.5s ease; }
+        body:not(.paused-mode):not(.flatline-theme):not(.failing-theme) .header, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme) .status-bar, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme) .dashboard, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme) .controls, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme) #rewardsDashboard { transition: all 0.5s ease; }
 
         /* --- UI COMPONENTS --- */
         .header { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 15px; padding: 20px 25px; width: 92%; max-width: 480px; --glow-color: 249, 115, 22; margin-top: 50px; }
@@ -490,8 +487,6 @@
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
         import { getDatabase, ref, set, onValue, onDisconnect } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
 
-        const $ = id => document.getElementById(id);
-        
         let myPlayerName = "";
         let viewedPlayerName = "";
         let savedPseudo = localStorage.getItem('lastPseudo');
@@ -506,19 +501,19 @@
         const EMOJIS = ['😀','😃','😄','😁','😆','😅','😂','🤣','🥲','🥹','☺️','😊','😇','🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚','😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🥸','🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️','😣','😖','😫','😩','🥺','😢','😭','😮‍💨','😤','😠','😡','🤬','🤯','😳','🥵','🥶','😱','😨','😰','😥','😓','🫣','🤗','🫡','🤔','🫢','🤭','🤫','🤥','😶','😶‍🌫️','😐','😑','😬','🫨','🫠','🙄','😯','😦','😧','🥱','😴','🤤','😪','😵','😵‍💫','🤐','🥴','🤢','🤮','🤧','😷','🤒','🤕','🤑','🤠','😈','👿','👹','👺','🤡','💩','👻','💀','☠️','👽','👾','🤖','🎃','😺','😸','😹','😻','😼','😽','🙀','😿','😾','🙈','🙉','🙊','💋','💌','💘','💝','💖','💗','💓','💞','💕','💟','❣️','💔','❤️‍🔥','❤️‍🩹','❤️','🩷','🧡','💛','💚','💙','🩵','💜','🖤','🩶','🤍','🤎','💯','💢','💥','💫','💦','💨','🕳️','💣','💬','👁️‍🗨️','🗨️','🗯️','💭','💤','👋','🤚','🖐️','✋','🖖','🫱','🫲','🫳','🫴','👌','🤌','🤏','✌️','🤞','🫰','🤟','🤘','🤙','👈','👉','👆','🖕','👇','☝️','👍','👎','✊','👊','🤛','🤜','👏','🙌','🫶','👐','🤲','🤝','🙏','✍️','💅','🤳','💪','🦾','🦿','🦵','🦶','👂','🦻','👃','🫀','🫁','🧠','🦷','🦴','👀','👁️','👅','👄','🫦','👶','👧','🧒','👦','👩','🧑','👨','👩‍🦱','🧑‍🦱','👨‍🦱','👩‍🦰','🧑‍🦰','👨‍🦰','👱‍♀️','👱','👱‍♂️','👩‍🦳','🧑‍🦳','👨‍🦳','👩‍🦲','🧑‍🦲','👨‍🦲','🧔‍♀️','🧔','🧔‍♂️','👵','🧓','👴','👲','👳‍♀️','👳','👳‍♂️','🧕','👮‍♀️','👮','👮‍♂️','👰‍♀️','👰','👰‍♂️','🤰','🤱','👼','🎅','🤶','🦸‍♀️','🦸','🦸‍♂️','🦹‍♀️','🦹','🦹‍♂️','🧙‍♀️','🧙','🧙‍♂️','🧚‍♀️','🧚','🧚‍♂️','🧛‍♀️','🧛','🧛‍♂️','🧜‍♀️','🧜','🧜‍♂️','🧝‍♀️','🧝','🧝‍♂️','🧞‍♀️','🧞','🧞‍♂️','🧟‍♀️','🧟','🧟‍♂️','🚶‍♀️','🚶','🚶‍♂️','🏃‍♀️','🏃','🏃‍♂️','💃','🕺','🕴️','👯‍♀️','👯','👯‍♂️','🧖‍♀️','🧖','🧖‍♂️','🧗‍♀️','🧗','🧗‍♂️','🧘‍♀️','🧘','🧘‍♂️','🛀','🛌','🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐻‍❄️','🐨','🐯','🦁','🐮','🐷','🐽','🐸','🐵','🐒','🦍','🦧','🐔','🐧','🐦','🐤','🐣','🐥','🦆','🦅','🦉','🦇','🐺','🐗','🐴','🦄','🐝','🪱','🐛','🦋','🐌','🐞','🐜','🪰','🪲','🪳','🦟','🦗','🕷️','🕸️','🦂','🐢','🐍','🦎','🐙','🦑','🦖','🐊','🦕','🐅','🐆','🦓','🦍','🦧','🦣','🐘','🦛','🦏','🐪','🐫','🦒','🦘','🐃','🐂','🐄','🐎','🐖','🐏','🐑','🦙','🐐','🦌','🐕','🐩','🦮','🐕‍🦺','🐈','🐈‍⬛','🪶','🐓','🦃','🦤','🦚','🦜','🦢','🦩','🕊️','🐇','🦝','🦨','🦡','🦫','🦦','🦥','🐁','🐀','🐿️','🦔','🐾','🐉','🐲','🌵','🎄','🌲','🌳','🌴','🪵','🌱','🌿','☘️','🍀','🎍','🪴','🎋','🍃','🍂','🍁','🍄','🌾','💐','🌷','🌹','🥀','🪷','🌺','🌸','🌼','🌻','🍏','🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐','🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑','🥦','🥬','🥒','🌶️','🫑','🌽','🥕','🫒','🧄','🧅','🥔','🍠','🥐','🥯','🍞','🥖','🥨','🧀','🥚','🍳','🧈','🥞','🧇','🥓','🥩','🍗','🍖','🌭','🍔','🍟','🍕','🫓','🥪','🥙','🧆','🌮','🌯','🫔','🥗','🥘','🫕','🥫','🍝','🍜','🍲','🍛','🍣','🍱','🥟','🦪','🍤','🍙','🍚','🍘','🍥','🥠','🥮','🍢','🍡','🍧','🍨','🍦','🥧','🧁','🍰','🎂','🍮','🍭','🍬','🍫','🍿','🍩','🍪','🌰','🥜','🍯','🥛','🍼','🫖','☕','🍵','🧃','🥤','🧋','🍶','🍺','🍻','🥂','🍷','🥃','🍸','🍹','🧉','🍾','🧊','🥄','🍴','🍽️','🥣','🥡','🥢','🧂'];
         
         window.addEventListener('DOMContentLoaded', () => {
-            $('inputPseudo').value = "";
-            setTimeout(() => { $('inputPseudo').value = ""; }, 50);
+            document.getElementById('inputPseudo').value = "";
+            setTimeout(() => { document.getElementById('inputPseudo').value = ""; }, 50);
 
             if(savedPseudo) {
-                $('btnResumeSession').style.display = 'block';
-                $('btnResumeSession').innerText = `Reprendre le profil ${savedPseudo}`;
-                $('btnResumeSession').onclick = () => {
-                    $('inputPseudo').value = savedPseudo;
-                    $('btnValiderPseudo').click();
+                document.getElementById('btnResumeSession').style.display = 'block';
+                document.getElementById('btnResumeSession').innerText = `Reprendre le profil ${savedPseudo}`;
+                document.getElementById('btnResumeSession').onclick = () => {
+                    document.getElementById('inputPseudo').value = savedPseudo;
+                    document.getElementById('btnValiderPseudo').click();
                 };
             }
 
-            const panel = $('emojiPanelModal');
+            const panel = document.getElementById('emojiPanelModal');
             EMOJIS.forEach(em => {
                 let span = document.createElement('span');
                 span.innerText = em;
@@ -528,22 +523,21 @@
                 panel.appendChild(span);
             });
 
-            // ATTACHE DES BOUTONS PROPOSITIONS (Sécurisé)
-            $('btnConsommerPetite').onclick = () => proposerItem('nbPetitesSurprises', 'defPetite');
-            $('btnConsommerGrande').onclick = () => proposerItem('nbGrandesSurprises', 'defGrande');
+            document.getElementById('btnConsommerPetite').onclick = () => proposerItem('nbPetitesSurprises', 'defPetite');
+            document.getElementById('btnConsommerGrande').onclick = () => proposerItem('nbGrandesSurprises', 'defGrande');
         });
 
-        $('chatEmojiToggleModal').onclick = (e) => {
-            let p = $('emojiPanelModal');
+        document.getElementById('chatEmojiToggleModal').onclick = (e) => {
+            let p = document.getElementById('emojiPanelModal');
             p.style.display = p.style.display === 'none' ? 'flex' : 'none';
             e.stopPropagation();
         };
-        document.addEventListener('click', () => { if($('emojiPanelModal')) $('emojiPanelModal').style.display = 'none'; });
-        $('emojiPanelModal').addEventListener('click', e => e.stopPropagation());
+        document.addEventListener('click', () => { if(document.getElementById('emojiPanelModal')) document.getElementById('emojiPanelModal').style.display = 'none'; });
+        document.getElementById('emojiPanelModal').addEventListener('click', e => e.stopPropagation());
 
         window.insertEmojiModal = function(emoji) {
-            $('chatInputModal').value += emoji;
-            $('chatInputModal').focus();
+            document.getElementById('chatInputModal').value += emoji;
+            document.getElementById('chatInputModal').focus();
         };
 
         const firebaseConfig = {
@@ -762,7 +756,7 @@
         window.showNotification = function(title, text, colorCode, icon, type='normal', sender='') {
             const container = document.getElementById('toastContainer');
             let existingToast = Array.from(container.children).find(c => c.getAttribute('data-title') === title);
-            let extraBtn = (type === 'message') ? `<button onclick="window.replyToMessage(event, '${sender}'); this.parentElement.parentElement.remove();" style="background:#3b82f6!important; padding:6px 10px; font-size:0.8em; font-weight:bold; margin-top:8px; border:none; border-radius:8px; color:white; cursor:pointer; flex:none;">💬 Répondre</button>` : '';
+            let extraBtn = (type === 'message' && sender && sender !== myPlayerName) ? `<button onclick="window.replyToMessage(event, '${sender}'); this.parentElement.parentElement.remove();" style="background:#3b82f6!important; padding:6px 10px; font-size:0.8em; font-weight:bold; margin-top:8px; border:none; border-radius:8px; color:white; cursor:pointer; flex:none;">💬 Répondre</button>` : '';
 
             if (existingToast) {
                 let countEl = existingToast.querySelector('.toast-count');
@@ -801,12 +795,7 @@
                 if(type === 'message') window.replyToMessage(e, sender);
                 clearTimeout(toast.hideTimeout); toast.style.transform = 'translateX(150%)'; toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500);
             };
-            
-            toast.hideTimeout = setTimeout(() => {
-                toast.style.transform = 'translateX(150%)';
-                toast.style.opacity = '0';
-                setTimeout(() => toast.remove(), 500);
-            }, 4500);
+            toast.hideTimeout = setTimeout(() => { toast.style.transform = 'translateX(150%)'; toast.style.opacity = '0'; setTimeout(() => toast.remove(), 500); }, 4500);
         };
 
         document.getElementById('btnNotifBell').onclick = () => {
@@ -942,7 +931,6 @@
                     btnSwitch.innerHTML = `👁️ Voir ${partnerName}`; 
                     document.body.classList.remove('viewing-partner'); 
                     
-                    // Appliquer la couleur grise si l'autre est hors ligne
                     if (!isPartnerOnline) {
                         btnSwitch.style.setProperty('--glow-color', '156, 163, 175');
                         btnSwitch.style.borderColor = 'rgba(156, 163, 175, 0.5)';
@@ -958,7 +946,6 @@
                     document.getElementById('partnerIndicator').innerHTML = `HUD DE ${partnerName}`; 
                     document.body.classList.add('viewing-partner'); 
                     
-                    // Retirer le gris pour notre propre bouton
                     btnSwitch.style.removeProperty('--glow-color');
                     btnSwitch.style.removeProperty('border-color');
                     btnSwitch.style.removeProperty('color');
@@ -973,12 +960,6 @@
                 btnSwitch.style.removeProperty('--glow-color');
                 btnSwitch.style.removeProperty('border-color');
                 btnSwitch.style.removeProperty('color');
-            }
-
-            if (!isMe && partnerName && !isPartnerOnline) {
-                document.body.classList.add('offline-theme');
-            } else {
-                document.body.classList.remove('offline-theme');
             }
 
             let vState = players[viewedPlayerName] || {};
@@ -1070,6 +1051,11 @@
 
                 let lToast = data.players[myPlayerName].lastToast;
                 if (lToast && lToast.id !== lastToastId) { lastToastId = lToast.id; if (Date.now() - lToast.id < 5000 && !(lToast.type === 'message' && lToast.sender === myPlayerName)) window.showNotification(lToast.title, lToast.text, lToast.colorCode, lToast.icon, lToast.type, lToast.sender); }
+                
+                if (data.players[myPlayerName].piecesBase !== undefined && data.players[myPlayerName].modeJeu === 'attente') {
+                    localPieces = data.players[myPlayerName].piecesBase;
+                }
+                
                 saveDeviceInventory(data.players[myPlayerName].nbPetitesSurprises || 0, data.players[myPlayerName].nbGrandesSurprises || 0, data.players[myPlayerName].nbSouhaits || 0);
             }
             
@@ -1104,10 +1090,17 @@
         const launch = () => {
             document.getElementById('toastContainer').innerHTML = ""; 
             let players = Object.assign({}, state.players || {}); let vState = players[viewedPlayerName] || {};
-            
-            if(viewedPlayerName === myPlayerName) { if (!window.rewardTrackers) window.rewardTrackers = {}; if (!window.rewardTrackers[myPlayerName]) window.rewardTrackers[myPlayerName] = {}; window.rewardTrackers[myPlayerName].r5 = true; }
 
-            players[viewedPlayerName] = { ...vState, pvActuels: 5, piecesBase: 0, repasRestants: 2, recompense5Obtenue: true, recompense7Obtenue: false, recompense10Obtenue: false, sessionPetites: (Number(vState.sessionPetites)||0)+1, sessionGrandes: 0, sessionSouhaits: 0, modeJeu: 'travail', timestampMode: Date.now(), tempsTravailCumule: 0 };
+            players[viewedPlayerName] = {
+                ...vState,
+                pvActuels: 5, 
+                piecesBase: vState.piecesBase || 0,
+                repasRestants: vState.repasRestants || 2, 
+                recompense5Obtenue: false, recompense7Obtenue: false, recompense10Obtenue: false,
+                sessionPetites: 0, sessionGrandes: 0, sessionSouhaits: 0,
+                modeJeu: 'travail', timestampMode: Date.now(), tempsTravailCumule: 0
+            };
+            
             notifyOther(players, "Session Démarrée", `${myPlayerName} a lancé le chrono !`, "16, 185, 129", "🚀");
             set(gameRef, cleanObj({ ...state, players }));
         };
@@ -1138,8 +1131,16 @@
             triggerSharedAnim('anim-flash-green', 'green'); document.getElementById('toastContainer').innerHTML = ""; 
             let players = Object.assign({}, state.players || {});
             
-            if(viewedPlayerName === myPlayerName) { if (!window.rewardTrackers) window.rewardTrackers = {}; if (!window.rewardTrackers[myPlayerName]) window.rewardTrackers[myPlayerName] = {}; window.rewardTrackers[myPlayerName].r5 = true; }
-            players[viewedPlayerName] = { ...(players[viewedPlayerName]||{}), pvActuels: 5, piecesBase: 0, repasRestants: 2, recompense5Obtenue: true, recompense7Obtenue: false, recompense10Obtenue: false, sessionPetites: 1, sessionGrandes: 0, sessionSouhaits: 0, modeJeu: 'travail', timestampMode: Date.now(), tempsTravailCumule: 0 };
+            players[viewedPlayerName] = { 
+                ...(players[viewedPlayerName]||{}),
+                pvActuels: 5, 
+                piecesBase: localPieces, 
+                repasRestants: players[viewedPlayerName]?.repasRestants || 2, 
+                recompense5Obtenue: false, recompense7Obtenue: false, recompense10Obtenue: false,
+                sessionPetites: 0, sessionGrandes: 0, sessionSouhaits: 0,
+                modeJeu: 'travail', timestampMode: Date.now(), tempsTravailCumule: 0
+            };
+            
             notifyOther(players, "Réanimation", `${viewedPlayerName} a été réanimé !`, "16, 185, 129", "⚡");
             set(gameRef, cleanObj({ ...state, players }));
         };
@@ -1147,9 +1148,13 @@
         document.getElementById('btnStart').onclick = launch;
         document.getElementById('btnStop').onclick = () => {
             let players = Object.assign({}, state.players || {});
-            players[viewedPlayerName].modeJeu = 'attente'; players[viewedPlayerName].tacheActuelle = ""; players[viewedPlayerName].tacheEnCours = false;
+            players[viewedPlayerName].modeJeu = 'attente'; 
+            players[viewedPlayerName].tacheActuelle = ""; 
+            players[viewedPlayerName].tacheEnCours = false;
+            players[viewedPlayerName].piecesBase = localPieces; 
+            
             notifyOther(players, "Session Stoppée", `${myPlayerName} a arrêté le chrono.`, "239, 68, 68", "🛑");
-            set(gameRef, cleanObj({ ...state, players, tachesAccomplies: [] }));
+            set(gameRef, cleanObj({ ...state, players, tachesAccomplies: (state.tachesAccomplies || []).filter(t => t.author !== viewedPlayerName) }));
         };
         
         document.getElementById('btnInventaire').onclick = () => document.getElementById('modalInventaire').style.display='flex';
@@ -1186,24 +1191,24 @@
         
         document.getElementById('buy1P').onclick = () => handleShopPurchase(() => {
             let vState = (state.players || {})[viewedPlayerName] || {}; if(localPieces < 600) return false;
-            let players = Object.assign({}, state.players || {}); players[viewedPlayerName] = { ...vState, piecesBase: vState.piecesBase - 600, nbPetitesSurprises: (vState.nbPetitesSurprises || 0) + 1, sessionPetites: (vState.sessionPetites || 0) + 1 };
+            let players = Object.assign({}, state.players || {}); players[viewedPlayerName] = { ...vState, piecesBase: localPieces - 600, nbPetitesSurprises: (vState.nbPetitesSurprises || 0) + 1, sessionPetites: (vState.sessionPetites || 0) + 1 };
             notifyOther(players, "Achat Boutique", `${myPlayerName} a acheté : Petite Surprise !`, "236, 72, 153", "🛒"); set(gameRef, cleanObj({ ...state, players })); return true;
         }, "petite");
 
         document.getElementById('buy2P').onclick = () => handleShopPurchase(() => {
             let vState = (state.players || {})[viewedPlayerName] || {}; if(localPieces < 1200) return false;
-            let players = Object.assign({}, state.players || {}); players[viewedPlayerName] = { ...vState, piecesBase: vState.piecesBase - 1200, nbGrandesSurprises: (vState.nbGrandesSurprises || 0) + 1, sessionGrandes: (vState.sessionGrandes || 0) + 1 };
+            let players = Object.assign({}, state.players || {}); players[viewedPlayerName] = { ...vState, piecesBase: localPieces - 1200, nbGrandesSurprises: (vState.nbGrandesSurprises || 0) + 1, sessionGrandes: (vState.sessionGrandes || 0) + 1 };
             notifyOther(players, "Achat Boutique", `${myPlayerName} a acheté : Grande Surprise !`, "236, 72, 153", "🛒"); set(gameRef, cleanObj({ ...state, players })); return true;
         }, "grande");
 
         document.getElementById('buy1S').onclick = () => handleShopPurchase(() => {
             let vState = (state.players || {})[viewedPlayerName] || {}; if(vState.pvActuels < 7) return false;
-            applyPvChange(vState.pvActuels - 2, { nbPetitesSurprises: (vState.nbPetitesSurprises || 0) + 1, sessionPetites: (vState.sessionPetites || 0) + 1 }, ["Achat Boutique", `${myPlayerName} a échangé du focus pour une Petite Surprise !`, "236, 72, 153", "🛒"]); return true;
+            applyPvChange(vState.pvActuels - 2, { nbPetitesSurprises: (vState.nbPetitesSurprises || 0) + 1, sessionPetites: (vState.sessionPetites || 0) + 1, piecesBase: localPieces }, ["Achat Boutique", `${myPlayerName} a échangé du focus pour une Petite Surprise !`, "236, 72, 153", "🛒"]); return true;
         }, "petite");
 
         document.getElementById('buy2S').onclick = () => handleShopPurchase(() => {
             let vState = (state.players || {})[viewedPlayerName] || {}; if(vState.pvActuels < 8) return false;
-            applyPvChange(vState.pvActuels - 3, { nbGrandesSurprises: (vState.nbGrandesSurprises || 0) + 1, sessionGrandes: (vState.sessionGrandes || 0) + 1 }, ["Achat Boutique", `${myPlayerName} a échangé du focus pour une Grande Surprise !`, "236, 72, 153", "🛒"]); return true;
+            applyPvChange(vState.pvActuels - 3, { nbGrandesSurprises: (vState.nbGrandesSurprises || 0) + 1, sessionGrandes: (vState.sessionGrandes || 0) + 1, piecesBase: localPieces }, ["Achat Boutique", `${myPlayerName} a échangé du focus pour une Grande Surprise !`, "236, 72, 153", "🛒"]); return true;
         }, "grande");
 
         function proposerItem(typeKey, nameField) {
@@ -1218,7 +1223,15 @@
             let partnerDevice = state.players[partnerName]?.deviceId || myDeviceId;
 
             let props = Object.values(state.propositions || {}).filter(x => x != null);
-            props.push({ id: Date.now(), type: typeKey, text: val, author: myPlayerName, authorDevice: myDeviceId, target: partnerName, targetDevice: partnerDevice });
+            props.push({ 
+                id: Date.now(), 
+                type: typeKey, 
+                text: val, 
+                author: myPlayerName, 
+                authorDevice: myDeviceId,
+                target: partnerName,
+                targetDevice: partnerDevice 
+            });
             
             let patch = {}; patch[typeKey] = currentNb - 1; 
             let players = Object.assign({}, state.players || {});
@@ -1237,8 +1250,17 @@
             if(p.type==='nbPetitesSurprises') patch.consommePetites = (vState.consommePetites||0)+1; else patch.consommeGrandes = (vState.consommeGrandes||0)+1;
 
             let timers = Object.values(state.timers || {}).filter(x => x != null);
-            timers.push({ id: Date.now(), name: p.text, end: Date.now() + 86400000, color: p.type==='nbPetitesSurprises'?'#10b981':'#f59e0b', author: p.author, authorDevice: p.authorDevice, target: actualTargetPseudo, targetDevice: p.targetDevice, type: p.type });
-            let players = Object.assign({}, state.players || {}); players[actualTargetPseudo] = { ...vState, ...patch };
+            timers.push({ 
+                id: Date.now(), name: p.text, end: Date.now() + 86400000, 
+                color: p.type==='nbPetitesSurprises'?'#10b981':'#f59e0b', 
+                author: p.author, authorDevice: p.authorDevice,
+                target: actualTargetPseudo, targetDevice: p.targetDevice, 
+                type: p.type 
+            });
+            
+            let players = Object.assign({}, state.players || {});
+            players[actualTargetPseudo] = { ...vState, ...patch };
+
             notifyOther(players, "Accord Validé", `L'accord de ${myPlayerName} sur "${p.text}" est validé !`, "16, 185, 129", "🤝");
             set(gameRef, cleanObj({ ...state, players, timers, propositions: props.filter(x => x.id !== pId) }));
         };
@@ -1279,13 +1301,18 @@
             let myState = (state.players || {})[myPlayerName] || {};
             let currentNb = Number(myState.nbSouhaits) || 0;
             if (currentNb <= 0) { alert("Stock insuffisant !"); return; }
-            let val = document.getElementById('defSouhait').value.trim(); if(!val) { alert("Veuillez saisir une description."); return; }
+            let val = document.getElementById('defSouhait').value.trim(); if(!val) { alert("Veuillez saisir une description pour la récompense."); return; }
             
             let partnerName = Object.keys(state.players||{}).find(k => k !== myPlayerName) || myPlayerName;
             let partnerDevice = state.players[partnerName]?.deviceId || myDeviceId;
             
             let timers = Object.values(state.timers || {}).filter(x => x != null);
-            timers.push({ id: Date.now(), name: val, end: Date.now() + 86400000, color: '#a855f7', author: myPlayerName, authorDevice: myDeviceId, target: partnerName, targetDevice: partnerDevice, type: 'nbSouhaits' });
+            timers.push({ 
+                id: Date.now(), name: val, end: Date.now() + 86400000, color: '#a855f7', 
+                author: myPlayerName, authorDevice: myDeviceId, 
+                target: partnerName, targetDevice: partnerDevice, 
+                type: 'nbSouhaits' 
+            });
             
             let players = Object.assign({}, state.players || {}); players[myPlayerName] = { ...myState, nbSouhaits: currentNb - 1, consommeSouhaits: (myState.consommeSouhaits||0) + 1 };
             notifyOther(players, "Souhait Utilisé", `${myPlayerName} a lancé le Souhait : ${val} !`, "168, 85, 247", "🪔");
@@ -1304,30 +1331,47 @@
             let comps = state.pendingCompensations || []; let idx = comps.findIndex(c => c.id === window.currentCompContext);
             if (idx !== -1) {
                 let comp = comps[idx]; comps[idx].victimSeen = true; let players = Object.assign({}, state.players || {});
-                if (players[myPlayerName] && comp.type) players[myPlayerName][comp.type] = (players[myPlayerName][comp.type] || 0) + 1;
+                
+                // Remboursement
+                if (players[myPlayerName] && comp.type) {
+                    players[myPlayerName][comp.type] = (players[myPlayerName][comp.type] || 0) + 1;
+                }
+
                 let guiltyKey = Object.keys(players).find(k => players[k].deviceId === comp.guiltyDevice || k === comp.guiltyPseudo);
-                if (guiltyKey && players[guiltyKey] && guiltyKey !== myPlayerName) appendNotif(players[guiltyKey], "Remboursement effectué", `${myPlayerName} a récupéré sa surprise "${comp.text}".`, "16, 185, 129", "✅", "normal", myPlayerName);
+                if (guiltyKey && players[guiltyKey] && guiltyKey !== myPlayerName) {
+                    appendNotif(players[guiltyKey], "Remboursement effectué", `${myPlayerName} a récupéré sa surprise "${comp.text}".`, "16, 185, 129", "✅", "normal", myPlayerName);
+                }
+
                 if(comps[idx].guiltySeen && comps[idx].victimSeen) comps.splice(idx, 1);
                 set(gameRef, cleanObj({ ...state, players, pendingCompensations: comps }));
-                showRewardAnim(comp.type === 'nbPetitesSurprises' ? 'petite' : (comp.type === 'nbGrandesSurprises' ? 'grande' : 'souhait')); 
+                
+                let typeStr = comp.type === 'nbPetitesSurprises' ? 'petite' : (comp.type === 'nbGrandesSurprises' ? 'grande' : 'souhait');
+                showRewardAnim(typeStr); 
             }
             document.getElementById('modalVictimExpired').style.display = 'none';
         };
 
         function checkCompensations() {
-            if (!myPlayerName || document.getElementById('modalGuiltyExpired').style.display === 'flex' || document.getElementById('modalVictimExpired').style.display === 'flex') return;
+            if (!myPlayerName) return;
+            if (document.getElementById('modalGuiltyExpired').style.display === 'flex') return;
+            if (document.getElementById('modalVictimExpired').style.display === 'flex') return;
+
             let comps = state.pendingCompensations || [];
+            
             let myGuilty = comps.find(c => (c.guiltyDevice === myDeviceId || c.guiltyPseudo === myPlayerName) && !c.guiltySeen);
             if (myGuilty) {
                 window.currentCompContext = myGuilty.id;
                 document.getElementById('guiltyExpiredText').innerText = `Oupss ! 🙈 Tu as oublié la surprise "${myGuilty.text}". Le temps est écoulé et ${myGuilty.victimPseudo} a récupéré son action. 😊`;
-                document.getElementById('modalGuiltyExpired').style.display = 'flex'; return;
+                document.getElementById('modalGuiltyExpired').style.display = 'flex';
+                return;
             }
+
             let myVictim = comps.find(c => (c.victimDevice === myDeviceId || c.victimPseudo === myPlayerName) && !c.victimSeen);
             if (myVictim) {
                 window.currentCompContext = myVictim.id;
                 document.getElementById('victimExpiredText').innerText = `Oups ! ${myVictim.guiltyPseudo} a oublié la surprise "${myVictim.text}". Clique ci-dessous pour la récupérer ! 🎁`;
-                document.getElementById('modalVictimExpired').style.display = 'flex'; return;
+                document.getElementById('modalVictimExpired').style.display = 'flex';
+                return;
             }
         }
 
@@ -1347,7 +1391,12 @@
                 expiredTimers.forEach(t => {
                     if (t.targetDevice === myDeviceId || t.target === myPlayerName || Object.keys(state.players || {}).length < 2) {
                         doUpdate = true;
-                        comps.push({ id: t.id, text: t.name, type: t.type, victimDevice: t.targetDevice, victimPseudo: t.target || myPlayerName, guiltyDevice: t.authorDevice, guiltyPseudo: t.author || 'Inconnu', victimSeen: false, guiltySeen: false });
+                        comps.push({ 
+                            id: t.id, text: t.name, type: t.type,
+                            victimDevice: t.targetDevice, victimPseudo: t.target || myPlayerName,
+                            guiltyDevice: t.authorDevice, guiltyPseudo: t.author || 'Inconnu',
+                            victimSeen: false, guiltySeen: false 
+                        });
                     }
                 });
                 if (doUpdate) { set(gameRef, cleanObj({ ...state, timers: activeTimers, pendingCompensations: comps })); return; }
@@ -1422,7 +1471,7 @@
             let baseR = isMax ? 251 : (isPartner ? 59 : 236); let baseG = isMax ? 191 : (isPartner ? 130 : 72); let baseB = isMax ? 36 : (isPartner ? 246 : 153);
             if (document.body.classList.contains('paused-mode')) { baseR = 255; baseG = 255; baseB = 255; }
             if (window.fxState === 'failing') { baseR = 239; baseG = 68; baseB = 68; }
-            if (window.fxState === 'flatline' || document.body.classList.contains('offline-theme')) { baseR = 200; baseG = 200; baseB = 200; }
+            if (window.fxState === 'flatline') { baseR = 200; baseG = 200; baseB = 200; }
             
             let gGrad = ctx.createRadialGradient(mx,my,0,mx,my,350); gGrad.addColorStop(0, `rgba(${baseR}, ${baseG}, ${baseB}, 0.12)`); gGrad.addColorStop(1, 'transparent');
             ctx.fillStyle = gGrad; ctx.fillRect(0,0,w,h);
