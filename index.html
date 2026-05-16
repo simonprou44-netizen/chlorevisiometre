@@ -118,7 +118,10 @@
         body.flatline-theme .header, body.flatline-theme .status-bar, body.flatline-theme .dashboard, body.flatline-theme .controls, body.flatline-theme #rewardsDashboard,
         body.failing-theme .header, body.failing-theme .status-bar, body.failing-theme .dashboard, body.failing-theme .controls, body.failing-theme #rewardsDashboard { filter: grayscale(1) opacity(0.15); pointer-events: none; transition: all 1s ease; }
         
-        body:not(.paused-mode):not(.flatline-theme):not(.failing-theme) .header, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme) .status-bar, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme) .dashboard, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme) .controls, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme) #rewardsDashboard { transition: all 0.5s ease; }
+        /* NEW OFFLINE THEME */
+        body.offline-theme .header, body.offline-theme .status-bar, body.offline-theme .dashboard, body.offline-theme .controls, body.offline-theme #rewardsDashboard { filter: grayscale(1) opacity(0.85); transition: all 0.5s ease; }
+        
+        body:not(.paused-mode):not(.flatline-theme):not(.failing-theme):not(.offline-theme) .header, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme):not(.offline-theme) .status-bar, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme):not(.offline-theme) .dashboard, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme):not(.offline-theme) .controls, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme):not(.offline-theme) #rewardsDashboard { transition: all 0.5s ease; }
 
         /* --- UI COMPONENTS --- */
         .header { display: flex; flex-direction: column; align-items: center; gap: 12px; margin-bottom: 15px; padding: 20px 25px; width: 92%; max-width: 480px; --glow-color: 249, 115, 22; margin-top: 50px; }
@@ -756,7 +759,7 @@
         window.showNotification = function(title, text, colorCode, icon, type='normal', sender='') {
             const container = document.getElementById('toastContainer');
             let existingToast = Array.from(container.children).find(c => c.getAttribute('data-title') === title);
-            let extraBtn = (type === 'message' && sender && sender !== myPlayerName) ? `<button onclick="window.replyToMessage(event, '${sender}'); this.parentElement.parentElement.remove();" style="background:#3b82f6!important; padding:6px 10px; font-size:0.8em; font-weight:bold; margin-top:8px; border:none; border-radius:8px; color:white; cursor:pointer; flex:none;">💬 Répondre</button>` : '';
+            let extraBtn = (type === 'message') ? `<button onclick="window.replyToMessage(event, '${sender}'); this.parentElement.parentElement.remove();" style="background:#3b82f6!important; padding:6px 10px; font-size:0.8em; font-weight:bold; margin-top:8px; border:none; border-radius:8px; color:white; cursor:pointer; flex:none;">💬 Répondre</button>` : '';
 
             if (existingToast) {
                 let countEl = existingToast.querySelector('.toast-count');
@@ -960,6 +963,12 @@
                 btnSwitch.style.removeProperty('--glow-color');
                 btnSwitch.style.removeProperty('border-color');
                 btnSwitch.style.removeProperty('color');
+            }
+
+            if (!isMe && partnerName && !isPartnerOnline) {
+                document.body.classList.add('offline-theme');
+            } else {
+                document.body.classList.remove('offline-theme');
             }
 
             let vState = players[viewedPlayerName] || {};
@@ -1230,7 +1239,8 @@
                 author: myPlayerName, 
                 authorDevice: myDeviceId,
                 target: partnerName,
-                targetDevice: partnerDevice 
+                targetDevice: partnerDevice,
+                lastSender: myPlayerName 
             });
             
             let patch = {}; patch[typeKey] = currentNb - 1; 
@@ -1261,16 +1271,25 @@
             let players = Object.assign({}, state.players || {});
             players[actualTargetPseudo] = { ...vState, ...patch };
 
-            notifyOther(players, "Accord Validé", `L'accord de ${myPlayerName} sur "${p.text}" est validé !`, "16, 185, 129", "🤝");
+            notifyOther(players, "Accord Validé", `L'accord sur "${p.text}" est validé !`, "16, 185, 129", "🤝");
             set(gameRef, cleanObj({ ...state, players, timers, propositions: props.filter(x => x.id !== pId) }));
         };
 
-        window.ouvrirContrePropo = function(pId, oldText) { currentNegoId = pId; document.getElementById('inputNego').value = oldText; document.getElementById('modalNego').style.display = 'flex'; };
+        window.ouvrirContrePropo = function(pId) { 
+            currentNegoId = pId; 
+            document.getElementById('inputNego').value = ""; 
+            document.getElementById('modalNego').style.display = 'flex'; 
+            setTimeout(() => document.getElementById('inputNego').focus(), 50);
+        };
 
         document.getElementById('btnValiderNego').onclick = () => {
-            let val = document.getElementById('inputNego').value.trim(); let props = Object.values(state.propositions || {}).filter(x => x != null); let idx = props.findIndex(x => x.id === currentNegoId);
+            let val = document.getElementById('inputNego').value.trim(); 
+            let props = Object.values(state.propositions || {}).filter(x => x != null); 
+            let idx = props.findIndex(x => x.id === currentNegoId);
             if(idx !== -1 && val) {
-                props[idx].text = val; props[idx].author = myPlayerName; props[idx].authorDevice = myDeviceId;
+                props[idx].text = val; 
+                props[idx].lastSender = myPlayerName;
+                
                 let players = Object.assign({}, state.players || {});
                 notifyOther(players, "Contre-Proposition", `${myPlayerName} propose : ${val}`, "236, 72, 153", "⚖️");
                 set(gameRef, cleanObj({ ...state, players, propositions: props }));
@@ -1284,12 +1303,22 @@
             props.forEach(p => {
                 let actualTargetPseudo = Object.keys(state.players || {}).find(k => state.players[k].deviceId === p.targetDevice) || p.target;
                 let actualAuthorPseudo = Object.keys(state.players || {}).find(k => state.players[k].deviceId === p.authorDevice) || p.author;
-                let authorColor = p.authorDevice === myDeviceId ? '#ec4899' : '#3b82f6';
-                let targetColor = p.targetDevice === myDeviceId ? '#ec4899' : '#3b82f6';
+                
+                let authorColor = p.author === myPlayerName ? '#ec4899' : '#3b82f6';
+                let targetColor = actualTargetPseudo === myPlayerName ? '#ec4899' : '#3b82f6';
+                
+                let lastSender = p.lastSender || p.author;
+                let isMyTurn = lastSender !== myPlayerName;
+                if (Object.keys(state.players || {}).length < 2) isMyTurn = true; 
+                
                 let actionsHtml = '';
-                if (p.targetDevice === myDeviceId || Object.keys(state.players || {}).length < 2) {
-                    actionsHtml = `<div class="nego-actions"><button class="glow-track btn-nego-acc" style="--glow-color: 16, 185, 129;" onclick="window.accepterNego(${p.id})">✅ Accepter</button><button class="glow-track btn-nego-ct" style="--glow-color: 236, 72, 153;" onclick="window.ouvrirContrePropo(${p.id}, '${p.text.replace(/'/g, "\\'")}')">✍️ Contre-proposer</button></div>`;
-                } else { actionsHtml = `<div style="font-size:0.85em; color:#94a3b8; margin-top:8px; font-style:italic;">⏳ En attente d'une réponse de <span style="color:${targetColor}">${actualTargetPseudo}</span>...</div>`; }
+                if (isMyTurn) {
+                    actionsHtml = `<div class="nego-actions"><button class="glow-track btn-nego-acc" style="--glow-color: 16, 185, 129;" onclick="window.accepterNego(${p.id})">✅ Accepter</button><button class="glow-track btn-nego-ct" style="--glow-color: 236, 72, 153;" onclick="window.ouvrirContrePropo(${p.id})">✍️ Contre-proposer</button></div>`;
+                } else { 
+                    let waitingForPseudo = (lastSender === actualAuthorPseudo) ? actualTargetPseudo : actualAuthorPseudo;
+                    let waitingColor = waitingForPseudo === myPlayerName ? '#ec4899' : '#3b82f6';
+                    actionsHtml = `<div style="font-size:0.85em; color:#94a3b8; margin-top:8px; font-style:italic;">⏳ En attente d'une réponse de <span style="color:${waitingColor}">${waitingForPseudo}</span>...</div>`; 
+                }
 
                 let div = document.createElement('div'); div.className = "nego-block";
                 div.innerHTML = `<div style="font-size:0.9em; margin-bottom:5px;">De <strong style="color:${authorColor};">${actualAuthorPseudo}</strong> pour <strong style="color:${targetColor};">${actualTargetPseudo}</strong> :</div><div style="font-size:1.1em; color:white; font-style:italic;">"${p.text}"</div>${actionsHtml}`;
@@ -1332,7 +1361,7 @@
             if (idx !== -1) {
                 let comp = comps[idx]; comps[idx].victimSeen = true; let players = Object.assign({}, state.players || {});
                 
-                // Remboursement
+                // Remboursement direct sans bonus supplémentaire
                 if (players[myPlayerName] && comp.type) {
                     players[myPlayerName][comp.type] = (players[myPlayerName][comp.type] || 0) + 1;
                 }
@@ -1352,10 +1381,7 @@
         };
 
         function checkCompensations() {
-            if (!myPlayerName) return;
-            if (document.getElementById('modalGuiltyExpired').style.display === 'flex') return;
-            if (document.getElementById('modalVictimExpired').style.display === 'flex') return;
-
+            if (!myPlayerName || document.getElementById('modalGuiltyExpired').style.display === 'flex' || document.getElementById('modalVictimExpired').style.display === 'flex') return;
             let comps = state.pendingCompensations || [];
             
             let myGuilty = comps.find(c => (c.guiltyDevice === myDeviceId || c.guiltyPseudo === myPlayerName) && !c.guiltySeen);
@@ -1389,6 +1415,7 @@
             if (expiredTimers.length > 0 && myPlayerName) {
                 let doUpdate = false; let comps = state.pendingCompensations || [];
                 expiredTimers.forEach(t => {
+                    // On check si on est impliqué
                     if (t.targetDevice === myDeviceId || t.target === myPlayerName || Object.keys(state.players || {}).length < 2) {
                         doUpdate = true;
                         comps.push({ 
@@ -1412,7 +1439,23 @@
                 let targetColor = t.targetDevice === myDeviceId ? '#ec4899' : '#3b82f6';
 
                 let div = document.createElement('div'); div.className = "active-timer"; div.style.borderLeftColor = t.color;
-                div.innerHTML = `<div class="timer-header" style="align-items: flex-start; flex-direction: column; gap: 5px;"><div style="display:flex; justify-content:space-between; width: 100%;"><div style="display:flex; flex-direction:column; gap:2px;"><span style="font-size:0.75em; color:#cbd5e1;">De <strong style="color:${authorColor};">${actualAuthorPseudo}</strong> pour <strong style="color:${targetColor};">${actualTargetPseudo}</strong></span><strong style="font-size:1.05em;">${t.name}</strong></div></div><div style="display:flex; justify-content:space-between; align-items:center; width: 100%;"><span style="color:${t.color}; font-size:0.9em; font-weight:bold;">${timeStr}</span><button class="glow-track" onclick="window.terminerTimer(${t.id})" style="--glow-color: 16, 185, 129; padding: 4px 8px; font-size: 0.8em; background: rgba(16, 185, 129, 0.1) !important; border: 1px solid rgba(16, 185, 129, 0.5); color: #10b981; border-radius: 5px; flex: 0; white-space:nowrap;">✔ Fait</button></div></div><div class="timer-gauge-bg"><div class="timer-gauge-fill" style="width: ${pct}%; background: ${t.color};"></div></div>`;
+                div.innerHTML = `
+                    <div class="timer-header" style="align-items: flex-start; flex-direction: column; gap: 5px;">
+                        <div style="display:flex; justify-content:space-between; width: 100%;">
+                            <div style="display:flex; flex-direction:column; gap:2px;">
+                                <span style="font-size:0.75em; color:#cbd5e1;">De <strong style="color:${authorColor};">${actualAuthorPseudo}</strong> pour <strong style="color:${targetColor};">${actualTargetPseudo}</strong></span>
+                                <strong style="font-size:1.05em;">${t.name}</strong>
+                            </div>
+                        </div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; width: 100%;">
+                            <span style="color:${t.color}; font-size:0.9em; font-weight:bold;">${timeStr}</span>
+                            <button class="glow-track" onclick="window.terminerTimer(${t.id})" style="--glow-color: 16, 185, 129; padding: 4px 8px; font-size: 0.8em; background: rgba(16, 185, 129, 0.1) !important; border: 1px solid rgba(16, 185, 129, 0.5); color: #10b981; border-radius: 5px; flex: 0; white-space:nowrap;">✔ Fait</button>
+                        </div>
+                    </div>
+                    <div class="timer-gauge-bg">
+                        <div class="timer-gauge-fill" style="width: ${pct}%; background: ${t.color};"></div>
+                    </div>
+                `;
                 container.appendChild(div);
             });
         }
@@ -1425,7 +1468,11 @@
             
             try { updateTimersUI(); } catch(e) {} try { checkCompensations(); } catch(e) {} try { updateViewUI(); } catch(e) {}
             
-            if(modeJeuSafe === 'attente') { document.getElementById('chrono').innerText = "00:00:00"; document.getElementById('piecesDisplay').innerText = "🪙 Pièces : " + (Number(vState.piecesBase) || 0); return; }
+            if(modeJeuSafe === 'attente') {
+                document.getElementById('chrono').innerText = "00:00:00"; 
+                document.getElementById('piecesDisplay').innerText = "🪙 Pièces : " + (Number(vState.piecesBase) || 0); 
+                return; 
+            }
             
             let tMode = Number(vState.timestampMode) || Date.now();
             const elap = Math.max(0, Math.floor((Date.now() - tMode) / 1000)); const cumule = Number(vState.tempsTravailCumule) || 0; const baseP = Number(vState.piecesBase) || 0;
@@ -1471,7 +1518,7 @@
             let baseR = isMax ? 251 : (isPartner ? 59 : 236); let baseG = isMax ? 191 : (isPartner ? 130 : 72); let baseB = isMax ? 36 : (isPartner ? 246 : 153);
             if (document.body.classList.contains('paused-mode')) { baseR = 255; baseG = 255; baseB = 255; }
             if (window.fxState === 'failing') { baseR = 239; baseG = 68; baseB = 68; }
-            if (window.fxState === 'flatline') { baseR = 200; baseG = 200; baseB = 200; }
+            if (window.fxState === 'flatline' || document.body.classList.contains('offline-theme')) { baseR = 200; baseG = 200; baseB = 200; }
             
             let gGrad = ctx.createRadialGradient(mx,my,0,mx,my,350); gGrad.addColorStop(0, `rgba(${baseR}, ${baseG}, ${baseB}, 0.12)`); gGrad.addColorStop(1, 'transparent');
             ctx.fillStyle = gGrad; ctx.fillRect(0,0,w,h);
