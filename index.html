@@ -92,6 +92,20 @@
 
         #btnSwitchView { position: fixed; top: 20px; left: 20px; z-index: 9998; height: 55px; border-radius: 15px; display: flex; justify-content: center; align-items: center; font-size: 0.9em; padding: 0 15px; flex: none; background: rgba(0,0,0,0.4) !important; --glow-color: 59, 130, 246; border-color: rgba(59, 130, 246, 0.5); color: #3b82f6; cursor: pointer; max-width: 140px; transition: all 0.3s ease; }
 
+        /* --- EMOJI SYSTEM --- */
+        .emoji-btn { cursor:pointer; flex:none; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.05); border-radius:8px; padding:0 12px; border:1px solid rgba(255,255,255,0.1); font-size: 1.2em; transition: all 0.2s; }
+        .emoji-btn:active { transform: scale(0.9); background:rgba(255,255,255,0.15); }
+        .emoji-span { font-size: 1.8em; cursor: pointer; padding: 6px; transition: transform 0.1s; display:inline-block; }
+        .emoji-span:active { transform: scale(0.7); }
+
+        #floatingEmojiPanel {
+            display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 320px; max-height: 400px; z-index: 1000050; background: rgba(10,10,14,0.95);
+            border: 1px solid rgba(59,130,246,0.5); border-radius: 15px; padding: 15px;
+            flex-direction: column; box-sizing: border-box; box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+        }
+
         /* --- LISTES ET MESSAGERIE --- */
         .notif-item { background: rgba(255,255,255,0.03); border-left: 4px solid var(--n-color); border-radius: 8px; margin-bottom: 8px; transition: background 0.3s ease; display: flex; flex-direction: column; overflow: hidden; flex-shrink: 0; }
         .notif-main { padding: 12px; display: flex; gap: 12px; align-items: center; cursor: pointer; transition: background 0.2s; }
@@ -117,10 +131,7 @@
         body.flatline-theme #bgCanvas { filter: grayscale(1); }
         body.flatline-theme .header, body.flatline-theme .status-bar, body.flatline-theme .dashboard, body.flatline-theme .controls, body.flatline-theme #rewardsDashboard,
         body.failing-theme .header, body.failing-theme .status-bar, body.failing-theme .dashboard, body.failing-theme .controls, body.failing-theme #rewardsDashboard { filter: grayscale(1) opacity(0.15); pointer-events: none; transition: all 1s ease; }
-        
-        /* NEW OFFLINE THEME */
         body.offline-theme .header, body.offline-theme .status-bar, body.offline-theme .dashboard, body.offline-theme .controls, body.offline-theme #rewardsDashboard { filter: grayscale(1) opacity(0.85); transition: all 0.5s ease; }
-        
         body:not(.paused-mode):not(.flatline-theme):not(.failing-theme):not(.offline-theme) .header, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme):not(.offline-theme) .status-bar, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme):not(.offline-theme) .dashboard, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme):not(.offline-theme) .controls, body:not(.paused-mode):not(.flatline-theme):not(.failing-theme):not(.offline-theme) #rewardsDashboard { transition: all 0.5s ease; }
 
         /* --- UI COMPONENTS --- */
@@ -166,7 +177,7 @@
         .inv-row.disabled-row { filter: grayscale(1); opacity: 0.4; pointer-events: none; } 
         .inv-icon { font-size: 2.5em; width: 60px; text-align: center; }
         .inv-details { flex: 1; display: flex; flex-direction: column; gap: 5px; }
-        .inv-details input { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 6px 10px; border-radius: 5px; width: 100%; box-sizing: border-box; font-size: 0.9em; outline: none; }
+        .inv-details input { background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.2); color: white; padding: 6px 10px; border-radius: 5px; box-sizing: border-box; font-size: 0.9em; outline: none; }
         .inv-stats { font-size: 0.85em; color: #cbd5e1; display: flex; justify-content: space-between; }
         .btn-consume { padding: 8px 15px; font-size: 0.85em; background: rgba(255, 255, 255, 0.05) !important; margin-top: 5px; }
         .btn-consume.souhait-btn { background: rgba(168, 85, 247, 0.2) !important; border-color: #a855f7; color: #a855f7; }
@@ -270,6 +281,7 @@
         <div class="cible-container">
             <span class="cible-prefix">> CIBLE:</span>
             <input type="text" id="tacheInput" placeholder="Saisir puis taper Entrée..." autocomplete="new-password" spellcheck="false">
+            <span id="emojiBtnTache" class="emoji-btn" style="border:none; background:transparent; padding:0 5px;" onclick="window.openEmojiPicker(event, 'tacheInput')">😀</span>
             <span id="tacheDisplay"></span>
             <button id="btnTerminerTache" class="glow-track" style="--glow-color: 16, 185, 129;">✅ Terminer</button>
             <button id="btnHistoTaches" class="glow-track" style="--glow-color: 168, 85, 247; padding: 6px; margin-left:5px; flex:none; position:relative;">
@@ -282,6 +294,7 @@
         <div class="cible-container" style="margin-top:10px; background: rgba(59, 130, 246, 0.1); border-color: rgba(59, 130, 246, 0.3);">
             <span class="cible-prefix" style="color: #3b82f6;">> MSG:</span>
             <input type="text" id="msgInputQuick" placeholder="Saisir puis taper Entrée..." autocomplete="off" spellcheck="false">
+            <span class="emoji-btn" style="border:none; background:transparent; padding:0 5px;" onclick="window.openEmojiPicker(event, 'msgInputQuick')">😀</span>
             <button id="btnOpenChat" class="glow-track" style="--glow-color: 59, 130, 246; padding: 6px; margin-left:5px; flex:none; position:relative;" onclick="window.clearMsgNotifs(); document.getElementById('modalMessagerie').style.display='flex'; window.updateChatUI();">
                 💬
                 <span id="chatBadge" style="position:absolute; top:-5px; right:-5px; background:#ef4444; color:white; font-size:0.7em; font-family:sans-serif; font-weight:bold; padding:3px 6px; border-radius:10px; display:none; box-shadow: 0 0 10px rgba(239,68,68,0.8);"></span>
@@ -349,14 +362,23 @@
             
             <div style="display:flex; align-items:center; gap:8px; background: rgba(0,0,0,0.5); padding:8px 12px; border-radius:10px; border:1px solid rgba(59, 130, 246, 0.5); position:relative;">
                 <input type="text" id="chatInputModal" placeholder="Votre message..." autocomplete="off" spellcheck="false" style="flex:1; background:transparent; border:none; outline:none; color:white; font-size:1em;">
-                <span id="chatEmojiToggleModal" style="cursor:pointer; font-size:1.5em; flex:none;">😀</span>
+                <span class="emoji-btn" style="border:none; background:transparent; padding:0 5px;" onclick="window.openEmojiPicker(event, 'chatInputModal')">😀</span>
                 <button id="btnSendChatMsgModal" class="glow-track" style="--glow-color: 59, 130, 246; padding:8px 15px; flex:none; border-color:#3b82f6; color:#3b82f6;">Envoyer</button>
-                
-                <!-- PANEL EMOJIS MODAL GEANT -->
-                <div id="emojiPanelModal" style="display:none; position:absolute; bottom:55px; right:0; background:rgba(0,0,0,0.95); border:1px solid rgba(59,130,246,0.5); border-radius:10px; padding:10px; gap:8px; flex-wrap:wrap; width:280px; max-height:220px; overflow-y:auto; z-index:100; box-shadow:0 0 15px rgba(59,130,246,0.4);">
-                    <!-- EMOJIS INJECTES VIA JS -->
-                </div>
             </div>
+        </div>
+    </div>
+
+    <!-- CLAVIER EMOJIS GLOBAL -->
+    <div id="floatingEmojiPanel" class="glow-track" style="display:none; position:fixed; top:50%; left:50%; transform:translate(-50%, -50%); width:320px; max-height:400px; z-index:1000050; background:rgba(10,10,14,0.95); border:1px solid rgba(59,130,246,0.5); border-radius:15px; padding:15px; flex-direction:column; box-sizing:border-box; box-shadow: 0 0 20px rgba(0,0,0,0.8); backdrop-filter: blur(10px);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
+            <h4 style="margin:0; color:#3b82f6;">Emojis</h4>
+            <button onclick="document.getElementById('floatingEmojiPanel').style.display='none'" style="flex:none; padding:4px 8px; font-size:0.8em; background:rgba(239,68,68,0.2)!important; color:#ef4444; border:1px solid rgba(239,68,68,0.4);">✖</button>
+        </div>
+        <div style="overflow-y:auto; flex:1; display:flex; flex-direction:column; gap:10px;">
+            <div style="font-size:0.8em; color:#cbd5e1;">Récents</div>
+            <div id="recentEmojiList" style="display:flex; flex-wrap:wrap; gap:5px; border-bottom:1px solid rgba(255,255,255,0.1); padding-bottom:10px;"></div>
+            <div style="font-size:0.8em; color:#cbd5e1;">Tous</div>
+            <div id="allEmojiList" style="display:flex; flex-wrap:wrap; gap:5px;"></div>
         </div>
     </div>
 
@@ -373,9 +395,7 @@
     <div id="modalNotifs" class="modal-overlay" style="z-index:9999;">
         <div class="modal-content glow-track" style="--glow-color: 255, 255, 255; width:90%; max-width:420px; padding: 25px;">
             <h3 style="color:#ffffff; margin-top:0; margin-bottom: 20px; letter-spacing: 1px;">🔔 Notifications</h3>
-            <div id="notifsList" style="display:flex; flex-direction:column; max-height: 45vh; overflow-y:auto; margin-bottom:20px; text-align:left;">
-                <!-- Les notifs s'afficheront ici -->
-            </div>
+            <div id="notifsList" style="display:flex; flex-direction:column; max-height: 45vh; overflow-y:auto; margin-bottom:20px; text-align:left;"></div>
             <div style="display:flex; gap:10px;">
                 <button id="btnClearAllNotifs" class="glow-track" style="--glow-color: 239, 68, 68; color: #ef4444; border-color: rgba(239,68,68,0.4); padding:12px;">Vider</button>
                 <button onclick="document.getElementById('modalNotifs').style.display='none'" class="glow-track" style="flex:1.5; --glow-color: 255, 255, 255; color: white; border-color: rgba(255,255,255,0.2); padding:12px;">Fermer</button>
@@ -409,7 +429,10 @@
                 <div class="inv-icon">🎁</div>
                 <div class="inv-details">
                     <div class="inv-stats"><span style="color:#10b981; font-weight:bold;">Stock: <span id="invP_stock">0</span></span> <span>Consommées: <span id="invP_cons">0</span></span></div>
-                    <input type="text" id="defPetite" autocomplete="new-password" placeholder="Ex: Regarder 1 épisode de série">
+                    <div style="display:flex; gap:8px; margin-bottom:5px;">
+                        <input type="text" id="defPetite" autocomplete="new-password" placeholder="Ex: Regarder 1 épisode de série" style="flex:1; min-width:0;">
+                        <span class="emoji-btn" onclick="window.openEmojiPicker(event, 'defPetite')">😀</span>
+                    </div>
                     <button class="btn-consume glow-track" id="btnConsommerPetite" style="--glow-color: 16, 185, 129; border-color:#10b981; color:#10b981;">▶ Proposer</button>
                 </div>
             </div>
@@ -418,7 +441,10 @@
                 <div class="inv-icon">🎀</div>
                 <div class="inv-details">
                     <div class="inv-stats"><span style="color:#f59e0b; font-weight:bold;">Stock: <span id="invG_stock">0</span></span> <span>Consommées: <span id="invG_cons">0</span></span></div>
-                    <input type="text" id="defGrande" autocomplete="new-password" placeholder="Ex: Sortie resto ce soir">
+                    <div style="display:flex; gap:8px; margin-bottom:5px;">
+                        <input type="text" id="defGrande" autocomplete="new-password" placeholder="Ex: Sortie resto ce soir" style="flex:1; min-width:0;">
+                        <span class="emoji-btn" onclick="window.openEmojiPicker(event, 'defGrande')">😀</span>
+                    </div>
                     <button class="btn-consume glow-track" id="btnConsommerGrande" style="--glow-color: 245, 158, 11; border-color:#f59e0b; color:#f59e0b;">▶ Proposer</button>
                 </div>
             </div>
@@ -427,7 +453,10 @@
                 <div class="inv-icon" style="filter: drop-shadow(0 0 5px #a855f7);">🪔</div>
                 <div class="inv-details">
                     <div class="inv-stats"><span style="color:#a855f7; font-weight:bold;">Stock: <span id="invS_stock">0</span></span> <span>Consommés: <span id="invS_cons">0</span></span></div>
-                    <input type="text" id="defSouhait" autocomplete="new-password" placeholder="Ex: Faire un massage 1h à ta copine">
+                    <div style="display:flex; gap:8px; margin-bottom:5px;">
+                        <input type="text" id="defSouhait" autocomplete="new-password" placeholder="Ex: Faire un massage 1h à ta copine" style="flex:1; min-width:0;">
+                        <span class="emoji-btn" onclick="window.openEmojiPicker(event, 'defSouhait')">😀</span>
+                    </div>
                     <button class="btn-consume souhait-btn glow-track" id="btnConsommerSouhait" style="--glow-color: 168, 85, 247;">▶ Consommer</button>
                 </div>
             </div>
@@ -441,7 +470,10 @@
         <div class="modal-content glow-track" style="--glow-color: 59, 130, 246;">
             <h3 style="color:#3b82f6; margin-bottom: 20px;">⚖️ Contre-Proposition</h3>
             <p style="margin-bottom:15px; color:#cbd5e1; font-size:0.9em;">Propose une autre idée à ton partenaire :</p>
-            <input type="text" id="inputNego" autocomplete="new-password" style="width:100%; box-sizing:border-box; padding:12px; border-radius:10px; border:1px solid rgba(59, 130, 246, 0.5); background:rgba(0,0,0,0.5); color:white; font-size:1em; margin-bottom:20px; outline:none;">
+            <div style="display:flex; gap:8px; margin-bottom:20px; width:100%;">
+                <input type="text" id="inputNego" autocomplete="new-password" style="flex:1; min-width:0; box-sizing:border-box; padding:12px; border-radius:10px; border:1px solid rgba(59, 130, 246, 0.5); background:rgba(0,0,0,0.5); color:white; font-size:1em; outline:none;">
+                <span class="emoji-btn" onclick="window.openEmojiPicker(event, 'inputNego')">😀</span>
+            </div>
             <div style="display:flex; gap:10px;">
                 <button onclick="document.getElementById('modalNego').style.display='none'" class="glow-track" style="--glow-color: 239, 68, 68; color: #ef4444; border-color:rgba(239,68,68,0.4);">Annuler</button>
                 <button id="btnValiderNego" class="glow-track" style="--glow-color: 59, 130, 246; border-color:rgba(59, 130, 246, 0.4); color:#3b82f6;">Envoyer</button>
@@ -503,6 +535,9 @@
         // Emojis Setup
         const EMOJIS = ['😀','😃','😄','😁','😆','😅','😂','🤣','🥲','🥹','☺️','😊','😇','🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚','😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🥸','🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️','😣','😖','😫','😩','🥺','😢','😭','😮‍💨','😤','😠','😡','🤬','🤯','😳','🥵','🥶','😱','😨','😰','😥','😓','🫣','🤗','🫡','🤔','🫢','🤭','🤫','🤥','😶','😶‍🌫️','😐','😑','😬','🫨','🫠','🙄','😯','😦','😧','🥱','😴','🤤','😪','😵','😵‍💫','🤐','🥴','🤢','🤮','🤧','😷','🤒','🤕','🤑','🤠','😈','👿','👹','👺','🤡','💩','👻','💀','☠️','👽','👾','🤖','🎃','😺','😸','😹','😻','😼','😽','🙀','😿','😾','🙈','🙉','🙊','💋','💌','💘','💝','💖','💗','💓','💞','💕','💟','❣️','💔','❤️‍🔥','❤️‍🩹','❤️','🩷','🧡','💛','💚','💙','🩵','💜','🖤','🩶','🤍','🤎','💯','💢','💥','💫','💦','💨','🕳️','💣','💬','👁️‍🗨️','🗨️','🗯️','💭','💤','👋','🤚','🖐️','✋','🖖','🫱','🫲','🫳','🫴','👌','🤌','🤏','✌️','🤞','🫰','🤟','🤘','🤙','👈','👉','👆','🖕','👇','☝️','👍','👎','✊','👊','🤛','🤜','👏','🙌','🫶','👐','🤲','🤝','🙏','✍️','💅','🤳','💪','🦾','🦿','🦵','🦶','👂','🦻','👃','🫀','🫁','🧠','🦷','🦴','👀','👁️','👅','👄','🫦','👶','👧','🧒','👦','👩','🧑','👨','👩‍🦱','🧑‍🦱','👨‍🦱','👩‍🦰','🧑‍🦰','👨‍🦰','👱‍♀️','👱','👱‍♂️','👩‍🦳','🧑‍🦳','👨‍🦳','👩‍🦲','🧑‍🦲','👨‍🦲','🧔‍♀️','🧔','🧔‍♂️','👵','🧓','👴','👲','👳‍♀️','👳','👳‍♂️','🧕','👮‍♀️','👮','👮‍♂️','👰‍♀️','👰','👰‍♂️','🤰','🤱','👼','🎅','🤶','🦸‍♀️','🦸','🦸‍♂️','🦹‍♀️','🦹','🦹‍♂️','🧙‍♀️','🧙','🧙‍♂️','🧚‍♀️','🧚','🧚‍♂️','🧛‍♀️','🧛','🧛‍♂️','🧜‍♀️','🧜','🧜‍♂️','🧝‍♀️','🧝','🧝‍♂️','🧞‍♀️','🧞','🧞‍♂️','🧟‍♀️','🧟','🧟‍♂️','🚶‍♀️','🚶','🚶‍♂️','🏃‍♀️','🏃','🏃‍♂️','💃','🕺','🕴️','👯‍♀️','👯','👯‍♂️','🧖‍♀️','🧖','🧖‍♂️','🧗‍♀️','🧗','🧗‍♂️','🧘‍♀️','🧘','🧘‍♂️','🛀','🛌','🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐻‍❄️','🐨','🐯','🦁','🐮','🐷','🐽','🐸','🐵','🐒','🦍','🦧','🐔','🐧','🐦','🐤','🐣','🐥','🦆','🦅','🦉','🦇','🐺','🐗','🐴','🦄','🐝','🪱','🐛','🦋','🐌','🐞','🐜','🪰','🪲','🪳','🦟','🦗','🕷️','🕸️','🦂','🐢','🐍','🦎','🐙','🦑','🦖','🐊','🦕','🐅','🐆','🦓','🦍','🦧','🦣','🐘','🦛','🦏','🐪','🐫','🦒','🦘','🐃','🐂','🐄','🐎','🐖','🐏','🐑','🦙','🐐','🦌','🐕','🐩','🦮','🐕‍🦺','🐈','🐈‍⬛','🪶','🐓','🦃','🦤','🦚','🦜','🦢','🦩','🕊️','🐇','🦝','🦨','🦡','🦫','🦦','🦥','🐁','🐀','🐿️','🦔','🐾','🐉','🐲','🌵','🎄','🌲','🌳','🌴','🪵','🌱','🌿','☘️','🍀','🎍','🪴','🎋','🍃','🍂','🍁','🍄','🌾','💐','🌷','🌹','🥀','🪷','🌺','🌸','🌼','🌻','🍏','🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🫐','🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆','🥑','🥦','🥬','🥒','🌶️','🫑','🌽','🥕','🫒','🧄','🧅','🥔','🍠','🥐','🥯','🍞','🥖','🥨','🧀','🥚','🍳','🧈','🥞','🧇','🥓','🥩','🍗','🍖','🌭','🍔','🍟','🍕','🫓','🥪','🥙','🧆','🌮','🌯','🫔','🥗','🥘','🫕','🥫','🍝','🍜','🍲','🍛','🍣','🍱','🥟','🦪','🍤','🍙','🍚','🍘','🍥','🥠','🥮','🍢','🍡','🍧','🍨','🍦','🥧','🧁','🍰','🎂','🍮','🍭','🍬','🍫','🍿','🍩','🍪','🌰','🥜','🍯','🥛','🍼','🫖','☕','🍵','🧃','🥤','🧋','🍶','🍺','🍻','🥂','🍷','🥃','🍸','🍹','🧉','🍾','🧊','🥄','🍴','🍽️','🥣','🥡','🥢','🧂'];
         
+        window.recentEmojis = JSON.parse(localStorage.getItem('recentEmojis')) || ['❤️','🔥','😂','😍','✨','🥺','😭','🥰','👍','🙏'];
+        window.currentEmojiInputId = null;
+
         window.addEventListener('DOMContentLoaded', () => {
             document.getElementById('inputPseudo').value = "";
             setTimeout(() => { document.getElementById('inputPseudo').value = ""; }, 50);
@@ -516,13 +551,12 @@
                 };
             }
 
-            const panel = document.getElementById('emojiPanelModal');
+            const panel = document.getElementById('allEmojiList');
             EMOJIS.forEach(em => {
                 let span = document.createElement('span');
                 span.innerText = em;
-                span.style.fontSize = '1.6em';
-                span.style.cursor = 'pointer';
-                span.onclick = () => window.insertEmojiModal(em);
+                span.className = 'emoji-span';
+                span.onclick = (e) => { e.stopPropagation(); window.insertEmojiModal(em); };
                 panel.appendChild(span);
             });
 
@@ -530,18 +564,43 @@
             document.getElementById('btnConsommerGrande').onclick = () => proposerItem('nbGrandesSurprises', 'defGrande');
         });
 
-        document.getElementById('chatEmojiToggleModal').onclick = (e) => {
-            let p = document.getElementById('emojiPanelModal');
-            p.style.display = p.style.display === 'none' ? 'flex' : 'none';
+        // --- GESTION DES EMOJIS GLOBAL ---
+        window.openEmojiPicker = function(e, targetId) {
             e.stopPropagation();
+            window.currentEmojiInputId = targetId;
+            window.renderEmojiPicker();
+            document.getElementById('floatingEmojiPanel').style.display = 'flex';
         };
-        document.addEventListener('click', () => { if(document.getElementById('emojiPanelModal')) document.getElementById('emojiPanelModal').style.display = 'none'; });
-        document.getElementById('emojiPanelModal').addEventListener('click', e => e.stopPropagation());
 
         window.insertEmojiModal = function(emoji) {
-            document.getElementById('chatInputModal').value += emoji;
-            document.getElementById('chatInputModal').focus();
+            let input = document.getElementById(window.currentEmojiInputId);
+            if(input) {
+                input.value += emoji;
+                input.focus();
+            }
+            window.recentEmojis = [emoji, ...window.recentEmojis.filter(em => em !== emoji)].slice(0, 15);
+            localStorage.setItem('recentEmojis', JSON.stringify(window.recentEmojis));
+            window.renderEmojiPicker();
         };
+
+        window.renderEmojiPicker = function() {
+            const recentPanel = document.getElementById('recentEmojiList');
+            recentPanel.innerHTML = '';
+            window.recentEmojis.forEach(em => {
+                let span = document.createElement('span');
+                span.innerText = em;
+                span.className = 'emoji-span';
+                span.onclick = (e) => { e.stopPropagation(); window.insertEmojiModal(em); };
+                recentPanel.appendChild(span);
+            });
+        };
+
+        document.addEventListener('click', (e) => { 
+            let p = document.getElementById('floatingEmojiPanel');
+            if(p && p.style.display === 'flex' && !p.contains(e.target) && !e.target.classList.contains('emoji-btn')) {
+                p.style.display = 'none';
+            }
+        });
 
         const firebaseConfig = {
             apiKey: "AIzaSyDaHguuxN1Jq8c4YZuk0XEzm1E-tHTBzAY",
@@ -568,6 +627,7 @@
         window.expandedNotifs = new Set();
         window.currentCompContext = null;
         window.rewardTrackers = {}; 
+        window.lastRenderedMsgId = 0;
         window.lastRenderedMsgCount = -1;
         
         window.currentPv = 5;
@@ -601,7 +661,7 @@
             });
         }
 
-        // --- ECRASER SESSION ---
+        // --- ECRASER SESSION (Transfert et non Destruction) ---
         window.overwriteSlot = function(oldName, newName) {
             let players = Object.assign({}, state.players || {});
             delete players[oldName]; 
@@ -611,12 +671,15 @@
                 nbPetitesSurprises: inv.p, nbGrandesSurprises: inv.g, nbSouhaits: inv.s, notifsHistory: []
             };
             
-            // Nettoyage de l'héritage
-            let msgs = (state.messagerie || []).filter(m => m.sender !== oldName && m.target !== oldName);
-            let taches = (state.tachesAccomplies || []).filter(t => t.author !== oldName);
-            let timers = (state.timers || []).filter(t => t.author !== oldName && t.target !== oldName);
+            // Transfert de l'héritage au lieu de le détruire
+            let msgs = []; // On nettoie les messages à la demande de l'utilisateur
+            let taches = (state.tachesAccomplies || []).map(t => { if(t.author===oldName) t.author=newName; return t; });
+            let timers = (state.timers || []).map(t => { if(t.author===oldName) t.author=newName; if(t.target===oldName) t.target=newName; return t; });
+            let props = (state.propositions || []).map(p => { if(p.author===oldName) p.author=newName; if(p.target===oldName) p.target=newName; if(p.lastSender===oldName) p.lastSender=newName; return p; });
+            let comps = (state.pendingCompensations || []).map(c => { if(c.guiltyPseudo===oldName) c.guiltyPseudo=newName; if(c.victimPseudo===oldName) c.victimPseudo=newName; return c; });
 
-            set(gameRef, cleanObj({ ...state, players, messagerie: msgs, tachesAccomplies: taches, timers }));
+            set(gameRef, cleanObj({ ...state, players, messagerie: msgs, tachesAccomplies: taches, timers: timers, propositions: props, pendingCompensations: comps }));
+            
             myPlayerName = newName; viewedPlayerName = newName;
             localStorage.setItem('lastPseudo', myPlayerName);
             
@@ -759,7 +822,7 @@
         window.showNotification = function(title, text, colorCode, icon, type='normal', sender='') {
             const container = document.getElementById('toastContainer');
             let existingToast = Array.from(container.children).find(c => c.getAttribute('data-title') === title);
-            let extraBtn = (type === 'message') ? `<button onclick="window.replyToMessage(event, '${sender}'); this.parentElement.parentElement.remove();" style="background:#3b82f6!important; padding:6px 10px; font-size:0.8em; font-weight:bold; margin-top:8px; border:none; border-radius:8px; color:white; cursor:pointer; flex:none;">💬 Répondre</button>` : '';
+            let extraBtn = (type === 'message' && sender && sender !== myPlayerName) ? `<button onclick="window.replyToMessage(event, '${sender}'); this.parentElement.parentElement.remove();" style="background:#3b82f6!important; padding:6px 10px; font-size:0.8em; font-weight:bold; margin-top:8px; border:none; border-radius:8px; color:white; cursor:pointer; flex:none;">💬 Répondre</button>` : '';
 
             if (existingToast) {
                 let countEl = existingToast.querySelector('.toast-count');
@@ -842,13 +905,20 @@
         };
 
         window.updateChatUI = function() {
-            localLastReadChatTime = Date.now(); localStorage.setItem('lastReadChatTime', localLastReadChatTime);
-            if(document.getElementById('chatBadge')) document.getElementById('chatBadge').style.display = 'none';
-            const history = document.getElementById('chatHistory'); 
             let msgs = state.messagerie || [];
+            if (msgs.length > 0) localLastReadChatTime = Math.max(...msgs.map(m => m.id));
+            else localLastReadChatTime = Date.now();
+            localStorage.setItem('lastReadChatTime', localLastReadChatTime);
+            
+            if(document.getElementById('chatBadge')) document.getElementById('chatBadge').style.display = 'none';
+            
+            const history = document.getElementById('chatHistory'); 
+            let currentLastId = msgs.length > 0 ? msgs[msgs.length - 1].id : 0;
+            
+            if (window.lastRenderedMsgCount === msgs.length && window.lastRenderedMsgId === currentLastId) return;
 
-            if (window.lastRenderedMsgCount === msgs.length) return;
             window.lastRenderedMsgCount = msgs.length;
+            window.lastRenderedMsgId = currentLastId;
 
             history.innerHTML = "";
             if(msgs.length === 0) { history.innerHTML = "<div style='color:#64748b; text-align:center; margin-top:20px; font-style:italic;'>Aucun message.</div>"; return; }
@@ -903,7 +973,8 @@
         };
 
         document.getElementById('btnHistoTaches').onclick = () => {
-            localLastReadTachesTime = Date.now(); localStorage.setItem('lastReadTachesTime', localLastReadTachesTime);
+            localLastReadTachesTime = Math.max(0, ...(state.tachesAccomplies || []).map(t => t.time));
+            localStorage.setItem('lastReadTachesTime', localLastReadTachesTime);
             document.getElementById('tachesBadge').style.display = 'none';
             let list = document.getElementById('tachesList'); list.innerHTML = "";
             let todayTaches = (state.tachesAccomplies || []).filter(t => new Date(t.time).toLocaleDateString('fr-FR') === new Date().toLocaleDateString('fr-FR'));
@@ -977,11 +1048,15 @@
             const input = document.getElementById('tacheInput');
             const display = document.getElementById('tacheDisplay');
             const btnTerminer = document.getElementById('btnTerminerTache');
+            const emojiBtnTache = document.getElementById('emojiBtnTache');
             
             if (vState.tacheEnCours) {
-                input.style.display = 'none'; display.style.display = 'inline'; display.innerText = vState.tacheActuelle; btnTerminer.style.display = 'inline-block';
+                input.style.display = 'none'; emojiBtnTache.style.display = 'none';
+                display.style.display = 'inline'; display.innerText = vState.tacheActuelle; 
+                btnTerminer.style.display = 'inline-block';
             } else {
-                input.style.display = 'inline'; if(document.activeElement !== input) input.value = vState.tacheActuelle || "";
+                input.style.display = 'inline'; emojiBtnTache.style.display = '';
+                if(document.activeElement !== input) input.value = vState.tacheActuelle || "";
                 display.style.display = 'none'; btnTerminer.style.display = 'none';
             }
             
@@ -1015,7 +1090,7 @@
             const modeJeuSafe = vState.modeJeu || 'attente'; const isTr = modeJeuSafe === 'travail'; const dead = window.currentPv <= 0; const isPa = modeJeuSafe.includes('pause');
 
             document.getElementById('btnStart').disabled = modeJeuSafe !== 'attente' || dead; document.getElementById('btnStop').disabled = modeJeuSafe === 'attente';
-            document.getElementById('btnPause').disabled = !isTr || dead; document.getElementById('btnMinus').disabled = !isTr || dead; document.getElementById('btnPlus').disabled = !isTr || dead; document.getElementById('btnBoutique').disabled = !isTr || dead;
+            document.getElementById('btnPause').disabled = !isTr || dead; document.getElementById('btnMinus').disabled = !isTr || dead; document.getElementById('btnPlus').disabled = !isTr || dead; document.getElementById('btnBoutique').disabled = dead;
             
             const btnMinus = document.getElementById('btnMinus');
             if (window.currentPv > 5) { btnMinus.innerHTML = `<span>⭐ Distraction</span><small>Reset Bonus</small>`; } else { btnMinus.innerHTML = `<span>👎 Distraction</span><small>-1 PV</small>`; }
@@ -1068,7 +1143,8 @@
                 saveDeviceInventory(data.players[myPlayerName].nbPetitesSurprises || 0, data.players[myPlayerName].nbGrandesSurprises || 0, data.players[myPlayerName].nbSouhaits || 0);
             }
             
-            let unreadCountChat = (data.messagerie || []).filter(m => m.id > localLastReadChatTime && m.sender !== myPlayerName).length;
+            let msgs = data.messagerie || [];
+            let unreadCountChat = msgs.filter(m => m.id > localLastReadChatTime && m.sender !== myPlayerName).length;
             if (document.getElementById('chatBadge')) document.getElementById('chatBadge').style.display = unreadCountChat > 0 ? 'block' : 'none';
             if (document.getElementById('chatBadge')) document.getElementById('chatBadge').innerText = unreadCountChat > 99 ? '99+' : unreadCountChat;
 
@@ -1078,6 +1154,10 @@
             
             state = data;
             
+            if (document.getElementById('modalMessagerie').style.display === 'flex') {
+                window.updateChatUI();
+            }
+
             if (myPlayerName && viewedPlayerName) {
                 let vState = state.players[viewedPlayerName] || {};
                 if (!window.rewardTrackers) window.rewardTrackers = {};
@@ -1111,7 +1191,9 @@
             };
             
             notifyOther(players, "Session Démarrée", `${myPlayerName} a lancé le chrono !`, "16, 185, 129", "🚀");
-            set(gameRef, cleanObj({ ...state, players }));
+            
+            // VIDE LA MESSAGERIE A CHAQUE NOUVELLE SESSION COMMENCEE !
+            set(gameRef, cleanObj({ ...state, players, messagerie: [] }));
         };
 
         const applyPvChange = (newPv, extraPatch = {}, notifParams = null) => {
@@ -1151,7 +1233,7 @@
             };
             
             notifyOther(players, "Réanimation", `${viewedPlayerName} a été réanimé !`, "16, 185, 129", "⚡");
-            set(gameRef, cleanObj({ ...state, players }));
+            set(gameRef, cleanObj({ ...state, players, messagerie: [] })); // Vide aussi les messages au redémarrage
         };
 
         document.getElementById('btnStart').onclick = launch;
@@ -1163,7 +1245,7 @@
             players[viewedPlayerName].piecesBase = localPieces; 
             
             notifyOther(players, "Session Stoppée", `${myPlayerName} a arrêté le chrono.`, "239, 68, 68", "🛑");
-            set(gameRef, cleanObj({ ...state, players, tachesAccomplies: (state.tachesAccomplies || []).filter(t => t.author !== viewedPlayerName) }));
+            set(gameRef, cleanObj({ ...state, players, tachesAccomplies: [] })); // Vide TOUT l'historique des tâches de session
         };
         
         document.getElementById('btnInventaire').onclick = () => document.getElementById('modalInventaire').style.display='flex';
@@ -1381,7 +1463,10 @@
         };
 
         function checkCompensations() {
-            if (!myPlayerName || document.getElementById('modalGuiltyExpired').style.display === 'flex' || document.getElementById('modalVictimExpired').style.display === 'flex') return;
+            if (!myPlayerName) return;
+            if (document.getElementById('modalGuiltyExpired').style.display === 'flex') return;
+            if (document.getElementById('modalVictimExpired').style.display === 'flex') return;
+
             let comps = state.pendingCompensations || [];
             
             let myGuilty = comps.find(c => (c.guiltyDevice === myDeviceId || c.guiltyPseudo === myPlayerName) && !c.guiltySeen);
