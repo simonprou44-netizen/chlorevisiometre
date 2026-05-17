@@ -661,7 +661,7 @@
             });
         }
 
-        // --- ECRASER SESSION (Transfert et non Destruction) ---
+        // --- ECRASER SESSION ---
         window.overwriteSlot = function(oldName, newName) {
             let players = Object.assign({}, state.players || {});
             delete players[oldName]; 
@@ -744,7 +744,7 @@
 
         window.deleteNotif = function(e, id) {
             if(e) e.stopPropagation();
-            let players = Object.assign({}, state.players || {});
+            let players = cleanObj(state.players || {});
             if(players[myPlayerName]) {
                 players[myPlayerName].notifsHistory = (players[myPlayerName].notifsHistory || []).filter(x => x.id !== id);
                 set(gameRef, cleanObj({ ...state, players }));
@@ -753,9 +753,11 @@
 
         window.handleGroupClick = function(e, title, groupKey) {
             if(e) e.stopPropagation();
-            let players = Object.assign({}, state.players || {});
+            let players = cleanObj(state.players || {});
             if(window.expandedNotifs.has(groupKey)) {
-                if(players[myPlayerName]) players[myPlayerName].notifsHistory = (players[myPlayerName].notifsHistory || []).filter(x => x.title !== title);
+                if(players[myPlayerName] && players[myPlayerName].notifsHistory) {
+                    players[myPlayerName].notifsHistory = players[myPlayerName].notifsHistory.filter(x => x.title !== title);
+                }
                 window.expandedNotifs.delete(groupKey);
                 set(gameRef, cleanObj({ ...state, players }));
             } else {
@@ -765,19 +767,19 @@
         };
 
         document.getElementById('btnClearAllNotifs').onclick = () => {
-            let players = Object.assign({}, state.players || {});
+            let players = cleanObj(state.players || {});
             if(players[myPlayerName]) { players[myPlayerName].notifsHistory = []; set(gameRef, cleanObj({ ...state, players })); }
             document.getElementById('modalNotifs').style.display = 'none'; 
         };
 
         window.clearMsgNotifs = function() {
-            let players = Object.assign({}, state.players || {});
+            let players = cleanObj(state.players || {});
             if(players[myPlayerName] && players[myPlayerName].notifsHistory) {
                 let initL = players[myPlayerName].notifsHistory.length;
                 players[myPlayerName].notifsHistory = players[myPlayerName].notifsHistory.filter(n => n.type !== 'message');
                 if (players[myPlayerName].notifsHistory.length !== initL) set(gameRef, cleanObj({ ...state, players }));
             }
-            window.lastRenderedMsgCount = -1; // Force scroll to bottom on open
+            window.lastRenderedMsgCount = -1; 
         };
 
         function renderNotifs(rawHistory) {
@@ -805,13 +807,13 @@
                 if (isStacked) {
                     subHtml = `<div class="notif-sublist">`;
                     group.subItems.forEach(sub => {
-                        let itemClick = (sub.type === 'message' && sub.sender !== myPlayerName) ? `onclick="window.replyToMessage(event, '${sub.sender}'); window.deleteNotif(event, ${sub.id});"` : `onclick="window.deleteNotif(event, ${sub.id})"`;
+                        let itemClick = (sub.type === 'message') ? `onclick="window.replyToMessage(event, '${sub.sender}');"` : `onclick="window.deleteNotif(event, ${sub.id})"`;
                         subHtml += `<div class="notif-sub-item" ${itemClick}><span style="color:#cbd5e1; font-size:0.85em; flex:1;">${sub.text}</span><span style="display:flex; align-items:center;"><span style="color:#64748b; font-size:0.8em;">${sub.timeStr} <span style="color:#ef4444; opacity:0.8; margin-left:5px;">❌</span></span></span></div>`;
                     });
                     subHtml += `</div>`;
                 }
 
-                let mainClick = isStacked ? `onclick="window.handleGroupClick(event, '${group.title}', '${groupKey}')"` : ((group.type === 'message' && group.sender !== myPlayerName) ? `onclick="window.replyToMessage(event, '${group.sender}'); window.deleteNotif(event, ${group.id});"` : `onclick="window.deleteNotif(event, ${group.id})"`);
+                let mainClick = isStacked ? `onclick="window.handleGroupClick(event, '${group.title}', '${groupKey}')"` : ((group.type === 'message') ? `onclick="window.replyToMessage(event, '${group.sender}');"` : `onclick="window.deleteNotif(event, ${group.id})"`);
                 let expandIcon = isStacked ? (window.expandedNotifs.has(groupKey) ? `<span style="color:#ef4444; opacity:0.8;">❌</span>` : `▼`) : `<span style="color:#ef4444; opacity:0.8;">❌</span>`;
                 
                 div.innerHTML = `<div class="notif-main" ${mainClick}><div class="notif-item-icon">${group.icon}</div><div class="notif-item-content"><div class="notif-item-title"><span><span style="color:rgb(${group.colorCode})">${group.title}</span>${badgeHtml}</span><span style="display:flex; align-items:center;"><span class="notif-item-time">${group.timeStr} <span style="font-size:0.8em; margin-left:5px;">${expandIcon}</span></span></span></div><div class="notif-item-text">${group.text}</div></div></div>${subHtml}`;
@@ -822,7 +824,7 @@
         window.showNotification = function(title, text, colorCode, icon, type='normal', sender='') {
             const container = document.getElementById('toastContainer');
             let existingToast = Array.from(container.children).find(c => c.getAttribute('data-title') === title);
-            let extraBtn = (type === 'message' && sender && sender !== myPlayerName) ? `<button onclick="window.replyToMessage(event, '${sender}'); this.parentElement.parentElement.remove();" style="background:#3b82f6!important; padding:6px 10px; font-size:0.8em; font-weight:bold; margin-top:8px; border:none; border-radius:8px; color:white; cursor:pointer; flex:none;">💬 Répondre</button>` : '';
+            let extraBtn = (type === 'message') ? `<button onclick="window.replyToMessage(event, '${sender}'); this.parentElement.parentElement.remove();" style="background:#3b82f6!important; padding:6px 10px; font-size:0.8em; font-weight:bold; margin-top:8px; border:none; border-radius:8px; color:white; cursor:pointer; flex:none;">💬 Répondre</button>` : '';
 
             if (existingToast) {
                 let countEl = existingToast.querySelector('.toast-count');
@@ -1183,7 +1185,7 @@
             players[viewedPlayerName] = {
                 ...vState,
                 pvActuels: 5, 
-                piecesBase: vState.piecesBase || 0,
+                piecesBase: vState.piecesBase || 0, 
                 repasRestants: vState.repasRestants || 2, 
                 recompense5Obtenue: false, recompense7Obtenue: false, recompense10Obtenue: false,
                 sessionPetites: 0, sessionGrandes: 0, sessionSouhaits: 0,
@@ -1192,7 +1194,6 @@
             
             notifyOther(players, "Session Démarrée", `${myPlayerName} a lancé le chrono !`, "16, 185, 129", "🚀");
             
-            // VIDE LA MESSAGERIE A CHAQUE NOUVELLE SESSION COMMENCEE !
             set(gameRef, cleanObj({ ...state, players, messagerie: [] }));
         };
 
@@ -1233,7 +1234,7 @@
             };
             
             notifyOther(players, "Réanimation", `${viewedPlayerName} a été réanimé !`, "16, 185, 129", "⚡");
-            set(gameRef, cleanObj({ ...state, players, messagerie: [] })); // Vide aussi les messages au redémarrage
+            set(gameRef, cleanObj({ ...state, players, messagerie: [] })); 
         };
 
         document.getElementById('btnStart').onclick = launch;
@@ -1245,7 +1246,7 @@
             players[viewedPlayerName].piecesBase = localPieces; 
             
             notifyOther(players, "Session Stoppée", `${myPlayerName} a arrêté le chrono.`, "239, 68, 68", "🛑");
-            set(gameRef, cleanObj({ ...state, players, tachesAccomplies: [] })); // Vide TOUT l'historique des tâches de session
+            set(gameRef, cleanObj({ ...state, players, tachesAccomplies: [] })); 
         };
         
         document.getElementById('btnInventaire').onclick = () => document.getElementById('modalInventaire').style.display='flex';
